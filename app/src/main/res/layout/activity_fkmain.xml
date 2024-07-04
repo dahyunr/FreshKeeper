@@ -1,0 +1,220 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".FKMainActivity">
+
+    <!-- 헤더 -->
+    <LinearLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:background="#FFFFFF">
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Fresh Keeper"
+            android:textColor="#4CAF50"
+            android:textSize="24sp"
+            android:gravity="center"/>
+
+        <Spinner
+            android:id="@+id/sort_spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:entries="@array/sort_options"
+            android:background="#757575"
+            android:padding="8dp"/>
+    </LinearLayout>
+
+    <!-- 검색 바 -->
+    <EditText
+        android:id="@+id/search_bar"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_below="@id/header"
+        android:layout_margin="16dp"
+        android:hint="식품을 검색하세요"
+        android:background="@drawable/search_bar_background"
+        android:padding="8dp"/>
+
+    <!-- 탭 -->
+    <LinearLayout
+        android:id="@+id/tabs"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/search_bar"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/tab_all"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:text="전체"
+            android:background="#FFFFFF"
+            android:textColor="#4CAF50"/>
+
+        <Button
+            android:id="@+id/tab_frozen"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:text="냉동"
+            android:background="#4CAF50"
+            android:textColor="#FFFFFF"/>
+
+        <Button
+            android:id="@+id/tab_refrigerated"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:text="냉장"
+            android:background="#FFFFFF"
+            android:textColor="#4CAF50"/>
+
+        <Button
+            android:id="@+id/tab_room_temp"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:text="상온"
+            android:background="#FFFFFF"
+            android:textColor="#4CAF50"/>
+    </LinearLayout>
+
+    <!-- 아이템 리스트 -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_below="@id/tabs"
+        android:layout_above="@id/footer">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- 반복되는 아이템 블록 -->
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:background="@drawable/item_background">
+
+                <ImageView
+                    android:id="@+id/item_image"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:layout_alignParentLeft="true"
+                    android:layout_centerVertical="true"
+                    android:src="@drawable/bibigo"/>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@id/item_image"
+                    android:orientation="vertical"
+                    android:paddingLeft="10dp"
+                    android:layout_centerVertical="true">
+
+                    <TextView
+                        android:id="@+id/item_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="비비고 만두"
+                        android:textSize="18sp"
+                        android:textColor="#000000"/>
+
+                    <TextView
+                        android:id="@+id/item_reg_date"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="등록일: 2024.03.21"
+                        android:textSize="14sp"
+                        android:textColor="#757575"/>
+
+                    <TextView
+                        android:id="@+id/item_exp_date"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="유통기한: 2024.04.21"
+                        android:textSize="14sp"
+                        android:textColor="#757575"/>
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/item_countdown"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:text="D-10"
+                    android:textSize="24sp"
+                    android:textColor="#FF0000"/>
+            </RelativeLayout>
+            <!-- 아이템 블록 반복 -->
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- 푸터 -->
+    <LinearLayout
+        android:id="@+id/footer"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_alignParentBottom="true"
+        android:background="#8BC34A"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/icon_ref"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:src="@drawable/fk_ref"
+            android:tint="#FFFFFF"/>
+
+        <ImageView
+            android:id="@+id/icon_calendar"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:src="@drawable/fk_calendar"
+            android:tint="#FFFFFF"/>
+
+        <ImageView
+            android:id="@+id/icon_barcode"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:src="@drawable/fk_bar"
+            android:tint="#FFFFFF"/>
+
+        <ImageView
+            android:id="@+id/icon_mypage"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:src="@drawable/fk_mypage"
+            android:tint="#FFFFFF"/>
+    </LinearLayout>
+
+    <!-- 플로팅 액션 버튼 -->
+    <ImageButton
+        android:id="@+id/fab"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="16dp"
+        android:layout_alignParentRight="true"
+        android:backgroundTint="#4CAF50"
+        android:src="@drawable/ic_add"
+        android:tint="#FFFFFF"/>
+
+</RelativeLayout>
