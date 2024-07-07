@@ -23,16 +23,16 @@
             android:exported="true">
         </activity>
 
-        <!-- RegisterActivity를 추가합니다. -->
         <activity
             android:name=".RegisterActivity"
             android:exported="true">
         </activity>
 
-        <!-- 기타 액티비티와 서비스 등을 정의합니다. -->
+        <activity
+            android:name=".FkmainActivity"
+            android:exported="true">
+        </activity>
 
     </application>
 
 </manifest>
-
-    <!-- 기타 액티비티와 서비스 등을 정의합니다. -->

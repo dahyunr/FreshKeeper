@@ -5,6 +5,9 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -12,92 +15,111 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class FkmainActivity extends AppCompatActivity {
 
-    private EditText editTextEmail;
-    private EditText editTextPassword;
-    private Button buttonLogin;
-    private TextView buttonGuestLogin;
-    private TextView buttonForgotPassword;
-    private TextView buttonRegister;
-    private Button buttonGoogleLogin;
-    private Button buttonKakaoLogin;
-    private Button buttonNaverLogin;
+    private EditText searchBar;
+    private Button tabAll, tabFrozen, tabRefrigerated, tabRoomTemp;
+    private ScrollView itemList;
+    private ImageView iconRef, iconCalendar, iconBarcode, iconMypage;
+    private ImageButton fab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+        setContentView(R.layout.activity_fkmain);
 
-        editTextEmail = findViewById(R.id.editTextEmail);
-        editTextPassword = findViewById(R.id.editTextPassword);
-        buttonLogin = findViewById(R.id.buttonLogin);
-        buttonGuestLogin = findViewById(R.id.buttonGuestLogin);
-        buttonForgotPassword = findViewById(R.id.buttonForgotPassword);
-        buttonRegister = findViewById(R.id.buttonRegister);
-        buttonGoogleLogin = findViewById(R.id.buttonGoogleLogin);
-        buttonKakaoLogin = findViewById(R.id.buttonKakaoLogin);
-        buttonNaverLogin = findViewById(R.id.buttonNaverLogin);
+        searchBar = findViewById(R.id.search_bar);
+        tabAll = findViewById(R.id.tab_all);
+        tabFrozen = findViewById(R.id.tab_frozen);
+        tabRefrigerated = findViewById(R.id.tab_refrigerated);
+        tabRoomTemp = findViewById(R.id.tab_room_temp);
+        itemList = findViewById(R.id.itemList);
+        iconRef = findViewById(R.id.icon_ref);
+        iconCalendar = findViewById(R.id.icon_calendar);
+        iconBarcode = findViewById(R.id.icon_barcode);
+        iconMypage = findViewById(R.id.icon_mypage);
+        fab = findViewById(R.id.fab);
 
-        buttonLogin.setOnClickListener(new View.OnClickListener() {
+        // 검색 바 클릭 이벤트
+        searchBar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // 로그인 버튼 클릭 시 동작하는 코드
-                String email = editTextEmail.getText().toString();
-                String password = editTextPassword.getText().toString();
-
-                if (email.isEmpty() || password.isEmpty()) {
-                    Toast.makeText(FkmainActivity.this, "이메일과 비밀번호를 입력하세요", Toast.LENGTH_SHORT).show();
-                } else {
-                    // 로그인 처리 로직
-                }
+                String query = searchBar.getText().toString();
+                Toast.makeText(FkmainActivity.this, "검색: " + query, Toast.LENGTH_SHORT).show();
+                // 검색 로직을 여기에 추가
             }
         });
 
-        buttonGuestLogin.setOnClickListener(new View.OnClickListener() {
+        // 탭 클릭 이벤트
+        tabAll.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // 비회원 로그인 버튼 클릭 시 동작하는 코드
-                Toast.makeText(FkmainActivity.this, "비회원으로 로그인합니다", Toast.LENGTH_SHORT).show();
+                Toast.makeText(FkmainActivity.this, "전체 탭 선택됨", Toast.LENGTH_SHORT).show();
+                // 전체 탭 로직을 여기에 추가
             }
         });
 
-        buttonForgotPassword.setOnClickListener(new View.OnClickListener() {
+        tabFrozen.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // 비밀번호 찾기 버튼 클릭 시 동작하는 코드
-                Toast.makeText(FkmainActivity.this, "비밀번호 찾기 기능을 구현하세요", Toast.LENGTH_SHORT).show();
+                Toast.makeText(FkmainActivity.this, "냉동 탭 선택됨", Toast.LENGTH_SHORT).show();
+                // 냉동 탭 로직을 여기에 추가
             }
         });
 
-        buttonRegister.setOnClickListener(new View.OnClickListener() {
+        tabRefrigerated.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // 회원가입 버튼 클릭 시 동작하는 코드
-                Intent intent = new Intent(FkmainActivity.this, RegisterActivity.class);
-                startActivity(intent);
+                Toast.makeText(FkmainActivity.this, "냉장 탭 선택됨", Toast.LENGTH_SHORT).show();
+                // 냉장 탭 로직을 여기에 추가
             }
         });
 
-        buttonGoogleLogin.setOnClickListener(new View.OnClickListener() {
+        tabRoomTemp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Google 로그인 버튼 클릭 시 동작하는 코드
-                Toast.makeText(FkmainActivity.this, "Google 로그인 기능을 구현하세요", Toast.LENGTH_SHORT).show();
+                Toast.makeText(FkmainActivity.this, "상온 탭 선택됨", Toast.LENGTH_SHORT).show();
+                // 상온 탭 로직을 여기에 추가
             }
         });
 
-        buttonKakaoLogin.setOnClickListener(new View.OnClickListener() {
+        // 아이콘 클릭 이벤트
+        iconRef.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Kakao 로그인 버튼 클릭 시 동작하는 코드
-                Toast.makeText(FkmainActivity.this, "Kakao 로그인 기능을 구현하세요", Toast.LENGTH_SHORT).show();
+                Toast.makeText(FkmainActivity.this, "냉장고 아이콘 클릭됨", Toast.LENGTH_SHORT).show();
+                // 냉장고 아이콘 클릭 로직을 여기에 추가
             }
         });
 
-        buttonNaverLogin.setOnClickListener(new View.OnClickListener() {
+        iconCalendar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Naver 로그인 버튼 클릭 시 동작하는 코드
-                Toast.makeText(FkmainActivity.this, "Naver 로그인 기능을 구현하세요", Toast.LENGTH_SHORT).show();
+                Toast.makeText(FkmainActivity.this, "캘린더 아이콘 클릭됨", Toast.LENGTH_SHORT).show();
+                // 캘린더 아이콘 클릭 로직을 여기에 추가
+            }
+        });
+
+        iconBarcode.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(FkmainActivity.this, "바코드 아이콘 클릭됨", Toast.LENGTH_SHORT).show();
+                // 바코드 아이콘 클릭 로직을 여기에 추가
+            }
+        });
+
+        iconMypage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(FkmainActivity.this, "마이페이지 아이콘 클릭됨", Toast.LENGTH_SHORT).show();
+                // 마이페이지 아이콘 클릭 로직을 여기에 추가
+            }
+        });
+
+        // 플로팅 액션 버튼 클릭 이벤트
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(FkmainActivity.this, "플로팅 액션 버튼 클릭됨", Toast.LENGTH_SHORT).show();
+                // 플로팅 액션 버튼 클릭 로직을 여기에 추가
             }
         });
     }

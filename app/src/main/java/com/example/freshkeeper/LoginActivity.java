@@ -47,6 +47,14 @@ public class LoginActivity extends AppCompatActivity {
                     Toast.makeText(LoginActivity.this, "이메일과 비밀번호를 입력하세요", Toast.LENGTH_SHORT).show();
                 } else {
                     // 로그인 처리 로직
+                    boolean loginSuccess = login(email, password); // 여기에 실제 로그인 처리가 구현되어야 함
+                    if (loginSuccess) {
+                        Intent intent = new Intent(LoginActivity.this, FkmainActivity.class);
+                        startActivity(intent);
+                        finish(); // 로그인 액티비티 종료
+                    } else {
+                        Toast.makeText(LoginActivity.this, "로그인 실패. 다시 시도하세요.", Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
         });
@@ -99,5 +107,13 @@ public class LoginActivity extends AppCompatActivity {
                 Toast.makeText(LoginActivity.this, "Naver 로그인 기능을 구현하세요", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    // 실제 로그인 처리 로직
+    private boolean login(String email, String password) {
+        // 여기에 실제 로그인 처리 로직을 구현해야 함
+        // 예를 들어, 서버와 통신하여 인증을 수행하거나 로컬 데이터베이스에서 확인하는 등의 로직이 필요함
+        // 현재는 예시로 항상 로그인 성공으로 처리
+        return true;
     }
 }
