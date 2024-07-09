@@ -102,8 +102,6 @@
                 android:padding="10dp"
                 android:textSize="14sp"
                 android:layout_marginBottom="5dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
                 android:backgroundTint="@null"/>
 
             <!-- Kakao 로그인 버튼 -->
@@ -117,8 +115,6 @@
                 android:padding="10dp"
                 android:textSize="14sp"
                 android:layout_marginBottom="5dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
                 android:backgroundTint="@null"/>
 
             <!-- Naver 로그인 버튼 -->
@@ -131,8 +127,6 @@
                 android:background="#F5F5F5"
                 android:padding="10dp"
                 android:textSize="14sp"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
                 android:backgroundTint="@null"/>
         </LinearLayout>
 
@@ -145,8 +139,6 @@
             android:background="#65B120"
             android:padding="10dp"
             android:text="로그인"
-            android:textSize="16sp"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"/>
+            android:textSize="16sp"/>
     </LinearLayout>
 </RelativeLayout>
