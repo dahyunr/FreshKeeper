@@ -1,6 +1,7 @@
 package com.example.freshkeeper;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
@@ -8,6 +9,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.Random;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -47,13 +50,22 @@ public class LoginActivity extends AppCompatActivity {
                     Toast.makeText(LoginActivity.this, "이메일과 비밀번호를 입력하세요", Toast.LENGTH_SHORT).show();
                 } else {
                     // 로그인 처리 로직
-                    boolean loginSuccess = login(email, password); // 여기에 실제 로그인 처리가 구현되어야 함
-                    if (loginSuccess) {
-                        Intent intent = new Intent(LoginActivity.this, FkmainActivity.class);
-                        startActivity(intent);
-                        finish(); // 로그인 액티비티 종료
-                    } else {
-                        Toast.makeText(LoginActivity.this, "로그인 실패. 다시 시도하세요.", Toast.LENGTH_SHORT).show();
+                    int loginResult = login(email, password);
+                    switch (loginResult) {
+                        case 1:
+                            Intent intent = new Intent(LoginActivity.this, FkmainActivity.class);
+                            startActivity(intent);
+                            finish(); // 로그인 액티비티 종료
+                            break;
+                        case -1:
+                            Toast.makeText(LoginActivity.this, "이메일을 다시 확인하세요.", Toast.LENGTH_SHORT).show();
+                            break;
+                        case -2:
+                            Toast.makeText(LoginActivity.this, "비밀번호를 다시 확인하세요.", Toast.LENGTH_SHORT).show();
+                            break;
+                        default:
+                            Toast.makeText(LoginActivity.this, "로그인 실패. 다시 시도하세요.", Toast.LENGTH_SHORT).show();
+                            break;
                     }
                 }
             }
@@ -63,7 +75,13 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // 비회원 로그인 버튼 클릭 시 동작하는 코드
-                Toast.makeText(LoginActivity.this, "비회원으로 로그인합니다", Toast.LENGTH_SHORT).show();
+                Random random = new Random();
+                int randomNumber = random.nextInt(100001); // 0부터 100000까지의 랜덤 숫자 생성
+                String guestId = "guest" + randomNumber;
+                Toast.makeText(LoginActivity.this, guestId + "으로 로그인합니다", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(LoginActivity.this, FkmainActivity.class);
+                startActivity(intent);
+                finish(); // 로그인 액티비티 종료
             }
         });
 
@@ -110,10 +128,19 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     // 실제 로그인 처리 로직
-    private boolean login(String email, String password) {
-        // 여기에 실제 로그인 처리 로직을 구현해야 함
-        // 예를 들어, 서버와 통신하여 인증을 수행하거나 로컬 데이터베이스에서 확인하는 등의 로직이 필요함
-        // 현재는 예시로 항상 로그인 성공으로 처리
-        return true;
+    private int login(String email, String password) {
+        // 저장된 사용자 데이터 가져오기
+        SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+        String registeredEmail = sharedPreferences.getString("Email", "");
+        String registeredPassword = sharedPreferences.getString("Password", "");
+
+        // 이메일과 비밀번호 확인
+        if (!email.equals(registeredEmail)) {
+            return -1; // 이메일 불일치
+        } else if (!password.equals(registeredPassword)) {
+            return -2; // 비밀번호 불일치
+        } else {
+            return 1; // 로그인 성공
+        }
     }
 }
