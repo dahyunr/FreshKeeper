@@ -1,15 +1,15 @@
 package com.example.freshkeeper;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.RecyclerView;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -40,6 +40,9 @@ public class FkmainActivity extends AppCompatActivity {
 
         // View 초기화
         searchBar = findViewById(R.id.search_bar);
+        searchBar.setIconifiedByDefault(false); // 검색창 클릭으로 검색 가능하도록 설정
+        searchBar.setQueryHint("식품을 검색하세요"); // 검색창에 힌트 추가
+
         tabAll = findViewById(R.id.tab_all);
         tabFrozen = findViewById(R.id.tab_frozen);
         tabRefrigerated = findViewById(R.id.tab_refrigerated);
