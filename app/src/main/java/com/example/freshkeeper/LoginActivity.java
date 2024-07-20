@@ -3,6 +3,7 @@ package com.example.freshkeeper;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
@@ -24,10 +25,14 @@ public class LoginActivity extends AppCompatActivity {
     private Button buttonKakaoLogin;
     private Button buttonNaverLogin;
 
+    private static final String TAG = "LoginActivity";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        Log.d(TAG, "onCreate: 시작");
 
         editTextEmail = findViewById(R.id.editTextEmail);
         editTextPassword = findViewById(R.id.editTextPassword);
@@ -49,21 +54,26 @@ public class LoginActivity extends AppCompatActivity {
                 if (email.isEmpty() || password.isEmpty()) {
                     Toast.makeText(LoginActivity.this, "이메일과 비밀번호를 입력하세요", Toast.LENGTH_SHORT).show();
                 } else {
+                    Log.d(TAG, "onClick: 로그인 시도 - 이메일: " + email);
                     // 로그인 처리 로직
                     int loginResult = login(email, password);
                     switch (loginResult) {
                         case 1:
+                            Log.d(TAG, "onClick: 로그인 성공");
                             Intent intent = new Intent(LoginActivity.this, FkmainActivity.class);
                             startActivity(intent);
                             finish(); // 로그인 액티비티 종료
                             break;
                         case -1:
+                            Log.d(TAG, "onClick: 이메일 불일치");
                             Toast.makeText(LoginActivity.this, "이메일을 다시 확인하세요.", Toast.LENGTH_SHORT).show();
                             break;
                         case -2:
+                            Log.d(TAG, "onClick: 비밀번호 불일치");
                             Toast.makeText(LoginActivity.this, "비밀번호를 다시 확인하세요.", Toast.LENGTH_SHORT).show();
                             break;
                         default:
+                            Log.d(TAG, "onClick: 로그인 실패");
                             Toast.makeText(LoginActivity.this, "로그인 실패. 다시 시도하세요.", Toast.LENGTH_SHORT).show();
                             break;
                     }
@@ -79,6 +89,7 @@ public class LoginActivity extends AppCompatActivity {
                 int randomNumber = random.nextInt(100001); // 0부터 100000까지의 랜덤 숫자 생성
                 String guestId = "guest" + randomNumber;
                 Toast.makeText(LoginActivity.this, guestId + "으로 로그인합니다", Toast.LENGTH_SHORT).show();
+                Log.d(TAG, "onClick: 비회원 로그인 - guestId: " + guestId);
                 Intent intent = new Intent(LoginActivity.this, FkmainActivity.class);
                 startActivity(intent);
                 finish(); // 로그인 액티비티 종료
@@ -90,6 +101,7 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View v) {
                 // 비밀번호 찾기 버튼 클릭 시 동작하는 코드
                 Toast.makeText(LoginActivity.this, "비밀번호 찾기 기능을 구현하세요", Toast.LENGTH_SHORT).show();
+                Log.d(TAG, "onClick: 비밀번호 찾기");
             }
         });
 
@@ -99,6 +111,7 @@ public class LoginActivity extends AppCompatActivity {
                 // 회원가입 버튼 클릭 시 동작하는 코드
                 Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
                 startActivity(intent);
+                Log.d(TAG, "onClick: 회원가입 이동");
             }
         });
 
@@ -107,6 +120,7 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View v) {
                 // Google 로그인 버튼 클릭 시 동작하는 코드
                 Toast.makeText(LoginActivity.this, "Google 로그인 기능을 구현하세요", Toast.LENGTH_SHORT).show();
+                Log.d(TAG, "onClick: Google 로그인");
             }
         });
 
@@ -115,6 +129,7 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View v) {
                 // Kakao 로그인 버튼 클릭 시 동작하는 코드
                 Toast.makeText(LoginActivity.this, "Kakao 로그인 기능을 구현하세요", Toast.LENGTH_SHORT).show();
+                Log.d(TAG, "onClick: Kakao 로그인");
             }
         });
 
@@ -123,6 +138,7 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View v) {
                 // Naver 로그인 버튼 클릭 시 동작하는 코드
                 Toast.makeText(LoginActivity.this, "Naver 로그인 기능을 구현하세요", Toast.LENGTH_SHORT).show();
+                Log.d(TAG, "onClick: Naver 로그인");
             }
         });
     }

@@ -45,9 +45,16 @@ public class FoodItemAdapter extends RecyclerView.Adapter<FoodItemAdapter.FoodIt
 
         holder.imageView.setImageResource(currentItem.getImageResource());
         holder.nameTextView.setText(currentItem.getName());
-        holder.regDateTextView.setText(currentItem.getRegDate());
-        holder.expDateTextView.setText(currentItem.getExpDate());
+        holder.regDateTextView.setText("등록일: " + currentItem.getRegDate());
+        holder.expDateTextView.setText("유통기한: " + currentItem.getExpDate());
         holder.countdownTextView.setText(currentItem.getCountdown());
+
+        // 첫 번째 아이템의 D-Day 텍스트는 빨간색, 나머지는 검정색으로 설정
+        if (position == 0) {
+            holder.countdownTextView.setTextColor(holder.itemView.getContext().getResources().getColor(android.R.color.holo_red_dark));
+        } else {
+            holder.countdownTextView.setTextColor(holder.itemView.getContext().getResources().getColor(android.R.color.black));
+        }
     }
 
     @Override
