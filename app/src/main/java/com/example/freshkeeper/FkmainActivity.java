@@ -1,15 +1,17 @@
 package com.example.freshkeeper;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.RecyclerView;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -24,6 +26,7 @@ public class FkmainActivity extends AppCompatActivity {
     private TextView sortOrder;
     private LinearLayout sortOptions;
     private TextView sortName, sortRegDate, sortExpDate;
+    private ImageView plusButton;
 
     private List<FoodItem> allItems;
     private List<FoodItem> frozenItems;
@@ -53,6 +56,7 @@ public class FkmainActivity extends AppCompatActivity {
         sortName = findViewById(R.id.sort_name);
         sortRegDate = findViewById(R.id.sort_reg_date);
         sortExpDate = findViewById(R.id.sort_exp_date);
+        plusButton = findViewById(R.id.plus_button);
 
         // 아이템 리스트 생성
         allItems = new ArrayList<>();
@@ -176,6 +180,15 @@ public class FkmainActivity extends AppCompatActivity {
         // 기본 선택 탭 설정
         updateTabSelection(tabAll);
         adapter.updateList(allItems);
+
+        // 플러스 버튼 클릭 리스너 설정
+        plusButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(FkmainActivity.this, AddItemActivity.class);
+                startActivity(intent);
+            }
+        });
 
         // 디버그 로그 추가
         Log.d("FkmainActivity", "onCreate 종료");

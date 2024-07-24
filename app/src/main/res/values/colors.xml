@@ -9,4 +9,6 @@
     <color name="selected_tab_color">#4CAF50</color>
     <color name="unselected_tab_color">#FFFFFF</color>
     <color name="tab_text_color">#000000</color>
+    <color name="save_button_color">#4CAF50</color>
+    <color name="cancel_button_color">#EAEAEA</color>
 </resources>

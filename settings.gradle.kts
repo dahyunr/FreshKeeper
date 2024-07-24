@@ -1,3 +1,4 @@
+// Root build.gradle.kts file
 pluginManagement {
     repositories {
         google()

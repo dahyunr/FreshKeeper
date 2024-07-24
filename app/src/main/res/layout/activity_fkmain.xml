@@ -240,6 +240,16 @@
                 android:textSize="16sp"
                 android:padding="8dp" />
         </LinearLayout>
-
+        <ImageView
+            android:id="@+id/plus_button"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="16dp"
+            android:src="@drawable/fk_plus"
+            android:contentDescription="추가 버튼"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"/>
     </RelativeLayout>
 </FrameLayout>

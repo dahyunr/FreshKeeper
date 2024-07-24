@@ -1,0 +1,14 @@
+#!/usr/bin/env sh
+
+# Gradle wrapper script
+
+set -u
+
+# Use the value of $JAVA_HOME if it's set, otherwise use the java command in the PATH.
+if [ -n "${JAVA_HOME+x}" ]; then
+  java="$JAVA_HOME/bin/java"
+else
+  java=java
+fi
+
+exec "$java" -Dorg.gradle.appname=gradlew -classpath "${CLASSPATH}" org.gradle.wrapper.GradleWrapperMain "$@"
