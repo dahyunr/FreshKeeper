@@ -5,6 +5,8 @@ import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -25,6 +27,13 @@ public class AddItemActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Dialog 스타일 적용
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+        setFinishOnTouchOutside(true);
+
         setContentView(R.layout.activity_add_item);
 
         itemName = findViewById(R.id.item_name);
@@ -42,11 +51,14 @@ public class AddItemActivity extends AppCompatActivity {
         itemImage = findViewById(R.id.item_image);
         calendar = Calendar.getInstance();
 
+        // 기본값을 0으로 설정
+        itemQuantity.setText("0");
+
         itemQuantityMinus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 int quantity = Integer.parseInt(itemQuantity.getText().toString());
-                if (quantity > 1) {
+                if (quantity > 0) {
                     itemQuantity.setText(String.valueOf(quantity - 1));
                 }
             }

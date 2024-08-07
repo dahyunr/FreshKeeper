@@ -3,16 +3,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- 불투명 배경 -->
+    <!-- 반투명 배경 -->
     <View
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#80000000" />
+        android:background="#80000000" /> <!-- 반투명 블랙 배경 -->
 
     <!-- 중앙에 위치할 내용물 -->
     <LinearLayout
         android:layout_width="350dp"
-        android:layout_height="600dp"
+        android:layout_height="550dp"
         android:layout_gravity="center"
         android:orientation="vertical"
         android:background="@drawable/fk_placeholder"
@@ -83,8 +83,9 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:hint="1"
+                android:hint="0"
                 android:background="@android:color/transparent"
+                android:gravity="center"
                 android:padding="8dp"
                 android:textColor="#000000"
                 android:inputType="number" />
@@ -163,7 +164,7 @@
         <!-- 메모 -->
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="100dp"
             android:orientation="horizontal"
             android:padding="8dp"
             android:background="@drawable/fk_memo">

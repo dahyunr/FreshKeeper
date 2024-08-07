@@ -6,7 +6,7 @@
     android:background="#FFFFFF"
     tools:context=".MainActivity">
 
-    <!-- Title Section -->
+    <!-- 상단 로고 -->
     <TextView
         android:id="@+id/title"
         android:layout_width="wrap_content"
@@ -20,15 +20,14 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true" />
 
-    <!-- Profile Section -->
+    <!-- 프로필 -->
 
-    <!-- Service Settings Section -->
+    <!-- 프로필 설정 -->
     <LinearLayout
         android:id="@+id/profile_section"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/title"
-        android:layout_marginTop="12dp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:padding="16dp">
@@ -110,6 +109,7 @@
             android:textStyle="bold" />
 
         <TextView
+            android:id="@+id/notification_settings"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="알림 설정"
@@ -117,7 +117,7 @@
             android:textSize="16sp"
             android:layout_marginBottom="8dp" />
 
-        <!-- Divider -->
+        <!-- 구분선 -->
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
@@ -133,6 +133,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:layout_marginTop="4dp"
                 android:text="앱 버전"
                 android:textColor="#000000"
                 android:textSize="16sp"
@@ -154,15 +155,14 @@
             android:layout_below="@id/profile_section" />
     </LinearLayout>
 
-    <!-- Customer Service Section -->
+    <!-- 고객센터 섹션 -->
 
-    <!-- Bottom Navigation Bar -->
+    <!-- 하단 -->
     <LinearLayout
         android:id="@+id/customer_service_section"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/service_settings_section"
-        android:layout_marginTop="10dp"
         android:orientation="vertical"
         android:padding="16dp">
 
@@ -199,58 +199,70 @@
                 android:src="@drawable/fk_n" />
         </LinearLayout>
 
-        <!-- Divider -->
+        <!-- 구분선 -->
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="#60C9C9C9" />
+            android:background="#60C9C9C9"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
             android:text="문의하기"
             android:textColor="#000000"
             android:textSize="16sp" />
 
-        <!-- Divider -->
+        <!-- 구분선 -->
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="#60C9C9C9" />
+            android:background="#60C9C9C9"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
             android:text="자주 묻어보는 질문"
             android:textColor="#000000"
             android:textSize="16sp" />
 
-        <!-- Divider -->
+        <!-- 구분선 -->
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="#60C9C9C9" />
+            android:background="#60C9C9C9"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
             android:text="개인 정보 처리 방침"
             android:textColor="#000000"
             android:textSize="16sp" />
 
-        <!-- Divider -->
+        <!-- 구분선 -->
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="#60C9C9C9" />
+            android:background="#60C9C9C9"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
             android:text="이용약관"
             android:textColor="#000000"
             android:textSize="16sp" />
@@ -259,17 +271,21 @@
             android:layout_width="match_parent"
             android:layout_height="2dp"
             android:layout_below="@id/profile_section"
-            android:background="#D9D9D9" />
+            android:background="#D9D9D9"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
             android:text="로그아웃"
             android:textColor="#000000"
             android:textSize="16sp" />
     </LinearLayout>
 
+    <!-- 하단바 -->
     <LinearLayout
         android:id="@+id/footer"
         android:layout_width="match_parent"
@@ -290,14 +306,14 @@
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:src="@drawable/fk_ref"
-                app:tint="#000000"
+                app:tint="#ffffff"
                 android:contentDescription="냉장고 아이콘" />
             <TextView
                 android:id="@+id/text_ref"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="냉장고"
-                android:textColor="#233746"
+                android:textColor="#ffffff"
                 android:textSize="12sp" />
         </LinearLayout>
 
@@ -359,19 +375,19 @@
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:src="@drawable/fk_mypage"
-                app:tint="#FFFFFF"
+                app:tint="#233746"
                 android:contentDescription="마이페이지 아이콘" />
             <TextView
                 android:id="@+id/text_mypage"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="마이페이지"
-                android:textColor="#ffffff"
+                android:textColor="#233746 "
                 android:textSize="12sp" />
         </LinearLayout>
     </LinearLayout>
 
-    <!-- Withdrawal Button -->
+    <!-- 회원탈퇴 버튼 -->
     <TextView
         android:id="@+id/withdrawal"
         android:layout_width="wrap_content"
@@ -380,7 +396,8 @@
         android:textColor="#000000"
         android:textSize="16sp"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="20dp"
+        android:layout_marginBottom="15dp"
         android:layout_alignParentEnd="true"
         android:layout_above="@id/footer" />
+
 </RelativeLayout>

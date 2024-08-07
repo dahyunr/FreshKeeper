@@ -40,16 +40,6 @@
                 android:gravity="right" />
         </LinearLayout>
 
-        <androidx.appcompat.widget.SearchView
-            android:id="@+id/search_bar"
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:layout_below="@id/header"
-            android:layout_margin="16dp"
-            android:iconifiedByDefault="false"
-            android:queryHint="식품을 검색하세요"
-            android:background="@drawable/fk_search"
-            android:padding="8dp" />
 
         <LinearLayout
             android:id="@+id/tabs"
@@ -245,10 +235,10 @@
             android:layout_width="56dp"
             android:layout_height="56dp"
             android:layout_gravity="bottom|end"
-            android:layout_margin="16dp"
+            android:layout_marginBottom="100dp"
+            android:layout_marginRight="20dp"
             android:src="@drawable/fk_plus"
             android:contentDescription="추가 버튼"
-            android:background="?attr/selectableItemBackgroundBorderless"
             android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="true"/>
     </RelativeLayout>
