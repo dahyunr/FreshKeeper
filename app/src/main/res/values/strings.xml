@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">FreshKeeper</string>
+    <string name="search_hint">식품을 검색하세요</string>
+    <string name="tab_all">전체</string>
+    <string name="tab_frozen">냉동</string>
+    <string name="tab_refrigerated">냉장</string>
+    <string name="tab_room_temp">상온</string>
+    <string name="item_image_desc">아이템 이미지</string>
+    <string name="item_name">비비고 만두</string>
+    <string name="item_reg_date">등록일: 2024.03.21</string>
+    <string name="item_exp_date">유통기한: 2024.04.21</string>
+    <string name="item_countdown">D-10</string>
+    <string name="icon_ref_desc">냉장고 아이콘</string>
+    <string name="icon_calendar_desc">캘린더 아이콘</string>
+    <string name="icon_barcode_desc">바코드 아이콘</string>
+    <string name="icon_mypage_desc">마이페이지 아이콘</string>
+    <string name="fab_desc">플로팅 액션 버튼</string>
+
+    <string-array name="category_array">
+        <item>카테고리 선택</item>
+        <item>건의사항</item>
+        <item>이용문의</item>
+        <item>기타사항</item>
+    </string-array>
+</resources>

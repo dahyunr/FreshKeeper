@@ -1,0 +1,144 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="20dp"
+    android:background="#FFFFFF">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:layout_centerInParent="true">
+
+        <!-- "로그인" 텍스트 -->
+        <TextView
+            android:id="@+id/textViewLogin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="20dp"
+            android:text="로그인"
+            android:textSize="30sp"
+            android:textStyle="bold" />
+
+        <!-- 이메일 입력칸 -->
+        <EditText
+            android:id="@+id/editTextEmail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:hint="이메일"
+            android:background="#EFEFEF"
+            android:padding="10dp"
+            android:textSize="16sp"
+            android:inputType="textEmailAddress" />
+
+        <!-- 비밀번호 입력칸 -->
+        <EditText
+            android:id="@+id/editTextPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:hint="비밀번호"
+            android:background="#EFEFEF"
+            android:padding="10dp"
+            android:textSize="16sp"
+            android:inputType="textPassword" />
+
+        <!-- 비회원 로그인, 비밀번호 찾기, 회원가입 버튼을 포함한 수평 레이아웃 -->
+        <LinearLayout
+            android:id="@+id/buttonsLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="10dp"
+            android:gravity="center_horizontal">
+
+            <!-- 비회원 로그인 버튼 -->
+            <TextView
+                android:id="@+id/buttonGuestLogin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="비회원 로그인"
+                android:textColor="@android:color/black"
+                android:layout_marginEnd="10dp"/>
+
+            <!-- 비밀번호 찾기 버튼 -->
+            <TextView
+                android:id="@+id/buttonForgotPassword"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="비밀번호 찾기"
+                android:textColor="@android:color/black"
+                android:layout_marginEnd="10dp" />
+
+            <!-- 회원가입 버튼 -->
+            <TextView
+                android:id="@+id/buttonRegister"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="회원가입"
+                android:textColor="@android:color/black"/>
+        </LinearLayout>
+
+        <!-- 소셜 로그인 버튼들 -->
+        <LinearLayout
+            android:id="@+id/socialLoginLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="10dp"
+            android:gravity="center_horizontal">
+
+            <!-- Google 로그인 버튼 -->
+            <Button
+                android:id="@+id/buttonGoogleLogin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Google로 로그인"
+                android:drawableLeft="@drawable/fk_google"
+                android:background="#F5F5F5"
+                android:padding="10dp"
+                android:textSize="14sp"
+                android:layout_marginBottom="5dp"
+                android:backgroundTint="@null"/>
+
+            <!-- Kakao 로그인 버튼 -->
+            <Button
+                android:id="@+id/buttonKakaoLogin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Kakao로 로그인"
+                android:drawableLeft="@drawable/fk_kakao"
+                android:background="#F5F5F5"
+                android:padding="10dp"
+                android:textSize="14sp"
+                android:layout_marginBottom="5dp"
+                android:backgroundTint="@null"/>
+
+            <!-- Naver 로그인 버튼 -->
+            <Button
+                android:id="@+id/buttonNaverLogin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Naver로 로그인"
+                android:drawableLeft="@drawable/fk_naver"
+                android:background="#F5F5F5"
+                android:padding="10dp"
+                android:textSize="14sp"
+                android:backgroundTint="@null"/>
+        </LinearLayout>
+
+        <!-- 로그인 버튼 -->
+        <Button
+            android:id="@+id/buttonLogin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="70dp"
+            android:background="#65B120"
+            android:padding="10dp"
+            android:text="로그인"
+            android:textSize="16sp"/>
+    </LinearLayout>
+</RelativeLayout>

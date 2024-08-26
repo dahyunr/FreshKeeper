@@ -1,0 +1,25 @@
+@echo off
+@rem ******************************************************************************
+@rem ** Gradle wrapper script for Windows. **
+@rem ******************************************************************************
+
+@if "%DEBUG%" == "" @echo off
+@setlocal
+
+@rem Determine the command-line arguments to pass to Gradle.
+set CMD_LINE_ARGS=
+:setArgs
+if "%1"=="" goto doneSetArgs
+set CMD_LINE_ARGS=%CMD_LINE_ARGS% %1
+shift
+goto setArgs
+:doneSetArgs
+
+@rem Determine the Java command to use to start the JVM.
+set JAVA_EXE=
+if defined JAVA_HOME set JAVA_EXE=%JAVA_HOME%\bin\java.exe
+if not defined JAVA_HOME set JAVA_EXE=java
+
+@rem Start Gradle.
+set CLASSPATH=%APP_HOME%\gradle\wrapper\gradle-wrapper.jar
+"%JAVA_EXE%" -Dorg.gradle.appname=gradlew -classpath "%CLASSPATH%" org.gradle.wrapper.GradleWrapperMain %CMD_LINE_ARGS%
