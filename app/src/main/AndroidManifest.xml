@@ -1,19 +1,16 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.freshkeeper">
 
-    <!-- 캘린더 접근 권한 추가 -->
+    <!-- 캘린더 접근 권한 -->
     <uses-permission android:name="android.permission.READ_CALENDAR"/>
     <uses-permission android:name="android.permission.WRITE_CALENDAR"/>
 
-    <!-- 카메라 접근 권한 추가 -->
+    <!-- 카메라 접근 권한 -->
     <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <!-- 카메라 하드웨어 사용 명시 -->
     <uses-feature android:name="android.hardware.camera" android:required="false" />
-
-    <!-- 바코드 API -->
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.CAMERA" />
 
     <application
         android:allowBackup="true"
@@ -21,7 +18,8 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        android:networkSecurityConfig="@xml/network_security_config">
 
         <!-- 액티비티 선언 -->
         <activity
@@ -80,6 +78,12 @@
 
         <activity
             android:name=".QnaActivity"
+            android:exported="true">
+        </activity>
+
+        <!-- PwActivity 선언 -->
+        <activity
+            android:name=".PwActivity"
             android:exported="true">
         </activity>
 

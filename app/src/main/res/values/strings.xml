@@ -15,6 +15,16 @@
     <string name="icon_barcode_desc">바코드 아이콘</string>
     <string name="icon_mypage_desc">마이페이지 아이콘</string>
     <string name="fab_desc">플로팅 액션 버튼</string>
+    <string name="send_code">코드 전송</string>
+    <string name="save">저장</string>
+    <string name="verify">인증하기</string>
+    <string name="find_password_title">비밀번호 찾기</string>
+    <string name="email_hint">이메일</string>
+    <string name="phone_hint">전화번호</string>
+    <string name="verification_code_hint">인증코드</string>
+    <string name="new_password_hint">새 비밀번호</string>
+    <string name="confirm_new_password_hint">새 비밀번호 확인</string>
+
 
     <string-array name="category_array">
         <item>카테고리 선택</item>

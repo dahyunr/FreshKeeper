@@ -99,9 +99,10 @@ public class LoginActivity extends AppCompatActivity {
         buttonForgotPassword.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // 비밀번호 찾기 버튼 클릭 시 동작하는 코드
-                Toast.makeText(LoginActivity.this, "비밀번호 찾기 기능을 구현하세요", Toast.LENGTH_SHORT).show();
-                Log.d(TAG, "onClick: 비밀번호 찾기");
+                // 비밀번호 찾기 버튼 클릭 시 PwActivity로 이동
+                Intent intent = new Intent(LoginActivity.this, PwActivity.class);
+                startActivity(intent);
+                Log.d(TAG, "onClick: 비밀번호 찾기 이동");
             }
         });
 

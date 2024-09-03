@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.Toast;
@@ -26,6 +27,7 @@ import com.google.mlkit.vision.barcode.BarcodeScannerOptions;
 import com.google.mlkit.vision.barcode.BarcodeScanning;
 import com.google.mlkit.vision.common.InputImage;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -128,12 +130,18 @@ public class BarcodeScanActivity extends AppCompatActivity {
                                 String rawValue = barcode.getDisplayValue();
                                 Log.d("BarcodeScan", "Barcode detected: " + rawValue);
 
+                                // 이미지 데이터를 Base64로 인코딩
+                                ByteBuffer buffer = imageProxy.getImage().getPlanes()[0].getBuffer();
+                                byte[] imageBytes = new byte[buffer.remaining()];
+                                buffer.get(imageBytes);
+                                String encodedImageData = encodeImageToBase64(imageBytes);
+
                                 // API 호출 부분 추가
                                 MyApiService apiService = ApiClient.getApiService();
 
                                 // JSON 요청 생성
                                 Image imageRequest = new Image();
-                                imageRequest.setContent("base64_encoded_image_data");
+                                imageRequest.setContent(encodedImageData);
 
                                 Feature featureRequest = new Feature();
                                 featureRequest.setType("TEXT_DETECTION");
@@ -151,7 +159,7 @@ public class BarcodeScanActivity extends AppCompatActivity {
                                 YourRequestType requestBody = new YourRequestType();
                                 requestBody.setRequests(requests);
 
-                                Call<MyResponseType> call = apiService.getData("Bearer " + BuildConfig.API_KEY, requestBody);
+                                Call<MyResponseType> call = apiService.getData(requestBody);
                                 call.enqueue(new Callback<MyResponseType>() {
                                     @Override
                                     public void onResponse(Call<MyResponseType> call, Response<MyResponseType> response) {
@@ -189,6 +197,10 @@ public class BarcodeScanActivity extends AppCompatActivity {
         });
 
         cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageAnalysis);
+    }
+
+    private String encodeImageToBase64(byte[] imageBytes) {
+        return Base64.encodeToString(imageBytes, Base64.NO_WRAP);
     }
 
     @Override
