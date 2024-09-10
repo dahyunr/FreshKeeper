@@ -234,11 +234,12 @@
                         android:layout_marginBottom="4dp" />
 
                     <TextView
+                        android:id="@+id/button_faq"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
                         android:layout_marginBottom="4dp"
-                        android:text="자주 묻어보는 질문"
+                        android:text="자주 묻는 질문"
                         android:textColor="#000000"
                         android:textSize="16sp" />
 

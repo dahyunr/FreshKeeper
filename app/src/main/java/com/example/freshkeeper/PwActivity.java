@@ -1,5 +1,6 @@
 package com.example.freshkeeper;
 
+import android.content.Intent; // 이 부분 추가
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -72,6 +73,11 @@ public class PwActivity extends AppCompatActivity {
                 if (validateInputs()) {
                     // 비밀번호를 저장하는 로직 구현 (예: 서버에 저장)
                     Toast.makeText(PwActivity.this, "비밀번호가 성공적으로 변경되었습니다.", Toast.LENGTH_SHORT).show();
+
+                    // 로그인 화면으로 이동하는 Intent 추가
+                    Intent intent = new Intent(PwActivity.this, LoginActivity.class);
+                    startActivity(intent);
+                    finish(); // 현재 액티비티를 종료하여 뒤로가기 시 비밀번호 화면으로 돌아가지 않게 함
                 }
             }
         });
@@ -80,13 +86,12 @@ public class PwActivity extends AppCompatActivity {
     // 전화번호 유효성 검사
     private boolean validatePhone() {
         String phone = phoneField.getText().toString();
-        if (TextUtils.isEmpty(phone)) { // "콜"을 "phone"으로 변경
+        if (TextUtils.isEmpty(phone)) {
             Toast.makeText(this, "전화번호를 입력하세요.", Toast.LENGTH_SHORT).show();
             return false;
         }
 
         // 추가적인 전화번호 형식 검사를 여기서 할 수 있습니다.
-        // 예를 들어, 전화번호가 특정 형식을 따르는지 확인할 수 있습니다.
 
         return true;
     }

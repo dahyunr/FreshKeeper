@@ -1,4 +1,4 @@
-package com.example.freshkeeper;
+package com.example.freshkeeper.network;
 
 import java.util.List;
 

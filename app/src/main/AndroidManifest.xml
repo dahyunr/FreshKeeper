@@ -5,8 +5,11 @@
     <uses-permission android:name="android.permission.READ_CALENDAR"/>
     <uses-permission android:name="android.permission.WRITE_CALENDAR"/>
 
-    <!-- 카메라 접근 권한 -->
+    <!-- 카메라 및 저장소 접근 권한 -->
     <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <!-- API 29 이상에서 권장되는 저장소 접근 권한 -->
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.INTERNET" />
 
     <!-- 카메라 하드웨어 사용 명시 -->
@@ -33,58 +36,63 @@
 
         <activity
             android:name=".LoginActivity"
-            android:exported="true">
+            android:exported="false">
         </activity>
 
         <activity
             android:name=".RegisterActivity"
-            android:exported="true">
+            android:exported="false">
         </activity>
 
         <activity
             android:name=".FkmainActivity"
-            android:exported="true">
+            android:exported="false">
         </activity>
 
         <activity
             android:name=".AddItemActivity"
-            android:exported="true">
+            android:exported="false">
         </activity>
 
         <activity
             android:name=".BarcodeScanActivity"
-            android:exported="true">
+            android:exported="false">
         </activity>
 
         <activity
             android:name=".NotificationSettingsActivity"
-            android:exported="true">
+            android:exported="false">
         </activity>
 
         <activity
             android:name=".MypageActivity"
-            android:exported="true">
+            android:exported="false">
         </activity>
 
         <activity
             android:name=".CalendarActivity"
-            android:exported="true">
+            android:exported="false">
         </activity>
 
         <activity
             android:name=".EditItemActivity"
-            android:exported="true">
+            android:exported="false">
         </activity>
 
         <activity
             android:name=".QnaActivity"
-            android:exported="true">
+            android:exported="false">
         </activity>
 
         <!-- PwActivity 선언 -->
         <activity
             android:name=".PwActivity"
-            android:exported="true">
+            android:exported="false">
+        </activity>
+
+        <activity
+            android:name=".FAQActivity"
+            android:exported="false">
         </activity>
 
     </application>

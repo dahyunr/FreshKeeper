@@ -7,10 +7,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,11 +26,12 @@ public class MypageActivity extends AppCompatActivity {
     private ImageView iconRef, iconCalendar, iconBarcode, iconMypage;
     private TextView withdrawalTextView, notificationSettingsTextView;
     private TextView contactUsButton;  // 문의하기 버튼 변수 추가
+    private TextView faqTextView; // 자주 묻는 질문 버튼
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_mypage);  // your mypage.xml 파일과 연결
+        setContentView(R.layout.activity_mypage);
 
         // UI 요소들 초기화
         profileImage = findViewById(R.id.profile_image);
@@ -42,21 +41,29 @@ public class MypageActivity extends AppCompatActivity {
         iconCalendar = findViewById(R.id.icon_calendar);
         iconBarcode = findViewById(R.id.icon_barcode);
         iconMypage = findViewById(R.id.icon_mypage);
-        withdrawalTextView = findViewById(R.id.withdrawal);  // 회원탈퇴 텍스트뷰
-        notificationSettingsTextView = findViewById(R.id.notification_settings); // 알림 설정 텍스트뷰
+        withdrawalTextView = findViewById(R.id.withdrawal);
+        notificationSettingsTextView = findViewById(R.id.notification_settings);
+
+        // "자주 물어보는 질문" 텍스트뷰 초기화 및 클릭 리스너 추가
+        faqTextView = findViewById(R.id.button_faq);
+        faqTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MypageActivity.this, FAQActivity.class);
+                startActivity(intent);
+            }
+        });
 
         // 문의하기 버튼 초기화 및 클릭 리스너 추가
         contactUsButton = findViewById(R.id.button_contact_us);
         contactUsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // 문의하기 페이지로 이동하는 인텐트 생성 및 시작
                 Intent intent = new Intent(MypageActivity.this, QnaActivity.class);
                 startActivity(intent);
             }
         });
 
-        // 프로필 이미지 클릭 리스너
         profileImage.setOnClickListener(v -> openGallery());
 
         // 닉네임 클릭 리스너 - 다이얼로그로 변경
@@ -87,23 +94,19 @@ public class MypageActivity extends AppCompatActivity {
 
         iconMypage.setOnClickListener(v -> Toast.makeText(this, "이미 마이페이지에 있습니다", Toast.LENGTH_SHORT).show());
 
-        // 회원탈퇴 텍스트뷰 클릭 리스너 추가
         withdrawalTextView.setOnClickListener(v -> showWithdrawalDialog());
 
-        // 알림 설정 텍스트뷰 클릭 리스너 추가
         notificationSettingsTextView.setOnClickListener(v -> {
             Intent intent = new Intent(MypageActivity.this, NotificationSettingsActivity.class);
             startActivity(intent);
         });
     }
 
-    // 갤러리 열기 메서드
     private void openGallery() {
         Intent gallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(gallery, PICK_IMAGE);
     }
 
-    // 선택한 이미지 처리 메서드
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -119,23 +122,19 @@ public class MypageActivity extends AppCompatActivity {
         }
     }
 
-    // 탈퇴 확인 다이얼로그 표시 메서드
     private void showWithdrawalDialog() {
         new AlertDialog.Builder(this)
                 .setTitle("정말 탈퇴하시겠습니까?")
                 .setMessage("탈퇴 처리 후 모든 데이터가 삭제되며, 언제라도 다시 가입 가능합니다.")
                 .setPositiveButton("확인", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        // 탈퇴 로직 추가
                         Toast.makeText(MypageActivity.this, "탈퇴가 처리되었습니다.", Toast.LENGTH_SHORT).show();
-                        // 실제 탈퇴 처리를 위한 로직을 여기에 추가하십시오.
                     }
                 })
                 .setNegativeButton("취소", null)
                 .show();
     }
 
-    // 닉네임 또는 이메일 변경을 위한 다이얼로그 표시 메서드
     private void showEditDialog(String title, TextView textViewToEdit) {
         EditText input = new EditText(this);
         input.setText(textViewToEdit.getText());

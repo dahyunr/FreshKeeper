@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <network-security-config>
+    <!-- googleapis.com에 대해서는 HTTP 통신 금지 -->
     <domain-config cleartextTrafficPermitted="false">
         <domain includeSubdomains="true">googleapis.com</domain>
+    </domain-config>
+
+    <!-- openapi.foodsafetykorea.go.kr에 대해서는 HTTP 통신 허용 -->
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">openapi.foodsafetykorea.go.kr</domain>
     </domain-config>
 </network-security-config>

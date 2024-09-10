@@ -33,7 +33,6 @@
             android:layout_centerInParent="true"/>
     </RelativeLayout>
 
-
     <!-- 타이틀 아래의 여백 -->
     <View
         android:layout_width="match_parent"
@@ -88,25 +87,22 @@
         android:gravity="top|start"
         android:padding="8dp"/>
 
-    <!-- 자주 묻어보는 질문 텍스트와 밑줄 -->
-    <LinearLayout
-        android:layout_width="wrap_content"
+    <!-- 여백 추가 -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="16dp" />
+
+    <!-- 작성하기 버튼 -->
+    <Button
+        android:id="@+id/submit_button"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginTop="16dp">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="자주 묻어보는 질문"
-            android:textSize="14sp"
-            android:textColor="#C8C8C8"/>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="#C8C8C8"
-            android:layout_marginTop="4dp"/>
-    </LinearLayout>
+        android:text="작성하기"
+        android:textColor="@android:color/white"
+        android:background="#65B120"
+        android:layout_marginTop="16dp"
+        android:padding="16dp"
+        android:textSize="16sp"
+        android:layout_gravity="center"/>
 
 </LinearLayout>

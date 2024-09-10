@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
@@ -58,6 +59,29 @@ public class QnaActivity extends AppCompatActivity {
             public void onFocusChange(View v, boolean hasFocus) {
                 if (hasFocus) {
                     // 텍스트 박스에 포커스가 갈 때
+                }
+            }
+        });
+
+        // 버튼 클릭 이벤트 설정
+        Button submitButton = findViewById(R.id.submit_button);
+        submitButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String selectedCategory = categorySpinner.getSelectedItem().toString();
+                String inquiryText = inquiryContent.getText().toString();
+
+                if (selectedCategory.equals("문의 유형을 선택하세요")) {
+                    Toast.makeText(QnaActivity.this, "문의 유형을 선택하세요.", Toast.LENGTH_SHORT).show();
+                } else if (inquiryText.isEmpty()) {
+                    Toast.makeText(QnaActivity.this, "문의 내용을 입력하세요.", Toast.LENGTH_SHORT).show();
+                } else {
+                    // 여기에서 문의 내용을 서버로 전송하거나, 데이터베이스에 저장할 수 있습니다.
+                    Toast.makeText(QnaActivity.this, "문의가 성공적으로 제출되었습니다.", Toast.LENGTH_SHORT).show();
+
+                    // 필요 시 입력값 초기화
+                    categorySpinner.setSelection(0); // 스피너 초기화
+                    inquiryContent.setText("");      // 문의 내용 초기화
                 }
             }
         });

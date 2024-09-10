@@ -4,13 +4,13 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.util.Base64;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.core.CameraSelector;
 import androidx.camera.core.ImageAnalysis;
@@ -26,19 +26,16 @@ import com.google.mlkit.vision.barcode.BarcodeScanner;
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions;
 import com.google.mlkit.vision.barcode.BarcodeScanning;
 import com.google.mlkit.vision.common.InputImage;
-
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
+import com.example.freshkeeper.network.ApiClient;
+import com.example.freshkeeper.network.MyApiService;
+import com.example.freshkeeper.network.MyResponseType;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import com.example.freshkeeper.YourRequestType.Image;
-import com.example.freshkeeper.YourRequestType.Feature;
-import com.example.freshkeeper.YourRequestType.Request;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 public class BarcodeScanActivity extends AppCompatActivity {
 
@@ -47,6 +44,10 @@ public class BarcodeScanActivity extends AppCompatActivity {
     private PreviewView previewView;
     private BarcodeScanner barcodeScanner;
     private ProcessCameraProvider cameraProvider;
+    private boolean isScanning = true;
+    private String lastScannedBarcode = "";
+    private static final String FOOD_SAFETY_API_KEY = "de3f81052d444e189ebd";  // 발급받은 FoodSafety API 키
+    private static final String TAG = "BarcodeScanActivity";  // 로그 태그
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,9 +56,9 @@ public class BarcodeScanActivity extends AppCompatActivity {
 
         previewView = findViewById(R.id.camera_preview);
         Button cancelButton = findViewById(R.id.cancel_button);
-        Button scanButton = findViewById(R.id.scan_button);
         Button manualEntryButton = findViewById(R.id.manual_entry_button);
 
+        // 카메라 권한 확인 및 요청
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, CAMERA_REQUEST_CODE);
         } else {
@@ -69,20 +70,15 @@ public class BarcodeScanActivity extends AppCompatActivity {
             finish();
         });
 
-        scanButton.setOnClickListener(v -> {
-            // 바코드 스캔 기능 구현
-        });
-
         manualEntryButton.setOnClickListener(v -> {
             Intent intent = new Intent(BarcodeScanActivity.this, AddItemActivity.class);
             startActivityForResult(intent, ADD_ITEM_REQUEST_CODE);
         });
 
-        BarcodeScannerOptions options =
-                new BarcodeScannerOptions.Builder()
-                        .setBarcodeFormats(Barcode.FORMAT_ALL_FORMATS)
-                        .build();
-
+        // 바코드 스캐너 설정
+        BarcodeScannerOptions options = new BarcodeScannerOptions.Builder()
+                .setBarcodeFormats(Barcode.FORMAT_ALL_FORMATS)
+                .build();
         barcodeScanner = BarcodeScanning.getClient(options);
     }
 
@@ -95,6 +91,7 @@ public class BarcodeScanActivity extends AppCompatActivity {
                 bindPreviewAndAnalysis(cameraProvider);
             } catch (ExecutionException | InterruptedException e) {
                 e.printStackTrace();
+                Toast.makeText(this, "카메라를 시작할 수 없습니다. 다시 시도해 주세요.", Toast.LENGTH_LONG).show();
             }
         }, ContextCompat.getMainExecutor(this));
     }
@@ -102,10 +99,7 @@ public class BarcodeScanActivity extends AppCompatActivity {
     @androidx.annotation.OptIn(markerClass = androidx.camera.core.ExperimentalGetImage.class)
     private void bindPreviewAndAnalysis(@NonNull ProcessCameraProvider cameraProvider) {
         Preview preview = new Preview.Builder().build();
-        CameraSelector cameraSelector = new CameraSelector.Builder()
-                .requireLensFacing(CameraSelector.LENS_FACING_BACK)
-                .build();
-
+        CameraSelector cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA;
         preview.setSurfaceProvider(previewView.getSurfaceProvider());
 
         ImageAnalysis imageAnalysis = new ImageAnalysis.Builder()
@@ -113,132 +107,83 @@ public class BarcodeScanActivity extends AppCompatActivity {
                 .build();
 
         imageAnalysis.setAnalyzer(ContextCompat.getMainExecutor(this), imageProxy -> {
-            if (imageProxy.getImage() == null) {
+            if (!isScanning || imageProxy.getImage() == null) {
                 imageProxy.close();
                 return;
             }
 
-            @SuppressWarnings("UnsafeOptInUsageError")
             InputImage image = InputImage.fromMediaImage(imageProxy.getImage(), imageProxy.getImageInfo().getRotationDegrees());
-
             barcodeScanner.process(image)
                     .addOnSuccessListener(barcodes -> {
-                        if (barcodes.isEmpty()) {
-                            Log.d("BarcodeScan", "No barcodes detected");
-                        } else {
+                        if (!barcodes.isEmpty()) {
                             for (Barcode barcode : barcodes) {
                                 String rawValue = barcode.getDisplayValue();
-                                Log.d("BarcodeScan", "Barcode detected: " + rawValue);
 
-                                // 이미지 데이터를 Base64로 인코딩
-                                ByteBuffer buffer = imageProxy.getImage().getPlanes()[0].getBuffer();
-                                byte[] imageBytes = new byte[buffer.remaining()];
-                                buffer.get(imageBytes);
-                                String encodedImageData = encodeImageToBase64(imageBytes);
+                                Log.d(TAG, "Scanned Barcode: " + rawValue);
+                                if (!rawValue.equals(lastScannedBarcode)) {
+                                    isScanning = false;
+                                    lastScannedBarcode = rawValue;
+                                    fetchProductInfo(rawValue);
 
-                                // API 호출 부분 추가
-                                MyApiService apiService = ApiClient.getApiService();
-
-                                // JSON 요청 생성
-                                Image imageRequest = new Image();
-                                imageRequest.setContent(encodedImageData);
-
-                                Feature featureRequest = new Feature();
-                                featureRequest.setType("TEXT_DETECTION");
-
-                                Request request = new Request();
-                                request.setImage(imageRequest);
-
-                                List<Feature> features = new ArrayList<>();
-                                features.add(featureRequest);
-                                request.setFeatures(features);
-
-                                List<Request> requests = new ArrayList<>();
-                                requests.add(request);
-
-                                YourRequestType requestBody = new YourRequestType();
-                                requestBody.setRequests(requests);
-
-                                Call<MyResponseType> call = apiService.getData(requestBody);
-                                call.enqueue(new Callback<MyResponseType>() {
-                                    @Override
-                                    public void onResponse(Call<MyResponseType> call, Response<MyResponseType> response) {
-                                        if (response.isSuccessful()) {
-                                            MyResponseType product = response.body();
-                                            if (product != null) {
-                                                // AddItemActivity에 제품 정보를 전달
-                                                Intent intent = new Intent(BarcodeScanActivity.this, AddItemActivity.class);
-                                                intent.putExtra("barcodeValue", rawValue);
-                                                intent.putExtra("productName", product.getName());
-                                                intent.putExtra("productImage", product.getImageUrl());
-                                                startActivityForResult(intent, ADD_ITEM_REQUEST_CODE);
-                                            }
-                                        } else {
-                                            Log.e("API_ERROR", "Response code: " + response.code());
-                                        }
-                                    }
-
-                                    @Override
-                                    public void onFailure(Call<MyResponseType> call, Throwable t) {
-                                        Log.e("API_ERROR", "Error: " + t.getMessage());
-                                    }
-                                });
-
-                                break; // 바코드가 인식되면 루프 종료
+                                    new Handler(Looper.getMainLooper()).postDelayed(() -> isScanning = true, 3000);
+                                }
                             }
                         }
                     })
-                    .addOnFailureListener(e -> {
-                        Log.e("BarcodeScan", "Barcode detection failed", e);
-                    })
-                    .addOnCompleteListener(task -> {
-                        imageProxy.close(); // 반드시 close 호출
-                    });
+                    .addOnFailureListener(e -> Log.e(TAG, "Barcode detection failed", e))
+                    .addOnCompleteListener(task -> imageProxy.close());
         });
 
         cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageAnalysis);
     }
 
-    private String encodeImageToBase64(byte[] imageBytes) {
-        return Base64.encodeToString(imageBytes, Base64.NO_WRAP);
-    }
+    private void fetchProductInfo(String barcode) {
+        Log.d(TAG, "Fetching product info for barcode: " + barcode);
+        MyApiService apiService = ApiClient.getApiService();
+        Call<MyResponseType> call = apiService.lookupItem(FOOD_SAFETY_API_KEY, barcode);
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (cameraProvider != null) {
-            cameraProvider.unbindAll();  // 카메라 리소스 해제
-        }
-        if (barcodeScanner != null) {
-            barcodeScanner.close();  // 바코드 스캐너 리소스 해제
-        }
-    }
+        call.enqueue(new Callback<MyResponseType>() {
+            @Override
+            public void onResponse(Call<MyResponseType> call, Response<MyResponseType> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<MyResponseType.Item> items = response.body().getItems();
+                    if (!items.isEmpty()) {
+                        MyResponseType.Item item = items.get(0);
+                        String productName = item.getTitle();
+                        String productImage = item.getImageUrl();
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == ADD_ITEM_REQUEST_CODE) {
-            if (resultCode == RESULT_OK && data != null) {
-                Intent resultIntent = new Intent(this, FkmainActivity.class);
-                resultIntent.putExtras(data.getExtras());
-                startActivity(resultIntent);
-                finish();
-            } else if (resultCode == RESULT_CANCELED) {
-                Toast.makeText(this, "아이템 추가가 취소되었습니다.", Toast.LENGTH_SHORT).show();
+                        if (productImage == null || productImage.isEmpty()) {
+                            productImage = "default_image_url";
+                        }
+
+                        Intent intent = new Intent(BarcodeScanActivity.this, AddItemActivity.class);
+                        intent.putExtra("barcodeValue", barcode);
+                        intent.putExtra("productName", productName);
+                        intent.putExtra("productImage", productImage);
+                        startActivityForResult(intent, ADD_ITEM_REQUEST_CODE);
+                    } else {
+                        Toast.makeText(BarcodeScanActivity.this, "상품 정보를 찾을 수 없습니다.", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Log.e(TAG, "API 실패, 오류 코드: " + response.code());
+                }
             }
-        }
+
+            @Override
+            public void onFailure(Call<MyResponseType> call, Throwable t) {
+                Log.e(TAG, "API 호출 실패: " + t.getMessage());
+            }
+        });
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        if (requestCode == CAMERA_REQUEST_CODE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                startCamera();
-            } else {
-                Toast.makeText(this, "카메라 권한이 필요합니다.", Toast.LENGTH_SHORT).show();
-            }
+        if (requestCode == CAMERA_REQUEST_CODE && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            startCamera();
+        } else {
+            Toast.makeText(this, "카메라 권한이 필요합니다.", Toast.LENGTH_LONG).show();
         }
     }
 }

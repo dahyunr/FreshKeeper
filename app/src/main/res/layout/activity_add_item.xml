@@ -19,7 +19,6 @@
         android:padding="16dp">
 
         <!-- 상품 이미지와 상품명 -->
-        <!-- 상품 이미지와 상품명 -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -31,11 +30,11 @@
                 android:id="@+id/item_image"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
-                android:src="@android:drawable/ic_menu_gallery"
                 android:scaleType="centerCrop"
-                android:contentDescription="상품 이미지 선택" />
+                android:contentDescription="상품 이미지"
+                android:src="@drawable/fk_placeholder" /> <!-- 기본 이미지 -->
 
-            <!-- 상품명 입력 -->
+            <!-- 상품명 (수정 가능) -->
             <EditText
                 android:id="@+id/item_name"
                 android:layout_width="0dp"
@@ -45,7 +44,7 @@
                 android:textColor="#000000"
                 android:textSize="16sp"
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="50dp" /> <!-- layout_marginTop 속성으로 간격 조정 -->
+                android:layout_gravity="center_vertical" />
         </LinearLayout>
 
         <!-- 저장 방법 -->
@@ -59,7 +58,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="저장방법"
+                android:text="저장 방법"
                 android:textColor="#000000"
                 android:textSize="16sp" />
 
@@ -131,7 +130,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="등록날짜"
+                android:text="등록 날짜"
                 android:textColor="#000000"
                 android:textSize="16sp" />
 
@@ -163,7 +162,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="유통기한"
+                android:text="유통 기한"
                 android:textColor="#000000"
                 android:textSize="16sp" />
 

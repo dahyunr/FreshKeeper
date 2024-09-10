@@ -1,25 +1,28 @@
-package com.example.freshkeeper;
+package com.example.freshkeeper.network;
 
+import com.google.gson.annotations.SerializedName;
 import java.util.List;
 
+// Vision API 요청 데이터 구조를 정의하는 클래스
 public class YourRequestType {
 
+    @SerializedName("requests")
     private List<Request> requests;
 
-    public static class Request {
-        private Image image;
-        private List<Feature> features;
+    public void setRequests(List<Request> requests) {
+        this.requests = requests;
+    }
 
-        public Image getImage() {
-            return image;
-        }
+    public static class Request {
+
+        @SerializedName("image")
+        private Image image;
+
+        @SerializedName("features")
+        private List<Feature> features;
 
         public void setImage(Image image) {
             this.image = image;
-        }
-
-        public List<Feature> getFeatures() {
-            return features;
         }
 
         public void setFeatures(List<Feature> features) {
@@ -28,11 +31,9 @@ public class YourRequestType {
     }
 
     public static class Image {
-        private String content;
 
-        public String getContent() {
-            return content;
-        }
+        @SerializedName("content")
+        private String content;
 
         public void setContent(String content) {
             this.content = content;
@@ -40,22 +41,12 @@ public class YourRequestType {
     }
 
     public static class Feature {
-        private String type;
 
-        public String getType() {
-            return type;
-        }
+        @SerializedName("type")
+        private String type;
 
         public void setType(String type) {
             this.type = type;
         }
-    }
-
-    public List<Request> getRequests() {
-        return requests;
-    }
-
-    public void setRequests(List<Request> requests) {
-        this.requests = requests;
     }
 }
