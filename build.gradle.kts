@@ -6,7 +6,8 @@ buildscript {
     dependencies {
         classpath("com.android.tools.build:gradle:8.1.0")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.0")
-        classpath("com.google.gms:google-services:4.3.15") // Firebase 서비스 플러그인 클래스패스 추가
+        // Firebase 관련 클래스패스 제거
+        // classpath("com.google.gms:google-services:4.3.15")
     }
 }
 

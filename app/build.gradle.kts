@@ -2,7 +2,8 @@ plugins {
     id("com.android.application")
     id("kotlin-android")
     id("kotlin-kapt") // Kotlin Annotation Processing Tool 추가
-    id("com.google.gms.google-services") // Firebase 및 Google 서비스 플러그인 추가
+    // Firebase 및 Google 서비스 플러그인 제거
+    // id("com.google.gms.google-services")
 }
 
 android {
@@ -14,7 +15,6 @@ android {
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }
@@ -62,11 +62,9 @@ dependencies {
     implementation("androidx.camera:camera-lifecycle:1.1.0")
     implementation("androidx.camera:camera-view:1.1.0")
 
-    // Firebase BoM (Bill of Materials) 추가
-    implementation(platform("com.google.firebase:firebase-bom:33.1.2"))
-
-    // Firebase Analytics 추가
-    implementation("com.google.firebase:firebase-analytics")
+    // Firebase BoM 및 Analytics 제거
+    // implementation(platform("com.google.firebase:firebase-bom:33.1.2"))
+    // implementation("com.google.firebase:firebase-analytics")
 
     // JUnit 의존성 추가
     testImplementation("junit:junit:4.13.2")
@@ -94,5 +92,4 @@ dependencies {
     implementation("com.jakewharton.threetenabp:threetenabp:1.2.1")
 
     implementation("com.github.prolificinteractive:material-calendarview:2.0.1")
-
 }
