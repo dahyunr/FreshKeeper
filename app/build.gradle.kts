@@ -16,9 +16,7 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-
-        // API_KEY 설정
-        buildConfigField("String", "UPC_API_KEY", "\"ff90ecf7eb44b337b8a39c11cd685d85\"") // 업데이트된 UPC API Key
+        vectorDrawables.useSupportLibrary = true
     }
 
     buildFeatures {
@@ -88,4 +86,13 @@ dependencies {
     // Glide 의존성 추가
     implementation("com.github.bumptech.glide:glide:4.13.2")
     kapt("com.github.bumptech.glide:compiler:4.13.2")
+
+    // Material CalendarView 추가
+    implementation("com.github.prolificinteractive:material-calendarview:2.0.1")
+
+    // ThreeTenABP 추가
+    implementation("com.jakewharton.threetenabp:threetenabp:1.2.1")
+
+    implementation("com.github.prolificinteractive:material-calendarview:2.0.1")
+
 }

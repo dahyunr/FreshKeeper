@@ -8,12 +8,23 @@
     <!-- 카메라 및 저장소 접근 권한 -->
     <uses-permission android:name="android.permission.CAMERA"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <!-- API 29 이상에서 권장되는 저장소 접근 권한 -->
-    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- Android 10 이하에서만 WRITE_EXTERNAL_STORAGE 사용 -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28"/>
+
+    <!-- Android 11 이상에서만 MANAGE_EXTERNAL_STORAGE 사용 -->
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="30"/>
+
+    <!-- 미디어 파일 위치 접근 (API 29 이상) -->
+    <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION"/>
+
+    <!-- 인터넷 접근 권한 -->
+    <uses-permission android:name="android.permission.INTERNET"/>
 
     <!-- 카메라 하드웨어 사용 명시 -->
-    <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <uses-feature android:name="android.hardware.camera" android:required="false"/>
 
     <application
         android:allowBackup="true"
@@ -22,6 +33,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
+        android:requestLegacyExternalStorage="true"
         android:networkSecurityConfig="@xml/network_security_config">
 
         <!-- 액티비티 선언 -->
@@ -29,72 +41,34 @@
             android:name=".LogoActivity"
             android:exported="true">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
 
-        <activity
-            android:name=".LoginActivity"
-            android:exported="false">
-        </activity>
+        <!-- 로그인 및 회원가입 -->
+        <activity android:name=".LoginActivity" android:exported="false"/>
+        <activity android:name=".RegisterActivity" android:exported="false"/>
 
-        <activity
-            android:name=".RegisterActivity"
-            android:exported="false">
-        </activity>
+        <!-- 메인 화면 및 아이템 추가 관련 액티비티 -->
+        <activity android:name=".FkmainActivity" android:exported="false"/>
+        <activity android:name=".AddItemActivity" android:exported="false"/>
+        <activity android:name=".BarcodeScanActivity" android:exported="false"/>
 
-        <activity
-            android:name=".FkmainActivity"
-            android:exported="false">
-        </activity>
+        <!-- 알림 및 설정 관련 액티비티 -->
+        <activity android:name=".NotificationSettingsActivity" android:exported="false"/>
+        <activity android:name=".MypageActivity" android:exported="false"/>
 
-        <activity
-            android:name=".AddItemActivity"
-            android:exported="false">
-        </activity>
+        <!-- 추가된 Calendar 관련 액티비티 -->
+        <activity android:name=".CalendarActivity" android:exported="false"/>
 
-        <activity
-            android:name=".BarcodeScanActivity"
-            android:exported="false">
-        </activity>
+        <!-- 수정된 아이템 액티비티 -->
+        <activity android:name=".EditItemActivity" android:exported="false"/>
 
-        <activity
-            android:name=".NotificationSettingsActivity"
-            android:exported="false">
-        </activity>
-
-        <activity
-            android:name=".MypageActivity"
-            android:exported="false">
-        </activity>
-
-        <activity
-            android:name=".CalendarActivity"
-            android:exported="false">
-        </activity>
-
-        <activity
-            android:name=".EditItemActivity"
-            android:exported="false">
-        </activity>
-
-        <activity
-            android:name=".QnaActivity"
-            android:exported="false">
-        </activity>
-
-        <!-- PwActivity 선언 -->
-        <activity
-            android:name=".PwActivity"
-            android:exported="false">
-        </activity>
-
-        <activity
-            android:name=".FAQActivity"
-            android:exported="false">
-        </activity>
+        <!-- 기타 지원 액티비티 -->
+        <activity android:name=".QnaActivity" android:exported="false"/>
+        <activity android:name=".PwActivity" android:exported="false"/>
+        <activity android:name=".FAQActivity" android:exported="false"/>
 
     </application>
-
 </manifest>

@@ -21,7 +21,6 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.google.common.util.concurrent.ListenableFuture;
-import com.google.mlkit.vision.barcode.common.Barcode;
 import com.google.mlkit.vision.barcode.BarcodeScanner;
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions;
 import com.google.mlkit.vision.barcode.BarcodeScanning;
@@ -46,7 +45,6 @@ public class BarcodeScanActivity extends AppCompatActivity {
     private ProcessCameraProvider cameraProvider;
     private boolean isScanning = true;
     private String lastScannedBarcode = "";
-    private static final String FOOD_SAFETY_API_KEY = "de3f81052d444e189ebd";  // 발급받은 FoodSafety API 키
     private static final String TAG = "BarcodeScanActivity";  // 로그 태그
 
     @Override
@@ -77,7 +75,7 @@ public class BarcodeScanActivity extends AppCompatActivity {
 
         // 바코드 스캐너 설정
         BarcodeScannerOptions options = new BarcodeScannerOptions.Builder()
-                .setBarcodeFormats(Barcode.FORMAT_ALL_FORMATS)
+                .setBarcodeFormats(com.google.mlkit.vision.barcode.common.Barcode.FORMAT_ALL_FORMATS)
                 .build();
         barcodeScanner = BarcodeScanning.getClient(options);
     }
@@ -116,7 +114,7 @@ public class BarcodeScanActivity extends AppCompatActivity {
             barcodeScanner.process(image)
                     .addOnSuccessListener(barcodes -> {
                         if (!barcodes.isEmpty()) {
-                            for (Barcode barcode : barcodes) {
+                            for (com.google.mlkit.vision.barcode.common.Barcode barcode : barcodes) {
                                 String rawValue = barcode.getDisplayValue();
 
                                 Log.d(TAG, "Scanned Barcode: " + rawValue);
@@ -140,7 +138,7 @@ public class BarcodeScanActivity extends AppCompatActivity {
     private void fetchProductInfo(String barcode) {
         Log.d(TAG, "Fetching product info for barcode: " + barcode);
         MyApiService apiService = ApiClient.getApiService();
-        Call<MyResponseType> call = apiService.lookupItem(FOOD_SAFETY_API_KEY, barcode);
+        Call<MyResponseType> call = apiService.lookupItem(barcode);
 
         call.enqueue(new Callback<MyResponseType>() {
             @Override

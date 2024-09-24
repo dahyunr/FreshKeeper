@@ -1,6 +1,9 @@
 package com.example.freshkeeper;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -10,16 +13,28 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.freshkeeper.database.DatabaseHelper;
+import com.example.freshkeeper.utils.FileUtils;
+
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import java.text.SimpleDateFormat;
+import java.text.ParseException;
+import java.util.Locale;
+
 
 public class FkmainActivity extends AppCompatActivity {
 
@@ -29,22 +44,22 @@ public class FkmainActivity extends AppCompatActivity {
     private Button tabAll, tabFrozen, tabRefrigerated, tabRoomTemp;
     private TextView sortOrder;
     private LinearLayout sortOptions;
-    private TextView sortName, sortRegDate, sortExpDate;
-    private ImageView plusButton, barcodeButton;
+    private ImageView plusButton, barcodeButton, myPageButton, calendarButton;
 
     private List<FoodItem> allItems;
-    private List<FoodItem> frozenItems;
-    private List<FoodItem> refrigeratedItems;
-    private List<FoodItem> roomTempItems;
+    private DatabaseHelper dbHelper;
 
-    private static final int EDIT_ITEM_REQUEST_CODE = 1;
+    private static final int CAMERA_REQUEST_CODE = 100;
+    private static final int STORAGE_REQUEST_CODE = 101;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fkmain);
 
-        // UI 요소 초기화
+        requestPermissions();
+        dbHelper = new DatabaseHelper(this);
+
         searchEditText = findViewById(R.id.search_edit_text);
         tabAll = findViewById(R.id.tab_all);
         tabFrozen = findViewById(R.id.tab_frozen);
@@ -53,112 +68,48 @@ public class FkmainActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recycler_view);
         sortOrder = findViewById(R.id.sort_order);
         sortOptions = findViewById(R.id.sort_options);
-        sortName = findViewById(R.id.sort_name);
-        sortRegDate = findViewById(R.id.sort_reg_date);
-        sortExpDate = findViewById(R.id.sort_exp_date);
         plusButton = findViewById(R.id.plus_button);
         barcodeButton = findViewById(R.id.icon_barcode);
+        myPageButton = findViewById(R.id.icon_mypage);
+        calendarButton = findViewById(R.id.icon_calendar);
 
         allItems = new ArrayList<>();
-        frozenItems = new ArrayList<>();
-        refrigeratedItems = new ArrayList<>();
-        roomTempItems = new ArrayList<>();
-
-        populateData();
 
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new FoodItemAdapter(this, allItems);
         recyclerView.setAdapter(adapter);
 
-        // ItemTouchHelper 추가
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new SwipeToDeleteCallback(adapter, this));
-        itemTouchHelper.attachToRecyclerView(recyclerView);
+        activateTab(tabAll);
+        loadItemsFromDatabase();
 
-        // 아이템 클릭 리스너 설정
-        adapter.setOnItemClickListener(position -> {
-            Intent intent = new Intent(FkmainActivity.this, EditItemActivity.class);
-            intent.putExtra("itemPosition", position);
-            intent.putExtra("itemData", allItems.get(position));
-            startActivityForResult(intent, EDIT_ITEM_REQUEST_CODE);
-        });
-
-        // EditText에 TextWatcher 추가하여 실시간 검색 구현
-        searchEditText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                // 필요시 구현
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                filter(s.toString());
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                // 필요시 구현
-            }
-        });
-
-        // 탭 클릭 리스너 설정
         tabAll.setOnClickListener(v -> {
-            updateTabSelection(tabAll);
-            adapter.updateList(allItems);
+            activateTab(tabAll);
+            loadItemsFromDatabase();
         });
 
         tabFrozen.setOnClickListener(v -> {
-            updateTabSelection(tabFrozen);
-            adapter.updateList(frozenItems);
+            activateTab(tabFrozen);
+            loadItemsByCategory(0);
         });
 
         tabRefrigerated.setOnClickListener(v -> {
-            updateTabSelection(tabRefrigerated);
-            adapter.updateList(refrigeratedItems);
+            activateTab(tabRefrigerated);
+            loadItemsByCategory(1);
         });
 
         tabRoomTemp.setOnClickListener(v -> {
-            updateTabSelection(tabRoomTemp);
-            adapter.updateList(roomTempItems);
+            activateTab(tabRoomTemp);
+            loadItemsByCategory(2);
         });
 
-        // 정렬 옵션 클릭 리스너 설정
-        sortOrder.setOnClickListener(v -> {
-            if (sortOptions.getVisibility() == View.GONE) {
-                sortOptions.setVisibility(View.VISIBLE);
-            } else {
-                sortOptions.setVisibility(View.GONE);
-            }
-        });
-
-        sortName.setOnClickListener(v -> {
-            sortOptions.setVisibility(View.GONE);
-            sortOrder.setText("이름순");
-            Collections.sort(allItems, Comparator.comparing(FoodItem::getName));
-            adapter.updateList(allItems);
-        });
-
-        sortRegDate.setOnClickListener(v -> {
-            sortOptions.setVisibility(View.GONE);
-            sortOrder.setText("등록순");
-            Collections.sort(allItems, Comparator.comparing(FoodItem::getRegDate));
-            adapter.updateList(allItems);
-        });
-
-        sortExpDate.setOnClickListener(v -> {
-            sortOptions.setVisibility(View.GONE);
-            sortOrder.setText("유통기한순");
-            Collections.sort(allItems, Comparator.comparing(FoodItem::getExpDate));
-            adapter.updateList(allItems);
-        });
-
-        // 기본 탭 선택 및 목록 업데이트
-        updateTabSelection(tabAll);
-        adapter.updateList(allItems);
-
-        // 추가 버튼 및 바코드 버튼 클릭 리스너 설정
         plusButton.setOnClickListener(v -> {
             Intent intent = new Intent(FkmainActivity.this, AddItemActivity.class);
+            startActivity(intent);
+        });
+
+        calendarButton.setOnClickListener(v -> {
+            Intent intent = new Intent(FkmainActivity.this, CalendarActivity.class);
             startActivity(intent);
         });
 
@@ -167,74 +118,155 @@ public class FkmainActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        // MyPage 버튼 클릭 리스너 설정
-        ImageView myPageButton = findViewById(R.id.icon_mypage);
         myPageButton.setOnClickListener(v -> {
             Intent intent = new Intent(FkmainActivity.this, MypageActivity.class);
             startActivity(intent);
         });
 
-        // Calendar 버튼 클릭 리스너 설정
-        ImageView calendarButton = findViewById(R.id.icon_calendar);
-        calendarButton.setOnClickListener(v -> {
-            Intent intent = new Intent(FkmainActivity.this, CalendarActivity.class);
+        adapter.setOnItemClickListener(position -> {
+            Intent intent = new Intent(FkmainActivity.this, AddItemActivity.class);
+            FoodItem clickedItem = allItems.get(position);
+
+            // 이미지 경로를 파일로 저장하고 경로 전달
+            String imagePath = clickedItem.getImagePath();
+            if (imagePath != null) {
+                String filePath = FileUtils.saveDataToFile(this, "imagePath.txt", imagePath);
+                intent.putExtra("filePath", filePath);
+            }
+
+            intent.putExtra("itemName", clickedItem.getName());
             startActivity(intent);
         });
 
-        onNewIntent(getIntent()); // 액티비티가 처음 시작될 때 인텐트를 처리합니다.
+        searchEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                filter(s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+
+        sortOrder.setOnClickListener(v -> {
+            if (sortOptions.getVisibility() == View.GONE) {
+                sortOptions.setVisibility(View.VISIBLE);
+            } else {
+                sortOptions.setVisibility(View.GONE);
+            }
+        });
+
+        findViewById(R.id.sort_name).setOnClickListener(v -> sortItemsByName());
+        findViewById(R.id.sort_reg_date).setOnClickListener(v -> sortItemsByRegDate());
+        findViewById(R.id.sort_exp_date).setOnClickListener(v -> sortItemsByExpDate());
+
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new SwipeToDeleteCallback(adapter, this));
+        itemTouchHelper.attachToRecyclerView(recyclerView);
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == EDIT_ITEM_REQUEST_CODE && resultCode == RESULT_OK) {
-            int position = data.getIntExtra("itemPosition", -1);
-            FoodItem updatedItem = (FoodItem) data.getSerializableExtra("updatedItem");
-
-            if (position != -1 && updatedItem != null) {
-                allItems.set(position, updatedItem);
-                adapter.notifyItemChanged(position);
-            }
+    private void requestPermissions() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{
+                    Manifest.permission.CAMERA,
+                    Manifest.permission.READ_EXTERNAL_STORAGE}, CAMERA_REQUEST_CODE);
         }
     }
 
     @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-
-        // 새로운 아이템을 받아 리스트에 추가
-        if (intent != null && intent.hasExtra("newItem")) {
-            FoodItem newItem = (FoodItem) intent.getSerializableExtra("newItem");
-            if (newItem != null) {
-                allItems.add(newItem);
-                adapter.notifyItemInserted(allItems.size() - 1);
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == CAMERA_REQUEST_CODE || requestCode == STORAGE_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // 권한 허용
+            } else {
+                Toast.makeText(this, "권한을 허용해야 기능을 사용할 수 있습니다.", Toast.LENGTH_SHORT).show();
             }
         }
     }
 
-    // 데이터 초기화 메서드
-    private void populateData() {
-        allItems.add(new FoodItem(R.drawable.fk_bibigo, "비비고 만두", "2024.06.21", "2024.07.10", "D-10", "메모1"));
-        allItems.add(new FoodItem(R.drawable.fk_hotdog, "크리스피 핫도그", "2024.06.21", "2024.08.16", "D-37", "메모2"));
-        allItems.add(new FoodItem(R.drawable.fk_blueberry, "냉동 블루베리", "2024.05.17", "2024.10.01", "D-83", "메모3"));
-        allItems.add(new FoodItem(R.drawable.fk_fish, "옛날 붕어빵", "2024.04.11", "2024.08.22", "D-43", "메모4"));
-        allItems.add(new FoodItem(R.drawable.fk_frenchfries, "프렌치 프라이", "2024.06.28", "2024.07.28", "D-18", "메모5"));
-        allItems.add(new FoodItem(R.drawable.fk_chicken, "닭가슴살", "2024.06.21", "2024.08.21", "D-30", "메모6"));
+    private void activateTab(Button activeTab) {
+        tabAll.setBackgroundColor(getResources().getColor(android.R.color.transparent));
+        tabFrozen.setBackgroundColor(getResources().getColor(android.R.color.transparent));
+        tabRefrigerated.setBackgroundColor(getResources().getColor(android.R.color.transparent));
+        tabRoomTemp.setBackgroundColor(getResources().getColor(android.R.color.transparent));
 
-        frozenItems.add(new FoodItem(R.drawable.fk_bibigo, "비비고 만두", "2024.06.21", "2024.07.10", "D-10", "메모1"));
-        frozenItems.add(new FoodItem(R.drawable.fk_hotdog, "크리스피 핫도그", "2024.06.21", "2024.08.16", "D-37", "메모2"));
-        frozenItems.add(new FoodItem(R.drawable.fk_blueberry, "냉동 블루베리", "2024.05.17", "2024.10.01", "D-83", "메모3"));
-
-        refrigeratedItems.add(new FoodItem(R.drawable.fk_fish, "옛날 붕어빵", "2024.04.11", "2024.08.22", "D-43", "메모4"));
-        refrigeratedItems.add(new FoodItem(R.drawable.fk_frenchfries, "프렌치 프라이", "2024.06.28", "2024.07.28", "D-18", "메모5"));
-        refrigeratedItems.add(new FoodItem(R.drawable.fk_chicken, "닭가슴살", "2024.06.21", "2024.08.21", "D-30", "메모6"));
-
-        roomTempItems.add(new FoodItem(R.drawable.fk_bibigo, "비비고 만두", "2024.06.21", "2024.07.10", "D-10", "메모1"));
-        roomTempItems.add(new FoodItem(R.drawable.fk_hotdog, "크리스피 핫도그", "2024.06.21", "2024.08.16", "D-37", "메모2"));
-        roomTempItems.add(new FoodItem(R.drawable.fk_blueberry, "냉동 블루베리", "2024.05.17", "2024.10.01", "D-83", "메모3"));
+        activeTab.setBackgroundColor(getResources().getColor(R.color.tab_active));
     }
 
-    // 검색 필터 메서드
+    private void loadItemsFromDatabase() {
+        allItems.clear();
+        Cursor cursor = dbHelper.getAllItems();
+        if (cursor.moveToFirst()) {
+            do {
+                String name = cursor.getString(cursor.getColumnIndexOrThrow("name"));
+                String regDate = cursor.getString(cursor.getColumnIndexOrThrow("reg_date"));
+                String expDate = cursor.getString(cursor.getColumnIndexOrThrow("exp_date"));
+                String memo = cursor.getString(cursor.getColumnIndexOrThrow("memo"));
+                String imagePath = cursor.getString(cursor.getColumnIndexOrThrow("image_path"));
+                int quantity = cursor.getInt(cursor.getColumnIndexOrThrow("quantity"));
+
+                String countdown = calculateDDay(expDate);
+                allItems.add(new FoodItem(R.drawable.fk_placeholder, name, regDate, expDate, countdown, memo, imagePath, quantity));
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        adapter.notifyDataSetChanged();
+    }
+
+    private void loadItemsByCategory(int storageMethod) {
+        allItems.clear();
+        Cursor cursor = dbHelper.getItemsByStorageMethod(storageMethod);
+        if (cursor.moveToFirst()) {
+            do {
+                String name = cursor.getString(cursor.getColumnIndexOrThrow("name"));
+                String regDate = cursor.getString(cursor.getColumnIndexOrThrow("reg_date"));
+                String expDate = cursor.getString(cursor.getColumnIndexOrThrow("exp_date"));
+                String memo = cursor.getString(cursor.getColumnIndexOrThrow("memo"));
+                String imagePath = cursor.getString(cursor.getColumnIndexOrThrow("image_path"));
+                int quantity = cursor.getInt(cursor.getColumnIndexOrThrow("quantity"));
+
+                String countdown = calculateDDay(expDate);
+                allItems.add(new FoodItem(R.drawable.fk_placeholder, name, regDate, expDate, countdown, memo, imagePath, quantity));
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        adapter.notifyDataSetChanged();
+    }
+
+    private String calculateDDay(String expDate) {
+        SimpleDateFormat dateFormat8 = new SimpleDateFormat("yyyyMMdd");
+        SimpleDateFormat dateFormat6 = new SimpleDateFormat("yyMMdd");
+        try {
+            Date expirationDate;
+            if (expDate.length() == 8) {
+                expirationDate = dateFormat8.parse(expDate);
+            } else if (expDate.length() == 6) {
+                expirationDate = dateFormat6.parse(expDate);
+            } else {
+                return "D-??";
+            }
+
+            Date today = new Date();
+            long diffInMillis = expirationDate.getTime() - today.getTime();
+            long daysLeft = TimeUnit.MILLISECONDS.toDays(diffInMillis);
+
+            if (daysLeft == 0) {
+                return "D-day";
+            } else if (daysLeft > 0) {
+                return "D-" + daysLeft;
+            } else {
+                return "D+" + Math.abs(daysLeft);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "D-??";
+    }
+
     private void filter(String text) {
         List<FoodItem> filteredList = new ArrayList<>();
         for (FoodItem item : allItems) {
@@ -245,13 +277,18 @@ public class FkmainActivity extends AppCompatActivity {
         adapter.updateList(filteredList);
     }
 
-    // 탭 선택 업데이트 메서드
-    private void updateTabSelection(Button selectedTab) {
-        tabAll.setBackgroundResource(R.drawable.tab_button_background);
-        tabFrozen.setBackgroundResource(R.drawable.tab_button_background);
-        tabRefrigerated.setBackgroundResource(R.drawable.tab_button_background);
-        tabRoomTemp.setBackgroundResource(R.drawable.tab_button_background);
+    private void sortItemsByName() {
+        Toast.makeText(this, "이름순 정렬", Toast.LENGTH_SHORT).show();
+        adapter.notifyDataSetChanged();
+    }
 
-        selectedTab.setBackgroundResource(R.drawable.tab_button_background_selected);
+    private void sortItemsByRegDate() {
+        Toast.makeText(this, "등록순 정렬", Toast.LENGTH_SHORT).show();
+        adapter.notifyDataSetChanged();
+    }
+
+    private void sortItemsByExpDate() {
+        Toast.makeText(this, "유통기한순 정렬", Toast.LENGTH_SHORT).show();
+        adapter.notifyDataSetChanged();
     }
 }

@@ -8,12 +8,16 @@
     tools:context=".CalendarActivity">
 
     <!-- 캘린더 뷰 -->
-    <CalendarView
-        android:id="@+id/calendar_view"
+    <com.prolificinteractive.materialcalendarview.MaterialCalendarView
+        android:id="@+id/calendarView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="370.5dp"
         android:layout_alignParentTop="true"
-        android:layout_margin="16dp"/>
+        android:layout_margin="16dp"
+        app:mcv_tileSize="53dp"
+        android:layout_marginTop="32dp"
+        app:mcv_selectionColor="@color/black"
+        app:mcv_showOtherDates="all" />
 
     <!-- 날짜 선택 버튼 -->
     <Button
@@ -21,9 +25,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Select Date"
-        android:layout_below="@id/calendar_view"
+        android:layout_below="@id/calendarView"
         android:layout_marginTop="16dp"
-        android:layout_centerHorizontal="true"/>
+        android:layout_centerHorizontal="true" />
 
     <!-- 하단바 -->
     <LinearLayout
