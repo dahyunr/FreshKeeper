@@ -1,9 +1,7 @@
 plugins {
     id("com.android.application")
     id("kotlin-android")
-    id("kotlin-kapt") // Kotlin Annotation Processing Tool 추가
-    // Firebase 및 Google 서비스 플러그인 제거
-    // id("com.google.gms.google-services")
+    id("kotlin-kapt")
 }
 
 android {
@@ -62,10 +60,6 @@ dependencies {
     implementation("androidx.camera:camera-lifecycle:1.1.0")
     implementation("androidx.camera:camera-view:1.1.0")
 
-    // Firebase BoM 및 Analytics 제거
-    // implementation(platform("com.google.firebase:firebase-bom:33.1.2"))
-    // implementation("com.google.firebase:firebase-analytics")
-
     // JUnit 의존성 추가
     testImplementation("junit:junit:4.13.2")
 
@@ -85,11 +79,12 @@ dependencies {
     implementation("com.github.bumptech.glide:glide:4.13.2")
     kapt("com.github.bumptech.glide:compiler:4.13.2")
 
-    // Material CalendarView 추가
-    implementation("com.github.prolificinteractive:material-calendarview:2.0.1")
+    // 최신 Material CalendarView 의존성 추가
+    //implementation("com.github.prolificinteractive:material-calendarview:2.0.1")
+    implementation("com.github.sundeepk:compact-calendar-view:3.0.0")
+
+
 
     // ThreeTenABP 추가
     implementation("com.jakewharton.threetenabp:threetenabp:1.2.1")
-
-    implementation("com.github.prolificinteractive:material-calendarview:2.0.1")
 }

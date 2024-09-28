@@ -98,7 +98,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             Log.e("DatabaseHelper", "항목 삽입/업데이트 오류: " + e.getMessage());
         } finally {
             db.endTransaction();  // 트랜잭션 종료
-            db.close();  // 데이터베이스 닫기
         }
 
         return result;
@@ -135,8 +134,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             }
         } catch (SQLException e) {
             Log.e("DatabaseHelper", "항목 삭제 오류: " + e.getMessage());
-        } finally {
-            db.close();
         }
         return success;
     }

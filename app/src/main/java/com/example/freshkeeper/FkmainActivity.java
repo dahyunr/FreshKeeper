@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -34,6 +35,7 @@ import java.util.concurrent.TimeUnit;
 import java.text.SimpleDateFormat;
 import java.text.ParseException;
 import java.util.Locale;
+import android.util.Log;
 
 
 public class FkmainActivity extends AppCompatActivity {
@@ -138,6 +140,14 @@ public class FkmainActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
+        // 엔터 키 입력을 제한하는 리스너 추가
+        searchEditText.setOnEditorActionListener((v, actionId, event) -> {
+            if (event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) {
+                return true;  // 엔터 키 입력을 무시하고 아무 동작도 하지 않음
+            }
+            return false;
+        });
+
         searchEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -165,6 +175,18 @@ public class FkmainActivity extends AppCompatActivity {
 
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new SwipeToDeleteCallback(adapter, this));
         itemTouchHelper.attachToRecyclerView(recyclerView);
+
+        // 삭제 시 데이터베이스에서도 영구적으로 삭제되도록 추가
+        adapter.setOnItemDeleteListener(position -> {
+            FoodItem itemToDelete = allItems.get(position);
+            if (dbHelper.deleteItem(itemToDelete.getName())) { // 데이터베이스에서 삭제
+                allItems.remove(position); // 목록에서 삭제
+                adapter.notifyItemRemoved(position); // UI 업데이트
+                Log.d("FkmainActivity", "항목이 성공적으로 삭제되었습니다.");
+            } else {
+                Log.e("FkmainActivity", "데이터베이스에서 항목 삭제에 실패했습니다.");
+            }
+        });
     }
 
     private void requestPermissions() {

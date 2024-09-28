@@ -2,61 +2,48 @@ package com.example.freshkeeper;
 
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
-import com.google.android.material.datepicker.MaterialDatePicker;
+import android.util.Log;
 import android.widget.Button;
-import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
-import com.prolificinteractive.materialcalendarview.CalendarDay;
+import com.github.sundeepk.compactcalendarview.CompactCalendarView;
+import com.github.sundeepk.compactcalendarview.domain.Event;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 public class CalendarActivity extends AppCompatActivity {
 
-    private MaterialCalendarView calendarView;
-    private ArrayList<CalendarDay> calendarDayList = new ArrayList<>();
+    private static final String TAG = "CalendarActivity";
+    private CompactCalendarView compactCalendarView;
+    private List<Date> calendarDayList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_calendar);
 
-        // MaterialCalendarView 설정
-        calendarView = findViewById(R.id.calendarView);
+        // CompactCalendarView 초기화
+        compactCalendarView = findViewById(R.id.compactcalendar_view);
+        compactCalendarView.setUseThreeLetterAbbreviation(true); // 세 자리 약어 설정
 
-        if (calendarView != null) {
-            // Decorator 설정할 날짜 추가
-            calendarDayList.add(CalendarDay.from(2022, 5, 25));
-            calendarDayList.add(CalendarDay.from(2022, 5, 24));
-            calendarDayList.add(CalendarDay.from(2022, 5, 23));
+        // 날짜를 추가하고 이벤트를 추가하는 예시
+        calendarDayList.add(new Date(2022 - 1900, 4, 25)); // May 25, 2022
+        calendarDayList.add(new Date(2022 - 1900, 4, 24)); // May 24, 2022
+        calendarDayList.add(new Date(2022 - 1900, 4, 23)); // May 23, 2022
 
-            // 오늘 날짜 선택
-            calendarView.setSelectedDate(CalendarDay.today());
-
-            // Decorator 추가
-            Decorator decorator = new Decorator(calendarDayList, this);
-            calendarView.addDecorator(decorator);
-        } else {
-            // calendarView가 null인 경우 로그 출력
-            System.out.println("calendarView가 null입니다.");
+        // 이벤트 추가
+        for (Date date : calendarDayList) {
+            Event event = new Event(0xFF0000, date.getTime(), "Test Event");
+            compactCalendarView.addEvent(event);
         }
+
+        // 오늘 날짜로 설정
+        compactCalendarView.setCurrentDate(new Date());
 
         // 날짜 선택 버튼 설정
         Button dateButton = findViewById(R.id.date_button);
-        if (dateButton != null) {
-            dateButton.setOnClickListener(v -> {
-                // 날짜 선택기 생성 및 표시
-                MaterialDatePicker<Long> datePicker =
-                        MaterialDatePicker.Builder.datePicker()
-                                .setTitleText("날짜 선택")
-                                .build();
-
-                datePicker.show(getSupportFragmentManager(), "date_picker");
-
-                // 선택된 날짜를 처리하는 리스너 추가
-                datePicker.addOnPositiveButtonClickListener(selection -> {
-                    // 선택된 날짜를 처리하는 코드
-                    long selectedDate = selection;
-                    // 선택된 날짜 활용 가능 (필요한 작업 추가 가능)
-                });
-            });
-        }
+        dateButton.setOnClickListener(v -> {
+            // 버튼 클릭 시 처리
+            Log.d(TAG, "날짜 선택 버튼 클릭됨");
+        });
     }
 }

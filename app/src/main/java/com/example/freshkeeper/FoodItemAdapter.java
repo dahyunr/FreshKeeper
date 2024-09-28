@@ -18,14 +18,23 @@ public class FoodItemAdapter extends RecyclerView.Adapter<FoodItemAdapter.FoodIt
 
     private List<FoodItem> foodItems;
     private Context context;
-    private OnItemClickListener listener;
+    private OnItemClickListener clickListener;
+    private OnItemDeleteListener deleteListener; // 삭제 리스너 추가
 
     public interface OnItemClickListener {
         void onItemClick(int position);
     }
 
+    public interface OnItemDeleteListener { // 삭제 리스너 인터페이스 추가
+        void onItemDelete(int position);
+    }
+
     public void setOnItemClickListener(OnItemClickListener listener) {
-        this.listener = listener;
+        this.clickListener = listener;
+    }
+
+    public void setOnItemDeleteListener(OnItemDeleteListener listener) { // 삭제 리스너 설정 메서드 추가
+        this.deleteListener = listener;
     }
 
     public FoodItemAdapter(Context context, List<FoodItem> foodItems) {
@@ -37,7 +46,7 @@ public class FoodItemAdapter extends RecyclerView.Adapter<FoodItemAdapter.FoodIt
     public FoodItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_food, parent, false);
-        return new FoodItemViewHolder(itemView, listener);
+        return new FoodItemViewHolder(itemView, clickListener, deleteListener); // 삭제 리스너 전달
     }
 
     @Override
@@ -108,7 +117,7 @@ public class FoodItemAdapter extends RecyclerView.Adapter<FoodItemAdapter.FoodIt
         public TextView expDateTextView;
         public TextView countdownTextView;
 
-        public FoodItemViewHolder(View itemView, final OnItemClickListener listener) {
+        public FoodItemViewHolder(View itemView, final OnItemClickListener clickListener, final OnItemDeleteListener deleteListener) {
             super(itemView);
             imageView = itemView.findViewById(R.id.item_image);
             nameTextView = itemView.findViewById(R.id.item_name);
@@ -117,12 +126,22 @@ public class FoodItemAdapter extends RecyclerView.Adapter<FoodItemAdapter.FoodIt
             countdownTextView = itemView.findViewById(R.id.item_countdown);
 
             itemView.setOnClickListener(v -> {
-                if (listener != null) {
+                if (clickListener != null) {
                     int position = getAdapterPosition();
                     if (position != RecyclerView.NO_POSITION) {
-                        listener.onItemClick(position);
+                        clickListener.onItemClick(position);
                     }
                 }
+            });
+
+            itemView.setOnLongClickListener(v -> {
+                if (deleteListener != null) {
+                    int position = getAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION) {
+                        deleteListener.onItemDelete(position); // 삭제 이벤트 전달
+                    }
+                }
+                return true;
             });
         }
     }

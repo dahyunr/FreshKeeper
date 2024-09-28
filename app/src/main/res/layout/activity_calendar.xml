@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -7,27 +6,24 @@
     android:layout_height="match_parent"
     tools:context=".CalendarActivity">
 
-    <!-- 캘린더 뷰 -->
-    <com.prolificinteractive.materialcalendarview.MaterialCalendarView
-        android:id="@+id/calendarView"
+    <!-- CompactCalendarView -->
+    <com.github.sundeepk.compactcalendarview.CompactCalendarView
+        android:id="@+id/compactcalendar_view"
         android:layout_width="match_parent"
         android:layout_height="370.5dp"
         android:layout_alignParentTop="true"
-        android:layout_margin="16dp"
-        app:mcv_tileSize="53dp"
-        android:layout_marginTop="32dp"
-        app:mcv_selectionColor="@color/black"
-        app:mcv_showOtherDates="all" />
+        android:layout_margin="16dp" />
 
     <!-- 날짜 선택 버튼 -->
     <Button
         android:id="@+id/date_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Select Date"
-        android:layout_below="@id/calendarView"
+        android:text="@string/select_date"
+        android:layout_below="@id/compactcalendar_view"
         android:layout_marginTop="16dp"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:background="?attr/selectableItemBackground" />
 
     <!-- 하단바 -->
     <LinearLayout
@@ -38,94 +34,94 @@
         android:background="#8BC34A"
         android:orientation="horizontal">
 
+        <!-- 냉장고 아이콘 -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:orientation="vertical"
             android:gravity="center">
-
             <ImageView
                 android:id="@+id/icon_ref"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:src="@drawable/fk_ref"
                 app:tint="#ffffff"
-                android:contentDescription="냉장고 아이콘" />
+                android:contentDescription="@string/fridge_icon" />
             <TextView
                 android:id="@+id/text_ref"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="냉장고"
+                android:text="@string/fridge"
                 android:textColor="#ffffff"
                 android:textSize="12sp" />
         </LinearLayout>
 
+        <!-- 캘린더 아이콘 -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:orientation="vertical"
             android:gravity="center">
-
             <ImageView
                 android:id="@+id/icon_calendar"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:src="@drawable/fk_calendar"
                 app:tint="#000000"
-                android:contentDescription="캘린더 아이콘" />
+                android:contentDescription="@string/calendar" />
             <TextView
                 android:id="@+id/text_calendar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="캘린더"
+                android:text="@string/calendar"
                 android:textColor="#000000"
                 android:textSize="12sp" />
         </LinearLayout>
 
+        <!-- 바코드 아이콘 -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:orientation="vertical"
             android:gravity="center">
-
             <ImageView
                 android:id="@+id/icon_barcode"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:src="@drawable/fk_bar"
                 app:tint="#FFFFFF"
-                android:contentDescription="바코드 아이콘" />
+                android:contentDescription="@string/barcode" />
             <TextView
                 android:id="@+id/text_barcode"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="바코드"
+                android:text="@string/barcode"
                 android:textColor="#ffffff"
                 android:textSize="12sp" />
         </LinearLayout>
 
+        <!-- 마이페이지 아이콘 -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:orientation="vertical"
             android:gravity="center">
-
             <ImageView
                 android:id="@+id/icon_mypage"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:src="@drawable/fk_mypage"
                 app:tint="#FFFFFF"
-                android:contentDescription="마이페이지 아이콘" />
+                android:contentDescription="@string/mypage" />
             <TextView
                 android:id="@+id/text_mypage"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="마이페이지"
+                android:text="@string/mypage"
                 android:textColor="#ffffff"
                 android:textSize="12sp" />
         </LinearLayout>

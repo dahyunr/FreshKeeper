@@ -25,6 +25,12 @@
     <string name="new_password_hint">새 비밀번호</string>
     <string name="confirm_new_password_hint">새 비밀번호 확인</string>
 
+    <string name="select_date">날짜 선택</string>
+    <string name="fridge_icon">냉장고 아이콘</string>
+    <string name="fridge">냉장고</string>
+    <string name="calendar">캘린더</string>
+    <string name="barcode">바코드</string>
+    <string name="mypage">마이페이지</string>
 
 
     <string-array name="category_array">
