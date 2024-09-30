@@ -27,8 +27,20 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
 
+        // 앱 시작 시 로그인 상태 확인
+        SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+        boolean isLoggedIn = sharedPreferences.getBoolean("isLoggedIn", false);
+
+        if (isLoggedIn) {
+            // 이미 로그인되어 있으면 메인 화면으로 이동
+            Intent intent = new Intent(LoginActivity.this, FkmainActivity.class);
+            startActivity(intent);
+            finish();  // LoginActivity 종료
+            return;
+        }
+
+        setContentView(R.layout.activity_login);
         Log.d(TAG, "onCreate: 시작");
 
         editTextEmail = findViewById(R.id.editTextEmail);
@@ -50,6 +62,7 @@ public class LoginActivity extends AppCompatActivity {
                     int loginResult = login(email, password);
                     switch (loginResult) {
                         case 1:
+                            saveLoginInfo(email, password); // 로그인 성공 시 정보 저장
                             Intent intent = new Intent(LoginActivity.this, FkmainActivity.class);
                             startActivity(intent);
                             finish(); // 로그인 액티비티 종료
@@ -98,6 +111,17 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
+    // 로그인 정보 저장 메서드
+    private void saveLoginInfo(String email, String password) {
+        SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("Email", email);
+        editor.putString("Password", password);
+        editor.putBoolean("isLoggedIn", true);  // 로그인 상태 저장
+        editor.apply();
+    }
+
+    // 로그인 검증 메서드
     private int login(String email, String password) {
         SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
         String registeredEmail = sharedPreferences.getString("Email", "");

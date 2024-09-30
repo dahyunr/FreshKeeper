@@ -31,14 +31,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
 import java.text.SimpleDateFormat;
-import java.text.ParseException;
 import java.util.Locale;
 import android.util.Log;
 
-
-public class FkmainActivity extends BaseActivity {
+public class FkmainActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
     private FoodItemAdapter adapter;
@@ -260,8 +257,8 @@ public class FkmainActivity extends BaseActivity {
     }
 
     private String calculateDDay(String expDate) {
-        SimpleDateFormat dateFormat8 = new SimpleDateFormat("yyyyMMdd");
-        SimpleDateFormat dateFormat6 = new SimpleDateFormat("yyMMdd");
+        SimpleDateFormat dateFormat8 = new SimpleDateFormat("yyyyMMdd", Locale.getDefault());
+        SimpleDateFormat dateFormat6 = new SimpleDateFormat("yyMMdd", Locale.getDefault());
         try {
             Date expirationDate;
             if (expDate.length() == 8) {
