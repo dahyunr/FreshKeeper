@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item>
-        <shape android:shape="oval">
-            <solid android:color="@android:color/transparent"/> <!-- 선택되지 않은 날짜의 배경색 설정 -->
-            <stroke android:width="2dp" android:color="#000000"/> <!-- 선택되지 않은 날짜의 테두리 색상 설정 -->
-        </shape>
-    </item>
-</layer-list>

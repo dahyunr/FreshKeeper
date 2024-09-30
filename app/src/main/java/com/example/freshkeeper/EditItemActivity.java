@@ -7,7 +7,7 @@ import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-public class EditItemActivity extends AppCompatActivity {
+public class EditItemActivity extends BaseActivity {
 
     private EditText editName, editRegDate, editExpDate, editMemo;
     private ImageView itemImage;

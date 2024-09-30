@@ -7,7 +7,7 @@ import android.widget.Spinner;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-public class NotificationSettingsActivity extends AppCompatActivity {
+public class NotificationSettingsActivity extends BaseActivity {
 
     private Spinner dateSpinner, timeSpinner;
 

@@ -21,9 +21,6 @@ public class LoginActivity extends AppCompatActivity {
     private TextView buttonGuestLogin;
     private TextView buttonForgotPassword;
     private TextView buttonRegister;
-    private Button buttonGoogleLogin;
-    private Button buttonKakaoLogin;
-    private Button buttonNaverLogin;
 
     private static final String TAG = "LoginActivity";
 
@@ -40,9 +37,6 @@ public class LoginActivity extends AppCompatActivity {
         buttonGuestLogin = findViewById(R.id.buttonGuestLogin);
         buttonForgotPassword = findViewById(R.id.buttonForgotPassword);
         buttonRegister = findViewById(R.id.buttonRegister);
-        buttonGoogleLogin = findViewById(R.id.buttonGoogleLogin);
-        buttonKakaoLogin = findViewById(R.id.buttonKakaoLogin);
-        buttonNaverLogin = findViewById(R.id.buttonNaverLogin);
 
         buttonLogin.setOnClickListener(new View.OnClickListener() {
             @Override

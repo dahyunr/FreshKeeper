@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import androidx.appcompat.app.AppCompatActivity;
 
-public class LogoActivity extends AppCompatActivity {
+public class LogoActivity extends BaseActivity {
     private static final int SPLASH_TIME_OUT = 3000; // 3초 후에 로그인 화면으로 이동
 
     @Override

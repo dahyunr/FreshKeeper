@@ -36,7 +36,7 @@ import retrofit2.Response;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-public class BarcodeScanActivity extends AppCompatActivity {
+public class BarcodeScanActivity extends BaseActivity {
 
     private static final int CAMERA_REQUEST_CODE = 100;
     private static final int ADD_ITEM_REQUEST_CODE = 200;

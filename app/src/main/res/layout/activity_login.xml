@@ -82,54 +82,6 @@
                 android:textColor="@android:color/black"/>
         </LinearLayout>
 
-        <!-- 소셜 로그인 버튼들 -->
-        <LinearLayout
-            android:id="@+id/socialLoginLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginTop="10dp"
-            android:gravity="center_horizontal">
-
-            <!-- Google 로그인 버튼 -->
-            <Button
-                android:id="@+id/buttonGoogleLogin"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Google로 로그인"
-                android:drawableLeft="@drawable/fk_google"
-                android:background="#F5F5F5"
-                android:padding="10dp"
-                android:textSize="14sp"
-                android:layout_marginBottom="5dp"
-                android:backgroundTint="@null"/>
-
-            <!-- Kakao 로그인 버튼 -->
-            <Button
-                android:id="@+id/buttonKakaoLogin"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Kakao로 로그인"
-                android:drawableLeft="@drawable/fk_kakao"
-                android:background="#F5F5F5"
-                android:padding="10dp"
-                android:textSize="14sp"
-                android:layout_marginBottom="5dp"
-                android:backgroundTint="@null"/>
-
-            <!-- Naver 로그인 버튼 -->
-            <Button
-                android:id="@+id/buttonNaverLogin"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Naver로 로그인"
-                android:drawableLeft="@drawable/fk_naver"
-                android:background="#F5F5F5"
-                android:padding="10dp"
-                android:textSize="14sp"
-                android:backgroundTint="@null"/>
-        </LinearLayout>
-
         <!-- 로그인 버튼 -->
         <Button
             android:id="@+id/buttonLogin"

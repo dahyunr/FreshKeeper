@@ -12,7 +12,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-public class QnaActivity extends AppCompatActivity {
+public class QnaActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

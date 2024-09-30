@@ -18,7 +18,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.IOException;
 
-public class MypageActivity extends AppCompatActivity {
+public class MypageActivity extends BaseActivity {
 
     private static final int PICK_IMAGE = 1;
     private ImageView profileImage;

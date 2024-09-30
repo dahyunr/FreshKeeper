@@ -12,7 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.Random;
 
-public class PwActivity extends AppCompatActivity {
+public class PwActivity extends BaseActivity {
 
     private EditText emailField;
     private EditText phoneField;
