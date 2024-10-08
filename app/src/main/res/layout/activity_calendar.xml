@@ -40,6 +40,16 @@
         android:layout_centerHorizontal="true"
         android:background="?attr/selectableItemBackground" />
 
+    <!-- 아이템 리스트 레이아웃 추가 -->
+    <LinearLayout
+        android:id="@+id/item_list_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_below="@id/date_button"
+        android:layout_marginTop="16dp"
+        android:padding="16dp" />
+
     <!-- 하단바 -->
     <LinearLayout
         android:id="@+id/footer"
@@ -140,14 +150,5 @@
                 android:textColor="#ffffff"
                 android:textSize="12sp" />
         </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/item_list_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_below="@id/compactcalendar_view"
-            android:layout_marginTop="16dp"
-            android:padding="16dp" />
     </LinearLayout>
 </RelativeLayout>
