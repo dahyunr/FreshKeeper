@@ -27,7 +27,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 
-public class AddItemActivity extends AppCompatActivity {
+public class AddItemActivity extends BaseActivity {
 
     private static final int PICK_IMAGE_REQUEST = 1;
     private static final int REQUEST_CODE_STORAGE_PERMISSION = 100;

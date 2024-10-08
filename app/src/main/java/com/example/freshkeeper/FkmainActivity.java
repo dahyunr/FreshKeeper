@@ -35,7 +35,7 @@ import java.text.SimpleDateFormat;
 import java.util.Locale;
 import android.util.Log;
 
-public class FkmainActivity extends AppCompatActivity {
+public class FkmainActivity extends BaseActivity {
 
     private RecyclerView recyclerView;
     private FoodItemAdapter adapter;

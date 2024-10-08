@@ -26,7 +26,7 @@ android {
             isMinifyEnabled = false
         }
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true  // ProGuard 난독화 활성화
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
@@ -54,11 +54,11 @@ dependencies {
     // ML Kit Barcode Scanning 의존성 추가
     implementation("com.google.mlkit:barcode-scanning:17.0.3")
 
-    // CameraX 의존성 추가
-    implementation("androidx.camera:camera-core:1.1.0")
-    implementation("androidx.camera:camera-camera2:1.1.0")
-    implementation("androidx.camera:camera-lifecycle:1.1.0")
-    implementation("androidx.camera:camera-view:1.1.0")
+    // CameraX 의존성 최신화
+    implementation("androidx.camera:camera-core:1.2.0")
+    implementation("androidx.camera:camera-camera2:1.2.0")
+    implementation("androidx.camera:camera-lifecycle:1.2.0")
+    implementation("androidx.camera:camera-view:1.2.0")
 
     // JUnit 의존성 추가
     testImplementation("junit:junit:4.13.2")
@@ -79,12 +79,9 @@ dependencies {
     implementation("com.github.bumptech.glide:glide:4.13.2")
     kapt("com.github.bumptech.glide:compiler:4.13.2")
 
-    // 최신 Material CalendarView 의존성 추가
-    //implementation("com.github.prolificinteractive:material-calendarview:2.0.1")
+    // CompactCalendarView 의존성 추가
     implementation("com.github.sundeepk:compact-calendar-view:3.0.0")
 
-
-
-    // ThreeTenABP 추가
-    implementation("com.jakewharton.threetenabp:threetenabp:1.2.1")
+    // ThreeTenABP 최신화
+    implementation("com.jakewharton.threetenabp:threetenabp:1.3.0")
 }

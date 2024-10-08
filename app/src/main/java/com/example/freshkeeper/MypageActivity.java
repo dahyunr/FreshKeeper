@@ -2,6 +2,7 @@ package com.example.freshkeeper;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
@@ -14,7 +15,6 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.IOException;
 
@@ -26,14 +26,15 @@ public class MypageActivity extends BaseActivity {
     private ImageView iconRef, iconCalendar, iconBarcode, iconMypage;
     private TextView withdrawalTextView, notificationSettingsTextView;
     private TextView contactUsButton;  // 문의하기 버튼 변수 추가
-    private TextView faqTextView; // 자주 묻는 질문 버튼
+    private TextView faqTextView;  // 자주 묻는 질문 버튼
+    private TextView logoutTextView;  // 로그아웃 버튼 변수 추가
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mypage);
 
-        // UI 요소들 초기화
+        // UI 요소 초기화
         profileImage = findViewById(R.id.profile_image);
         nicknameTextView = findViewById(R.id.profile_nickname);
         emailTextView = findViewById(R.id.profile_email);
@@ -44,13 +45,22 @@ public class MypageActivity extends BaseActivity {
         withdrawalTextView = findViewById(R.id.withdrawal);
         notificationSettingsTextView = findViewById(R.id.notification_settings);
 
+        // 로그아웃 텍스트뷰 초기화 및 클릭 리스너 추가
+        logoutTextView = findViewById(R.id.logout);
+        logoutTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                logout();
+            }
+        });
+
         // "자주 물어보는 질문" 텍스트뷰 초기화 및 클릭 리스너 추가
         faqTextView = findViewById(R.id.button_faq);
         faqTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MypageActivity.this, FAQActivity.class);
-                startActivity(intent);
+                Intent faqIntent = new Intent(MypageActivity.this, FAQActivity.class);
+                startActivity(faqIntent);
             }
         });
 
@@ -59,8 +69,8 @@ public class MypageActivity extends BaseActivity {
         contactUsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MypageActivity.this, QnaActivity.class);
-                startActivity(intent);
+                Intent contactIntent = new Intent(MypageActivity.this, QnaActivity.class);
+                startActivity(contactIntent);
             }
         });
 
@@ -77,18 +87,19 @@ public class MypageActivity extends BaseActivity {
         });
 
         // 하단바 아이콘 클릭 리스너
+        final Intent intent = new Intent();  // Intent 변수 재사용
         iconRef.setOnClickListener(v -> {
-            Intent intent = new Intent(MypageActivity.this, FkmainActivity.class);
+            intent.setClass(MypageActivity.this, FkmainActivity.class);
             startActivity(intent);
         });
 
         iconCalendar.setOnClickListener(v -> {
-            Intent intent = new Intent(MypageActivity.this, CalendarActivity.class);
+            intent.setClass(MypageActivity.this, CalendarActivity.class);
             startActivity(intent);
         });
 
         iconBarcode.setOnClickListener(v -> {
-            Intent intent = new Intent(MypageActivity.this, BarcodeScanActivity.class);
+            intent.setClass(MypageActivity.this, BarcodeScanActivity.class);
             startActivity(intent);
         });
 
@@ -97,9 +108,22 @@ public class MypageActivity extends BaseActivity {
         withdrawalTextView.setOnClickListener(v -> showWithdrawalDialog());
 
         notificationSettingsTextView.setOnClickListener(v -> {
-            Intent intent = new Intent(MypageActivity.this, NotificationSettingsActivity.class);
-            startActivity(intent);
+            Intent notificationIntent = new Intent(MypageActivity.this, NotificationSettingsActivity.class);
+            startActivity(notificationIntent);
         });
+
+        // SharedPreferences에서 사용자 정보 로드
+        loadUserInfo();
+    }
+
+    private void loadUserInfo() {
+        SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+        String userName = sharedPreferences.getString("userName", "Unknown User");
+        String userEmail = sharedPreferences.getString("userEmail", "No Email");
+
+        // UI 업데이트
+        nicknameTextView.setText(userName);
+        emailTextView.setText(userEmail);
     }
 
     private void openGallery() {
@@ -151,5 +175,17 @@ public class MypageActivity extends BaseActivity {
                 })
                 .setNegativeButton("취소", null)
                 .show();
+    }
+
+    private void logout() {
+        SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.clear();  // 저장된 로그인 정보 삭제
+        editor.apply();
+
+        // 로그인 화면으로 이동
+        Intent intent = new Intent(MypageActivity.this, LoginActivity.class);
+        startActivity(intent);
+        finish();  // 마이페이지 종료
     }
 }

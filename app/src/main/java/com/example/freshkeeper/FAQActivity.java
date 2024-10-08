@@ -4,9 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
-import com.google.android.material.tabs.TabLayout;
-
-import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,13 +30,6 @@ public class FAQActivity extends BaseActivity {
         // 어댑터 설정
         faqAdapter = new FAQAdapter(this, faqQuestions, faqAnswers);
         faqListView.setAdapter(faqAdapter);
-
-        // TabLayout 초기화 및 탭 추가
-        TabLayout tabLayout = findViewById(R.id.tabLayout);
-        tabLayout.addTab(tabLayout.newTab().setText("전체"));
-        tabLayout.addTab(tabLayout.newTab().setText("냉장고"));
-        tabLayout.addTab(tabLayout.newTab().setText("계정"));
-        tabLayout.addTab(tabLayout.newTab().setText("서비스"));
 
         // 뒤로 가기 버튼 설정
         ImageView backButton = findViewById(R.id.back_button);

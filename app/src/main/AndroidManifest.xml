@@ -23,6 +23,9 @@
     <!-- 인터넷 접근 권한 -->
     <uses-permission android:name="android.permission.INTERNET"/>
 
+    <!-- SMS 전송 권한 (두 번째 파일에 누락된 부분) -->
+    <uses-permission android:name="android.permission.SEND_SMS"/>
+
     <!-- 카메라 하드웨어 사용 명시 -->
     <uses-feature android:name="android.hardware.camera" android:required="false"/>
 
@@ -36,7 +39,7 @@
         android:requestLegacyExternalStorage="true"
         android:networkSecurityConfig="@xml/network_security_config">
 
-        <!-- 액티비티 선언 -->
+        <!-- 앱 실행 시 시작할 메인 액티비티 -->
         <activity
             android:name=".LogoActivity"
             android:exported="true">
@@ -59,10 +62,10 @@
         <activity android:name=".NotificationSettingsActivity" android:exported="false"/>
         <activity android:name=".MypageActivity" android:exported="false"/>
 
-        <!-- 추가된 Calendar 관련 액티비티 -->
+        <!-- 캘린더 관련 액티비티 -->
         <activity android:name=".CalendarActivity" android:exported="false"/>
 
-        <!-- 수정된 아이템 액티비티 -->
+        <!-- 아이템 수정 액티비티 -->
         <activity android:name=".EditItemActivity" android:exported="false"/>
 
         <!-- 기타 지원 액티비티 -->

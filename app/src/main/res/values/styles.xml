@@ -25,4 +25,17 @@
         <item name="android:textStyle">bold</item>
     </style>
 
+    <!-- Calendar Date Text Appearance -->
+    <style name="CalendarDateText">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">@color/colorPrimary</item>
+    </style>
+
+    <!-- Calendar Header Text Appearance -->
+    <style name="CalendarHeaderText">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/colorAccent</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
 </resources>

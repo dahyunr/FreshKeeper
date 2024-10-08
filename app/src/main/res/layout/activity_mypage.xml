@@ -285,7 +285,9 @@
                         android:layout_marginTop="8dp"
                         android:layout_marginBottom="8dp" />
 
+                    <!-- 로그아웃 버튼 추가 -->
                     <TextView
+                        android:id="@+id/logout"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"

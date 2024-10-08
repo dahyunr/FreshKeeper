@@ -6,24 +6,30 @@
     android:layout_height="match_parent"
     tools:context=".CalendarActivity">
 
+    <!-- 연도 및 월을 표시하는 TextView -->
     <TextView
         android:id="@+id/year_month_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="20sp"
-        android:textColor="#000000"
+        android:text="년/월"
+        android:textSize="18sp"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="16dp"
-        android:text="9월 2024" />
+        android:layout_marginTop="16dp" />
 
+    <!-- CompactCalendarView -->
     <com.github.sundeepk.compactcalendarview.CompactCalendarView
         android:id="@+id/compactcalendar_view"
         android:layout_width="match_parent"
         android:layout_height="370.5dp"
         android:layout_below="@id/year_month_text_view"
-        android:layout_margin="16dp" />
+        android:layout_margin="16dp"
+        android:background="#F0F0F0"
+        app:compactCalendarBackgroundColor="@android:color/white"
+        app:compactCalendarCurrentSelectedDayBackgroundColor="@android:color/holo_green_light"
+        app:compactCalendarTextColor="#000000" />
 
+    <!-- 날짜 선택 버튼 -->
     <Button
         android:id="@+id/date_button"
         android:layout_width="wrap_content"
@@ -34,6 +40,7 @@
         android:layout_centerHorizontal="true"
         android:background="?attr/selectableItemBackground" />
 
+    <!-- 하단바 -->
     <LinearLayout
         android:id="@+id/footer"
         android:layout_width="match_parent"
@@ -42,6 +49,7 @@
         android:background="#8BC34A"
         android:orientation="horizontal">
 
+        <!-- 냉장고 아이콘 -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -64,6 +72,7 @@
                 android:textSize="12sp" />
         </LinearLayout>
 
+        <!-- 캘린더 아이콘 -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -86,6 +95,7 @@
                 android:textSize="12sp" />
         </LinearLayout>
 
+        <!-- 바코드 아이콘 -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -108,6 +118,7 @@
                 android:textSize="12sp" />
         </LinearLayout>
 
+        <!-- 마이페이지 아이콘 -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -129,6 +140,14 @@
                 android:textColor="#ffffff"
                 android:textSize="12sp" />
         </LinearLayout>
-    </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/item_list_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_below="@id/compactcalendar_view"
+            android:layout_marginTop="16dp"
+            android:padding="16dp" />
+    </LinearLayout>
 </RelativeLayout>

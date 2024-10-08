@@ -1,14 +1,20 @@
 package com.example.freshkeeper;
 
-import android.content.Intent; // 이 부분 추가
+import android.Manifest;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.telephony.SmsManager;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
+import com.example.freshkeeper.database.DatabaseHelper;
 
 import java.util.Random;
 
@@ -30,6 +36,9 @@ public class PwActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pw);
 
+        // 권한 체크
+        checkSmsPermission();
+
         // View 초기화
         emailField = findViewById(R.id.email);
         phoneField = findViewById(R.id.phone);
@@ -46,7 +55,8 @@ public class PwActivity extends BaseActivity {
             public void onClick(View v) {
                 if (validatePhone()) {
                     generatedCode = generateVerificationCode();
-                    Toast.makeText(PwActivity.this, "인증번호: " + generatedCode, Toast.LENGTH_LONG).show();
+                    sendSms(phoneField.getText().toString(), generatedCode);
+                    Toast.makeText(PwActivity.this, "인증번호가 전송되었습니다.", Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -71,7 +81,11 @@ public class PwActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 if (validateInputs()) {
-                    // 비밀번호를 저장하는 로직 구현 (예: 서버에 저장)
+                    // 비밀번호 저장 로직 추가
+                    String email = emailField.getText().toString();
+                    String newPassword = newPasswordField.getText().toString();
+                    updatePassword(email, newPassword);
+
                     Toast.makeText(PwActivity.this, "비밀번호가 성공적으로 변경되었습니다.", Toast.LENGTH_SHORT).show();
 
                     // 로그인 화면으로 이동하는 Intent 추가
@@ -83,6 +97,13 @@ public class PwActivity extends BaseActivity {
         });
     }
 
+    // 런타임 권한 요청 메서드
+    private void checkSmsPermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.SEND_SMS}, 1);
+        }
+    }
+
     // 전화번호 유효성 검사
     private boolean validatePhone() {
         String phone = phoneField.getText().toString();
@@ -90,8 +111,6 @@ public class PwActivity extends BaseActivity {
             Toast.makeText(this, "전화번호를 입력하세요.", Toast.LENGTH_SHORT).show();
             return false;
         }
-
-        // 추가적인 전화번호 형식 검사를 여기서 할 수 있습니다.
 
         return true;
     }
@@ -125,5 +144,23 @@ public class PwActivity extends BaseActivity {
         Random random = new Random();
         int code = 100000 + random.nextInt(900000); // 100000 ~ 999999 사이의 숫자
         return String.valueOf(code);
+    }
+
+    // SMS 전송 메서드
+    private void sendSms(String phoneNumber, String message) {
+        try {
+            SmsManager smsManager = SmsManager.getDefault();
+            smsManager.sendTextMessage(phoneNumber, null, message, null, null);
+            Toast.makeText(getApplicationContext(), "SMS 전송 완료!", Toast.LENGTH_LONG).show();
+        } catch (Exception e) {
+            Toast.makeText(getApplicationContext(), "SMS 전송 실패, 다시 시도하세요.", Toast.LENGTH_LONG).show();
+            e.printStackTrace();
+        }
+    }
+
+    // 비밀번호 업데이트 메서드 추가
+    private void updatePassword(String email, String newPassword) {
+        DatabaseHelper dbHelper = new DatabaseHelper(this);
+        dbHelper.updateUserPassword(email, newPassword);  // DatabaseHelper 클래스에 있는 메서드를 호출
     }
 }

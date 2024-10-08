@@ -11,7 +11,7 @@ import android.util.Log;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "FreshKeeper.db";
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 6;
 
     // users 테이블 정보 (회원 관련)
     private static final String USERS_TABLE_NAME = "users";
@@ -53,16 +53,28 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     ITEM_COLUMN_STORAGE_METHOD + " INTEGER, " +
                     ITEM_COLUMN_IMAGE_PATH + " TEXT);";
 
+    // 데이터베이스 참조용 멤버 변수
+    private SQLiteDatabase database;
+
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+    }
+
+    // 재귀 호출 방지를 위한 getDatabase 메서드
+    public SQLiteDatabase getDatabase() {
+        if (database == null || !database.isOpen()) {
+            database = this.getReadableDatabase();  // 필요할 때만 데이터베이스를 엽니다.
+        }
+        return database;
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
         try {
-            // users 테이블과 items 테이블 생성
             db.execSQL(USERS_TABLE_CREATE);  // users 테이블 생성
+            Log.d("DatabaseHelper", "Users 테이블 생성 완료");
             db.execSQL(ITEMS_TABLE_CREATE);  // items 테이블 생성
+            Log.d("DatabaseHelper", "Items 테이블 생성 완료");
         } catch (SQLException e) {
             Log.e("DatabaseHelper", "테이블 생성 오류: " + e.getMessage());
         }
@@ -71,15 +83,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         if (oldVersion < newVersion) {
-            db.execSQL("DROP TABLE IF EXISTS " + USERS_TABLE_NAME);  // 기존 users 테이블 삭제
-            db.execSQL("DROP TABLE IF EXISTS " + ITEMS_TABLE_NAME);  // 기존 items 테이블 삭제
+            db.execSQL("DROP TABLE IF EXISTS " + USERS_TABLE_NAME);
+            db.execSQL("DROP TABLE IF EXISTS " + ITEMS_TABLE_NAME);
             onCreate(db);  // 새 테이블 생성
         }
     }
 
     // 이메일 중복 확인 메서드 (users 테이블)
     public boolean isEmailExists(String email) {
-        SQLiteDatabase db = this.getReadableDatabase();
+        SQLiteDatabase db = getDatabase();
         String selection = USER_COLUMN_EMAIL + " = ?";
         String[] selectionArgs = {email};
         Cursor cursor = db.query(USERS_TABLE_NAME, null, selection, selectionArgs, null, null, null);
@@ -90,7 +102,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     // 사용자 등록 메서드 (users 테이블)
     public long insertUser(String userName, String email, String password, String phone) {
-        SQLiteDatabase db = this.getWritableDatabase();
+        SQLiteDatabase db = getDatabase();
         ContentValues values = new ContentValues();
         values.put(USER_COLUMN_NAME, userName);
         values.put(USER_COLUMN_EMAIL, email);
@@ -100,13 +112,49 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return db.insert(USERS_TABLE_NAME, null, values);
     }
 
+    // 사용자 이메일과 비밀번호를 확인하는 메서드 (로그인)
+    public boolean authenticateUser(String email, String password) {
+        SQLiteDatabase db = getDatabase();
+        String[] columns = {USER_COLUMN_ID};
+        String selection = USER_COLUMN_EMAIL + " = ? AND " + USER_COLUMN_PASSWORD + " = ?";
+        String[] selectionArgs = {email, password};
+
+        Cursor cursor = db.query(USERS_TABLE_NAME, columns, selection, selectionArgs, null, null, null);
+        boolean isAuthenticated = cursor.getCount() > 0;
+        cursor.close();
+        return isAuthenticated;
+    }
+
+    // 이메일로 사용자 이름 가져오기
+    public String getUserNameByEmail(String email) {
+        SQLiteDatabase db = getDatabase();
+        String userName = "Unknown User";
+        String query = "SELECT " + USER_COLUMN_NAME + " FROM " + USERS_TABLE_NAME + " WHERE " + USER_COLUMN_EMAIL + " = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{email});
+
+        if (cursor.moveToFirst()) {
+            userName = cursor.getString(cursor.getColumnIndexOrThrow(USER_COLUMN_NAME));
+        }
+        cursor.close();
+        return userName;
+    }
+
+    // 사용자 비밀번호 업데이트 메서드 (비밀번호 찾기 기능에 사용)
+    public void updateUserPassword(String email, String newPassword) {
+        SQLiteDatabase db = getDatabase();
+        ContentValues values = new ContentValues();
+        values.put(USER_COLUMN_PASSWORD, newPassword);
+
+        db.update(USERS_TABLE_NAME, values, USER_COLUMN_EMAIL + " = ?", new String[]{email});
+    }
+
     // items 테이블에 항목 삽입 또는 업데이트 메서드
     public long insertOrUpdateItem(String name, String regDate, String expDate, String memo, int quantity, int storageMethod, String imagePath) {
-        SQLiteDatabase db = this.getWritableDatabase();
+        SQLiteDatabase db = getDatabase();
         long result = -1;
 
         try {
-            db.beginTransaction(); // 트랜잭션 시작
+            db.beginTransaction();  // 트랜잭션 시작
             ContentValues values = new ContentValues();
             values.put(ITEM_COLUMN_NAME, name);
             values.put(ITEM_COLUMN_REG_DATE, regDate);
@@ -116,18 +164,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             values.put(ITEM_COLUMN_STORAGE_METHOD, storageMethod);
             values.put(ITEM_COLUMN_IMAGE_PATH, imagePath);
 
-            // 이미 존재하면 업데이트, 없으면 삽입
             int rowsAffected = db.update(ITEMS_TABLE_NAME, values, ITEM_COLUMN_NAME + " = ?", new String[]{name});
             if (rowsAffected == 0) {
                 result = db.insert(ITEMS_TABLE_NAME, null, values);  // 중복 항목이 없을 경우 삽입
             } else {
                 result = rowsAffected;  // 업데이트된 행 수 반환
             }
-            db.setTransactionSuccessful(); // 트랜잭션 성공
+            db.setTransactionSuccessful();  // 트랜잭션 성공
         } catch (SQLException e) {
-            e.printStackTrace();
+            Log.e("DatabaseHelper", "아이템 삽입 또는 업데이트 오류: " + e.getMessage());
         } finally {
-            db.endTransaction(); // 트랜잭션 종료
+            db.endTransaction();  // 트랜잭션 종료
         }
 
         return result;
@@ -135,21 +182,29 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     // items 테이블에서 항목 삭제 메서드
     public boolean deleteItem(String name) {
-        SQLiteDatabase db = this.getWritableDatabase();
+        SQLiteDatabase db = getDatabase();
         return db.delete(ITEMS_TABLE_NAME, ITEM_COLUMN_NAME + " = ?", new String[]{name}) > 0;
     }
 
     // items 테이블에서 모든 항목을 가져오는 메서드
     public Cursor getAllItems() {
-        SQLiteDatabase db = this.getReadableDatabase();
+        SQLiteDatabase db = getDatabase();
         return db.query(ITEMS_TABLE_NAME, null, null, null, null, null, null);
     }
 
     // 저장 방법에 따른 items 테이블 항목을 가져오는 메서드
     public Cursor getItemsByStorageMethod(int storageMethod) {
-        SQLiteDatabase db = this.getReadableDatabase();
+        SQLiteDatabase db = getDatabase();
         String selection = ITEM_COLUMN_STORAGE_METHOD + " = ?";
         String[] selectionArgs = {String.valueOf(storageMethod)};
+        return db.query(ITEMS_TABLE_NAME, null, selection, selectionArgs, null, null, null);
+    }
+
+    // items 테이블에서 특정 유통기한을 가진 항목을 가져오는 메서드 (캘린더 기능)
+    public Cursor getItemsByExpDate(String expDate) {
+        SQLiteDatabase db = getDatabase();
+        String selection = ITEM_COLUMN_EXP_DATE + " = ?";
+        String[] selectionArgs = {expDate};
         return db.query(ITEMS_TABLE_NAME, null, selection, selectionArgs, null, null, null);
     }
 }
