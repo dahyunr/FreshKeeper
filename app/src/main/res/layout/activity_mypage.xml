@@ -76,31 +76,6 @@
                                 android:textSize="16sp" />
                         </LinearLayout>
 
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            android:background="@drawable/fk_round"
-                            android:gravity="center_vertical"
-                            android:orientation="horizontal"
-                            android:padding="10dp">
-
-                            <ImageView
-                                android:id="@+id/google_icon"
-                                android:layout_width="24dp"
-                                android:layout_height="24dp"
-                                android:layout_marginEnd="8dp"
-                                android:src="@drawable/fk_google" />
-
-                            <TextView
-                                android:id="@+id/profile_email"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:gravity="center"
-                                android:text="djseil@gmail.com"
-                                android:textColor="#000000"
-                                android:textSize="16sp" />
-                        </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>
 
@@ -239,7 +214,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
                         android:layout_marginBottom="4dp"
-                        android:text="자주 묻는 질문"
+                        android:text="자주 물어보는 질문"
                         android:textColor="#000000"
                         android:textSize="16sp" />
 
@@ -297,20 +272,6 @@
                         android:textSize="16sp" />
                 </LinearLayout>
             </LinearLayout>
-
-            <!-- 회원탈퇴 버튼 -->
-            <TextView
-                android:id="@+id/withdrawal"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="회원탈퇴"
-                android:textColor="#000000"
-                android:textSize="16sp"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentBottom="true"
-                android:layout_marginEnd="16dp"
-                android:layout_marginBottom="16dp" />
-
         </RelativeLayout>
     </ScrollView>
 

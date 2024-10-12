@@ -1,26 +1,30 @@
 package com.example.freshkeeper;
 
 import android.Manifest;
-import android.app.DatePickerDialog;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
+import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
+import android.widget.DatePicker;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.bumptech.glide.Glide;
 import com.example.freshkeeper.database.DatabaseHelper;
+import com.example.freshkeeper.utils.FileUtils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -35,7 +39,7 @@ public class AddItemActivity extends BaseActivity {
     private EditText itemName, itemRegDate, itemExpDate, itemMemo, itemQuantity;
     private Spinner storageMethodSpinner;
     private Button saveButton, cancelButton;
-    private ImageView itemImage, itemQuantityMinus, itemQuantityPlus;
+    private ImageView itemImage, itemQuantityMinus, itemQuantityPlus, itemRegDateIcon, itemExpDateIcon;
     private Calendar calendar;
     private DatabaseHelper dbHelper;
     private int quantity = 1;
@@ -55,6 +59,8 @@ public class AddItemActivity extends BaseActivity {
         itemQuantityMinus = findViewById(R.id.item_quantity_minus);
         itemQuantityPlus = findViewById(R.id.item_quantity_plus);
         itemImage = findViewById(R.id.item_image);
+        itemRegDateIcon = findViewById(R.id.item_reg_date_icon);
+        itemExpDateIcon = findViewById(R.id.item_exp_date_icon);
         storageMethodSpinner = findViewById(R.id.storage_method);
         saveButton = findViewById(R.id.save_button);
         cancelButton = findViewById(R.id.cancel_button);
@@ -65,6 +71,46 @@ public class AddItemActivity extends BaseActivity {
         Glide.with(this).load(R.drawable.fk_gallery).into(itemImage);
 
         itemQuantity.setText(String.valueOf(quantity));
+
+        // Spinner 설정에서 "전체" 옵션을 제거하고 "냉장", "냉동", "상온"만 남김
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.storage_methods, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        storageMethodSpinner.setAdapter(adapter);
+
+        // 전달된 Intent 데이터로부터 상품명과 기타 정보 설정
+        Intent intent = getIntent();
+        if (intent != null) {
+            String productName = intent.getStringExtra("itemName");
+            String regDate = intent.getStringExtra("regDate");
+            String expDate = intent.getStringExtra("expDate");
+            String memo = intent.getStringExtra("memo");
+            int quantityValue = intent.getIntExtra("quantity", 1);
+            int storageMethod = intent.getIntExtra("storageMethod", 0);
+            String filePath = intent.getStringExtra("filePath");
+
+            // 전달된 정보를 뷰에 설정
+            if (productName != null && !productName.isEmpty()) {
+                itemName.setText(productName);
+            }
+            if (regDate != null && !regDate.isEmpty()) {
+                itemRegDate.setText(regDate);
+            }
+            if (expDate != null && !expDate.isEmpty()) {
+                itemExpDate.setText(expDate);
+            }
+            if (memo != null && !memo.isEmpty()) {
+                itemMemo.setText(memo);
+            }
+            itemQuantity.setText(String.valueOf(quantityValue));
+            storageMethodSpinner.setSelection(storageMethod);
+
+            // 이미지 로드
+            if (filePath != null && !filePath.isEmpty()) {
+                Uri imageUri = Uri.parse(FileUtils.readFileToString(filePath));
+                Glide.with(this).load(imageUri).into(itemImage);
+            }
+        }
 
         itemQuantityMinus.setOnClickListener(v -> {
             if (quantity > 1) {
@@ -78,6 +124,21 @@ public class AddItemActivity extends BaseActivity {
             itemQuantity.setText(String.valueOf(quantity));
         });
 
+        itemRegDate.setOnClickListener(v -> {
+            showCustomDatePickerDialog(itemRegDate);
+        });
+        itemExpDate.setOnClickListener(v -> {
+            showCustomDatePickerDialog(itemExpDate);
+        });
+
+        itemRegDateIcon.setOnClickListener(v -> {
+            showCustomDatePickerDialog(itemRegDate);
+        });
+
+        itemExpDateIcon.setOnClickListener(v -> {
+            showCustomDatePickerDialog(itemExpDate);
+        });
+
         // 이미지 클릭 시 갤러리 열기
         itemImage.setOnClickListener(v -> {
             if (checkStoragePermission()) {
@@ -86,9 +147,6 @@ public class AddItemActivity extends BaseActivity {
                 requestStoragePermission();
             }
         });
-
-        itemRegDate.setOnClickListener(v -> showDatePickerDialog(itemRegDate));
-        itemExpDate.setOnClickListener(v -> showDatePickerDialog(itemExpDate));
 
         saveButton.setOnClickListener(v -> {
             String name = itemName.getText().toString().trim();
@@ -119,11 +177,10 @@ public class AddItemActivity extends BaseActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             return ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES)
                     == PackageManager.PERMISSION_GRANTED;
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        } else {
             return ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
                     == PackageManager.PERMISSION_GRANTED;
         }
-        return true;
     }
 
     private void requestStoragePermission() {
@@ -131,7 +188,7 @@ public class AddItemActivity extends BaseActivity {
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.READ_MEDIA_IMAGES},
                     REQUEST_CODE_STORAGE_PERMISSION);
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        } else {
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
                     REQUEST_CODE_STORAGE_PERMISSION);
@@ -162,38 +219,43 @@ public class AddItemActivity extends BaseActivity {
             imageUri = data.getData();
             try {
                 Glide.with(this).load(imageUri).into(itemImage);
-                imagePath = imageUri.toString();  // 이미지 경로 저장
+                imagePath = imageUri.toString();
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     }
 
-    private void showDatePickerDialog(final EditText dateField) {
-        int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH);
-        int day = calendar.get(Calendar.DAY_OF_MONTH);
+    private void showCustomDatePickerDialog(final EditText dateField) {
+        Log.d("AddItemActivity", "showCustomDatePickerDialog called");
+        final View dialogView = View.inflate(this, R.layout.custom_date_picker, null);
+        final AlertDialog alertDialog = new AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert).create();
 
-        DatePickerDialog datePickerDialog = new DatePickerDialog(this, (view, year1, monthOfYear, dayOfMonth) -> {
+        DatePicker datePicker = dialogView.findViewById(R.id.date_picker);
+        dialogView.findViewById(R.id.btn_ok).setOnClickListener(view -> {
+            int day = datePicker.getDayOfMonth();
+            int month = datePicker.getMonth();
+            int year = datePicker.getYear();
+
             Calendar selectedDate = Calendar.getInstance();
-            selectedDate.set(year1, monthOfYear, dayOfMonth);
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+            selectedDate.set(year, month, day);
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.getDefault());
             dateField.setText(dateFormat.format(selectedDate.getTime()));
-        }, year, month, day);
-        datePickerDialog.show();
+
+            Log.d("AddItemActivity", "Date selected: " + dateField.getText().toString());
+            alertDialog.dismiss();
+        });
+        dialogView.findViewById(R.id.btn_cancel).setOnClickListener(view -> {
+            Log.d("AddItemActivity", "DatePicker canceled");
+            alertDialog.dismiss();
+        });
+
+        alertDialog.setView(dialogView);
+        alertDialog.show();
     }
 
     private boolean isValidDate(String date) {
-        if (date.length() == 6) {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyMMdd", Locale.getDefault());
-            dateFormat.setLenient(false);
-            try {
-                dateFormat.parse(date);
-                return true;
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-        } else if (date.length() == 8) {
+        if (date.length() == 8) {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.getDefault());
             dateFormat.setLenient(false);
             try {
@@ -202,6 +264,8 @@ public class AddItemActivity extends BaseActivity {
             } catch (ParseException e) {
                 e.printStackTrace();
             }
+        } else {
+            Toast.makeText(this, "날짜를 8자리로 입력하세요 (yyyymmdd 형식).", Toast.LENGTH_SHORT).show();
         }
         return false;
     }

@@ -5,20 +5,20 @@
     <color name="white">#FFFFFF</color>
     <color name="green">#65B120</color> <!-- 선택된 날짜 색상 (녹색) -->
     <color name="tab_unselected">#757575</color>
-    <color name="tab_selected">#4CAF50</color> <!-- 선택된 날짜 색상 (녹색) -->
-    <color name="selected_tab_color">#4CAF50</color> <!-- 동일하게 녹색 -->
+    <color name="tab_selected">#65B120</color>
+    <color name="selected_tab_color">#65B120</color>
     <color name="unselected_tab_color">#FFFFFF</color>
     <color name="tab_text_color">#000000</color>
-    <color name="save_button_color">#4CAF50</color>
-    <color name="cancel_button_color">#EAEAEA</color>
+    <color name="save_button_color">#65B120</color> <!-- 저장 버튼 색상 -->
+    <color name="cancel_button_color">#EAEAEA</color> <!-- 취소 버튼 색상 -->
     <color name="text_error">#B00020</color>
     <color name="text_warning">#FFA000</color>
     <color name="text_info">#0288D1</color>
-    <color name="text_success">#4CAF50</color>
+    <color name="text_success">#65B120</color>
     <color name="background_primary">#FFFFFF</color>
     <color name="background_secondary">#F5F5F5</color>
     <color name="dialog_background">#E0E0E0</color>
-    <color name="gray">#BDBDBD</color> <!-- 오늘 날짜의 색상 (회색) -->
+    <color name="gray">#BDBDBD</color>
     <color name="black">#000000</color>
-    <color name="tab_active">#4CAF50</color> <!-- 선택된 탭 색상 -->
+    <color name="tab_active">#65B120</color>
 </resources>

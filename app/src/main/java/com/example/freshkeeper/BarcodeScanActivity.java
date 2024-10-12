@@ -11,7 +11,6 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.core.CameraSelector;
 import androidx.camera.core.ImageAnalysis;
 import androidx.camera.core.Preview;
@@ -156,8 +155,13 @@ public class BarcodeScanActivity extends BaseActivity {
 
                         Intent intent = new Intent(BarcodeScanActivity.this, AddItemActivity.class);
                         intent.putExtra("barcodeValue", barcode);
-                        intent.putExtra("productName", productName);
+                        intent.putExtra("productName", productName);  // 상품명 전달
                         intent.putExtra("productImage", productImage);
+
+                        // 로그로 데이터 전달 확인
+                        Log.d(TAG, "상품명: " + productName);
+                        Log.d(TAG, "상품 이미지: " + productImage);
+
                         startActivityForResult(intent, ADD_ITEM_REQUEST_CODE);
                     } else {
                         Toast.makeText(BarcodeScanActivity.this, "상품 정보를 찾을 수 없습니다.", Toast.LENGTH_SHORT).show();

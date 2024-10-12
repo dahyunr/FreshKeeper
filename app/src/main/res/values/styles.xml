@@ -25,10 +25,11 @@
         <item name="android:textStyle">bold</item>
     </style>
 
-    <!-- Calendar Date Text Appearance -->
-    <style name="CalendarDateText">
-        <item name="android:textSize">12sp</item>
-        <item name="android:textColor">@color/colorPrimary</item>
+    <!-- Calendar DatePicker Custom Style -->
+    <style name="CustomDatePicker" parent="Theme.AppCompat.DayNight.Dialog">
+        <item name="android:calendarTextColor">#65B120</item>
+        <item name="android:headerBackground">#65B120</item>
+        <!-- Removed android:daySelectorColor as it is not allowed -->
     </style>
 
     <!-- Calendar Header Text Appearance -->
@@ -36,6 +37,16 @@
         <item name="android:textSize">16sp</item>
         <item name="android:textColor">@color/colorAccent</item>
         <item name="android:textStyle">bold</item>
+    </style>
+
+    <!-- 공통 버튼 스타일 -->
+    <style name="CustomButtonStyle">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:padding">10dp</item>
+        <item name="android:textColor">@android:color/black</item>
+        <item name="android:textSize">16sp</item>
     </style>
 
 </resources>

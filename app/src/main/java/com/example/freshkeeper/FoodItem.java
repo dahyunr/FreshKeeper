@@ -11,8 +11,9 @@ public class FoodItem implements Serializable {
     private String memo;
     private String imagePath;  // 이미지 경로 필드 추가
     private int quantity;      // 수량 필드 추가
+    private int storageMethod; // 저장 방법 추가
 
-    public FoodItem(int imageResource, String name, String regDate, String expDate, String countdown, String memo, String imagePath, int quantity) {
+    public FoodItem(int imageResource, String name, String regDate, String expDate, String countdown, String memo, String imagePath, int quantity, int storageMethod) {
         this.imageResource = imageResource;
         this.name = name;
         this.regDate = regDate;
@@ -21,6 +22,7 @@ public class FoodItem implements Serializable {
         this.memo = memo;
         this.imagePath = imagePath;
         this.quantity = quantity;    // 생성자에 수량 추가
+        this.storageMethod = storageMethod; // 저장 방법 추가
     }
 
     // Getters and Setters
@@ -87,5 +89,14 @@ public class FoodItem implements Serializable {
 
     public void setQuantity(int quantity) {
         this.quantity = quantity;
+    }
+
+    // 저장 방법 관련 Getter 및 Setter 추가
+    public int getStorageMethod() {
+        return storageMethod;
+    }
+
+    public void setStorageMethod(int storageMethod) {
+        this.storageMethod = storageMethod;
     }
 }

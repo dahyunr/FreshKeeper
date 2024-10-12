@@ -148,6 +148,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.update(USERS_TABLE_NAME, values, USER_COLUMN_EMAIL + " = ?", new String[]{email});
     }
 
+    // 사용자 탈퇴 시 users 테이블에서 사용자 삭제하는 메서드 추가
+    public boolean deleteUserByEmail(String email) {
+        SQLiteDatabase db = getDatabase();
+        return db.delete(USERS_TABLE_NAME, USER_COLUMN_EMAIL + " = ?", new String[]{email}) > 0;
+    }
+
     // items 테이블에 항목 삽입 또는 업데이트 메서드
     public long insertOrUpdateItem(String name, String regDate, String expDate, String memo, int quantity, int storageMethod, String imagePath) {
         SQLiteDatabase db = getDatabase();

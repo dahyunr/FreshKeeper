@@ -7,7 +7,6 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -17,7 +16,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -28,6 +26,7 @@ import com.example.freshkeeper.database.DatabaseHelper;
 import com.example.freshkeeper.utils.FileUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -80,26 +79,26 @@ public class FkmainActivity extends BaseActivity {
         recyclerView.setAdapter(adapter);
 
         activateTab(tabAll);
-        loadItemsFromDatabase();
+        loadItemsFromDatabase(); // 전체 항목을 불러옴
 
         tabAll.setOnClickListener(v -> {
             activateTab(tabAll);
-            loadItemsFromDatabase();
+            loadItemsFromDatabase(); // 전체 탭 클릭 시 전체 항목 불러오기
         });
 
         tabFrozen.setOnClickListener(v -> {
             activateTab(tabFrozen);
-            loadItemsByCategory(0);
+            loadItemsByCategory(0); // 0: 냉동
         });
 
         tabRefrigerated.setOnClickListener(v -> {
             activateTab(tabRefrigerated);
-            loadItemsByCategory(1);
+            loadItemsByCategory(1); // 1: 냉장
         });
 
         tabRoomTemp.setOnClickListener(v -> {
             activateTab(tabRoomTemp);
-            loadItemsByCategory(2);
+            loadItemsByCategory(2); // 2: 상온
         });
 
         plusButton.setOnClickListener(v -> {
@@ -129,35 +128,35 @@ public class FkmainActivity extends BaseActivity {
             // 이미지 경로를 파일로 저장하고 경로 전달
             String imagePath = clickedItem.getImagePath();
             if (imagePath != null) {
-                String filePath = FileUtils.saveDataToFile(this, "imagePath.txt", imagePath);
+                String filePath = FileUtils.saveDataToFile(this, imagePath, "imagePath.txt");
                 intent.putExtra("filePath", filePath);
             }
 
             intent.putExtra("itemName", clickedItem.getName());
+            intent.putExtra("regDate", clickedItem.getRegDate());
+            intent.putExtra("expDate", clickedItem.getExpDate());
+            intent.putExtra("memo", clickedItem.getMemo());
+            intent.putExtra("quantity", clickedItem.getQuantity());
+            intent.putExtra("storageMethod", clickedItem.getStorageMethod());
+
             startActivity(intent);
         });
 
-        // 엔터 키 입력을 제한하는 리스너 추가
-        searchEditText.setOnEditorActionListener((v, actionId, event) -> {
-            if (event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) {
-                return true;  // 엔터 키 입력을 무시하고 아무 동작도 하지 않음
-            }
-            return false;
-        });
-
+        // 검색 기능 구현
         searchEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                filter(s.toString());
+                filter(s.toString()); // 입력 시 필터링
             }
 
             @Override
             public void afterTextChanged(Editable s) {}
         });
 
+        // 정렬 버튼 클릭 시 정렬 옵션을 표시
         sortOrder.setOnClickListener(v -> {
             if (sortOptions.getVisibility() == View.GONE) {
                 sortOptions.setVisibility(View.VISIBLE);
@@ -166,14 +165,29 @@ public class FkmainActivity extends BaseActivity {
             }
         });
 
-        findViewById(R.id.sort_name).setOnClickListener(v -> sortItemsByName());
-        findViewById(R.id.sort_reg_date).setOnClickListener(v -> sortItemsByRegDate());
-        findViewById(R.id.sort_exp_date).setOnClickListener(v -> sortItemsByExpDate());
+        // 정렬 옵션 클릭 이벤트 설정
+        findViewById(R.id.sort_name).setOnClickListener(v -> {
+            sortItemsByName();
+            sortOrder.setText("이름순");
+            sortOptions.setVisibility(View.GONE); // 정렬 후 옵션 숨김
+        });
+
+        findViewById(R.id.sort_reg_date).setOnClickListener(v -> {
+            sortItemsByRegDate();
+            sortOrder.setText("등록순");
+            sortOptions.setVisibility(View.GONE); // 정렬 후 옵션 숨김
+        });
+
+        findViewById(R.id.sort_exp_date).setOnClickListener(v -> {
+            sortItemsByExpDate();
+            sortOrder.setText("유통기한순");
+            sortOptions.setVisibility(View.GONE); // 정렬 후 옵션 숨김
+        });
 
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new SwipeToDeleteCallback(adapter, this));
         itemTouchHelper.attachToRecyclerView(recyclerView);
 
-        // 삭제 시 데이터베이스에서도 영구적으로 삭제되도록 추가
+        // 삭제 기능 구현
         adapter.setOnItemDeleteListener(position -> {
             FoodItem itemToDelete = allItems.get(position);
             if (dbHelper.deleteItem(itemToDelete.getName())) { // 데이터베이스에서 삭제
@@ -200,7 +214,7 @@ public class FkmainActivity extends BaseActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == CAMERA_REQUEST_CODE || requestCode == STORAGE_REQUEST_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // 권한 허용
+                // 권한이 허용된 경우
             } else {
                 Toast.makeText(this, "권한을 허용해야 기능을 사용할 수 있습니다.", Toast.LENGTH_SHORT).show();
             }
@@ -227,9 +241,10 @@ public class FkmainActivity extends BaseActivity {
                 String memo = cursor.getString(cursor.getColumnIndexOrThrow("memo"));
                 String imagePath = cursor.getString(cursor.getColumnIndexOrThrow("image_path"));
                 int quantity = cursor.getInt(cursor.getColumnIndexOrThrow("quantity"));
+                int storageMethodValue = cursor.getInt(cursor.getColumnIndexOrThrow("storage_method"));
 
                 String countdown = calculateDDay(expDate);
-                allItems.add(new FoodItem(R.drawable.fk_placeholder, name, regDate, expDate, countdown, memo, imagePath, quantity));
+                allItems.add(new FoodItem(R.drawable.fk_placeholder, name, regDate, expDate, countdown, memo, imagePath, quantity, storageMethodValue));
             } while (cursor.moveToNext());
         }
         cursor.close();
@@ -247,9 +262,10 @@ public class FkmainActivity extends BaseActivity {
                 String memo = cursor.getString(cursor.getColumnIndexOrThrow("memo"));
                 String imagePath = cursor.getString(cursor.getColumnIndexOrThrow("image_path"));
                 int quantity = cursor.getInt(cursor.getColumnIndexOrThrow("quantity"));
+                int storageMethodValue = cursor.getInt(cursor.getColumnIndexOrThrow("storage_method"));
 
                 String countdown = calculateDDay(expDate);
-                allItems.add(new FoodItem(R.drawable.fk_placeholder, name, regDate, expDate, countdown, memo, imagePath, quantity));
+                allItems.add(new FoodItem(R.drawable.fk_placeholder, name, regDate, expDate, countdown, memo, imagePath, quantity, storageMethodValue));
             } while (cursor.moveToNext());
         }
         cursor.close();
@@ -296,18 +312,21 @@ public class FkmainActivity extends BaseActivity {
         adapter.updateList(filteredList);
     }
 
+    // 이름순 정렬
     private void sortItemsByName() {
-        Toast.makeText(this, "이름순 정렬", Toast.LENGTH_SHORT).show();
+        Collections.sort(allItems, (item1, item2) -> item1.getName().compareToIgnoreCase(item2.getName()));
         adapter.notifyDataSetChanged();
     }
 
+    // 등록순 정렬
     private void sortItemsByRegDate() {
-        Toast.makeText(this, "등록순 정렬", Toast.LENGTH_SHORT).show();
+        Collections.sort(allItems, (item1, item2) -> item1.getRegDate().compareTo(item2.getRegDate()));
         adapter.notifyDataSetChanged();
     }
 
+    // 유통기한순 정렬
     private void sortItemsByExpDate() {
-        Toast.makeText(this, "유통기한순 정렬", Toast.LENGTH_SHORT).show();
+        Collections.sort(allItems, (item1, item2) -> item1.getExpDate().compareTo(item2.getExpDate()));
         adapter.notifyDataSetChanged();
     }
 }

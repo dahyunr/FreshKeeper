@@ -1,9 +1,18 @@
 package com.example.freshkeeper;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AlertDialog;
+
+import com.example.freshkeeper.database.DatabaseHelper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,44 +24,48 @@ public class FAQActivity extends BaseActivity {
     FAQAdapter faqAdapter;
     List<String> faqQuestions;
     HashMap<String, List<String>> faqAnswers;
+    private DatabaseHelper dbHelper;  // DatabaseHelper 추가
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_faq);
 
-        // ExpandableListView를 XML에서 찾아서 초기화
         faqListView = findViewById(R.id.faq_list);
 
-        // FAQ 데이터 초기화
+        // DatabaseHelper 초기화
+        dbHelper = new DatabaseHelper(this);
+
         initFAQData();
 
-        // 어댑터 설정
         faqAdapter = new FAQAdapter(this, faqQuestions, faqAnswers);
         faqListView.setAdapter(faqAdapter);
 
-        // 뒤로 가기 버튼 설정
         ImageView backButton = findViewById(R.id.back_button);
         backButton.setOnClickListener(v -> {
-            // 마이페이지로 돌아가는 인텐트
             Intent intent = new Intent(FAQActivity.this, MypageActivity.class);
             startActivity(intent);
-            finish(); // 현재 액티비티를 종료하여 돌아가는 동작처럼 보이도록 함
+            finish();
+        });
+
+        faqListView.setOnChildClickListener((parent, v, groupPosition, childPosition, id) -> {
+            if (faqQuestions.get(groupPosition).equals("회원 탈퇴를 하고 싶어요.") && childPosition == 0) {
+                showWithdrawalDialog();
+                return true;
+            }
+            return false;
         });
     }
 
-    // FAQ 질문과 답변 데이터를 초기화하는 메서드
     private void initFAQData() {
         faqQuestions = new ArrayList<>();
         faqAnswers = new HashMap<>();
 
-        // 질문 추가
         faqQuestions.add("식품류만 등록 가능한가요?");
         faqQuestions.add("유통기한 알림 시간 설정을 바꾸고 싶어요.");
         faqQuestions.add("회원 탈퇴를 하고 싶어요.");
         faqQuestions.add("큐알코드로 상품을 등록할 수 있나요?");
 
-        // 각 질문에 대한 답변 추가
         List<String> answer1 = new ArrayList<>();
         answer1.add("아니요, 다양한 종류의 제품을 등록할 수 있습니다.");
 
@@ -60,15 +73,50 @@ public class FAQActivity extends BaseActivity {
         answer2.add("알림 설정에서 시간을 변경할 수 있습니다.");
 
         List<String> answer3 = new ArrayList<>();
-        answer3.add("회원 탈퇴는 설정 메뉴에서 가능합니다.");
+        answer3.add("회원 탈퇴는 FAQ에서 처리할 수 있습니다.");
 
         List<String> answer4 = new ArrayList<>();
         answer4.add("네, 큐알코드로 상품을 등록할 수 있습니다.");
 
-        // 질문과 답변을 연결
         faqAnswers.put(faqQuestions.get(0), answer1);
         faqAnswers.put(faqQuestions.get(1), answer2);
         faqAnswers.put(faqQuestions.get(2), answer3);
         faqAnswers.put(faqQuestions.get(3), answer4);
+    }
+
+    private void showWithdrawalDialog() {
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View dialogView = inflater.inflate(R.layout.activity_dialog_withdrawal, null);
+
+        new AlertDialog.Builder(this)
+                .setView(dialogView)
+                .setPositiveButton("확인", (dialog, which) -> {
+                    // 회원 탈퇴 처리
+                    SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+                    String userEmail = sharedPreferences.getString("userEmail", null);
+
+                    if (userEmail != null) {
+                        boolean isDeleted = dbHelper.deleteUserByEmail(userEmail);
+                        if (isDeleted) {
+                            Toast.makeText(this, "회원 탈퇴가 완료되었습니다.", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(this, "회원 탈퇴 중 오류가 발생했습니다.", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    // 로그인 상태를 false로 설정 (로그아웃 처리)
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putBoolean("isLoggedIn", false);
+                    editor.apply();
+
+                    // LoginActivity로 이동하고 기존 액티비티 스택을 모두 지우기
+                    Intent intent = new Intent(FAQActivity.this, LoginActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);  // 기존 스택 제거
+                    Log.d("FAQActivity", "LoginActivity로 이동하는 인텐트 실행 중");
+                    startActivity(intent);
+                    finish();
+                })
+                .setNegativeButton("취소", (dialog, which) -> dialog.dismiss())
+                .show();
     }
 }

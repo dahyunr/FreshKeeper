@@ -223,22 +223,16 @@
             <!-- 취소 버튼 -->
             <Button
                 android:id="@+id/cancel_button"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
+                style="@style/CustomButtonStyle"
                 android:text="취소하기"
-                android:textColor="@android:color/black"
                 android:background="@color/cancel_button_color" />
 
             <!-- 저장 버튼 -->
             <Button
                 android:id="@+id/save_button"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
+                style="@style/CustomButtonStyle"
                 android:text="저장하기"
                 android:layout_marginStart="8dp"
-                android:textColor="@android:color/black"
                 android:background="@color/save_button_color" />
         </LinearLayout>
     </LinearLayout>

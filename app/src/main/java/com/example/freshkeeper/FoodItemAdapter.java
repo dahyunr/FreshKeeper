@@ -12,6 +12,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 public class FoodItemAdapter extends RecyclerView.Adapter<FoodItemAdapter.FoodItemViewHolder> {
@@ -65,33 +66,13 @@ public class FoodItemAdapter extends RecyclerView.Adapter<FoodItemAdapter.FoodIt
             holder.imageView.setImageResource(R.drawable.fk_gallery); // 기본 이미지
         }
 
-        // D-Day 계산
-        String expDate = currentItem.getExpDate();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        try {
-            Date expirationDate = dateFormat.parse(expDate);
-            Date today = new Date();
-            if (expirationDate == null) {
-                holder.countdownTextView.setText("D-??");
-                return;
-            }
-
-            long diffInMillis = expirationDate.getTime() - today.getTime();
-            long daysLeft = TimeUnit.MILLISECONDS.toDays(diffInMillis);
-
-            if (daysLeft == 0) {
-                holder.countdownTextView.setText("D-day");
-                holder.countdownTextView.setTextColor(holder.itemView.getContext().getResources().getColor(android.R.color.holo_red_dark));
-            } else if (daysLeft > 0) {
-                holder.countdownTextView.setText("D-" + daysLeft);
-                holder.countdownTextView.setTextColor(holder.itemView.getContext().getResources().getColor(android.R.color.black));
-            } else {
-                holder.countdownTextView.setText("D+" + Math.abs(daysLeft));
-                holder.countdownTextView.setTextColor(holder.itemView.getContext().getResources().getColor(android.R.color.holo_red_dark));
-            }
-
-        } catch (ParseException e) {
-            e.printStackTrace();
+        // D-Day 계산 및 설정
+        String countdown = calculateDDay(currentItem.getExpDate());
+        holder.countdownTextView.setText(countdown);
+        if (countdown.equals("D-day") || countdown.startsWith("D+")) {
+            holder.countdownTextView.setTextColor(holder.itemView.getContext().getResources().getColor(android.R.color.holo_red_dark));
+        } else {
+            holder.countdownTextView.setTextColor(holder.itemView.getContext().getResources().getColor(android.R.color.black));
         }
     }
 
@@ -108,6 +89,36 @@ public class FoodItemAdapter extends RecyclerView.Adapter<FoodItemAdapter.FoodIt
     public void removeItem(int position) {
         foodItems.remove(position);
         notifyItemRemoved(position);
+    }
+
+    private String calculateDDay(String expDate) {
+        SimpleDateFormat dateFormat8 = new SimpleDateFormat("yyyyMMdd", Locale.getDefault());
+        SimpleDateFormat dateFormat6 = new SimpleDateFormat("yyMMdd", Locale.getDefault());
+        try {
+            Date expirationDate;
+            if (expDate.length() == 8) {
+                expirationDate = dateFormat8.parse(expDate);
+            } else if (expDate.length() == 6) {
+                expirationDate = dateFormat6.parse(expDate);
+            } else {
+                return "D-??";
+            }
+
+            Date today = new Date();
+            long diffInMillis = expirationDate.getTime() - today.getTime();
+            long daysLeft = TimeUnit.MILLISECONDS.toDays(diffInMillis);
+
+            if (daysLeft == 0) {
+                return "D-day";
+            } else if (daysLeft > 0) {
+                return "D-" + daysLeft;
+            } else {
+                return "D+" + Math.abs(daysLeft);
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return "D-??";
     }
 
     public class FoodItemViewHolder extends RecyclerView.ViewHolder {

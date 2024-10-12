@@ -26,7 +26,7 @@
         <EditText
             android:id="@+id/editTextEmail"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="43dp"
             android:layout_marginTop="20dp"
             android:hint="이메일"
             android:background="#EFEFEF"
@@ -38,7 +38,7 @@
         <EditText
             android:id="@+id/editTextPassword"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="43dp"
             android:layout_marginTop="10dp"
             android:hint="비밀번호"
             android:background="#EFEFEF"
@@ -86,7 +86,7 @@
         <Button
             android:id="@+id/buttonLogin"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="48dp"
             android:layout_marginTop="70dp"
             android:background="#65B120"
             android:padding="10dp"

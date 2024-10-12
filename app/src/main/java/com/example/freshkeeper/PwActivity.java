@@ -30,6 +30,7 @@ public class PwActivity extends BaseActivity {
     private Button saveButton;
 
     private String generatedCode;
+    private boolean isCodeVerified = false;  // 인증 성공 여부를 저장하는 변수 추가
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,8 +70,10 @@ public class PwActivity extends BaseActivity {
                 if (TextUtils.isEmpty(enteredCode)) {
                     Toast.makeText(PwActivity.this, "인증코드를 입력하세요.", Toast.LENGTH_SHORT).show();
                 } else if (enteredCode.equals(generatedCode)) {
+                    isCodeVerified = true;  // 인증 성공 시 플래그를 true로 설정
                     Toast.makeText(PwActivity.this, "인증되었습니다.", Toast.LENGTH_SHORT).show();
                 } else {
+                    isCodeVerified = false;  // 인증 실패 시 플래그를 false로 유지
                     Toast.makeText(PwActivity.this, "인증코드가 틀렸습니다.", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -81,17 +84,20 @@ public class PwActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 if (validateInputs()) {
-                    // 비밀번호 저장 로직 추가
-                    String email = emailField.getText().toString();
-                    String newPassword = newPasswordField.getText().toString();
-                    updatePassword(email, newPassword);
+                    if (isCodeVerified) {  // 인증이 완료되었을 경우에만 비밀번호 변경을 허용
+                        String email = emailField.getText().toString();
+                        String newPassword = newPasswordField.getText().toString();
+                        updatePassword(email, newPassword);
 
-                    Toast.makeText(PwActivity.this, "비밀번호가 성공적으로 변경되었습니다.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(PwActivity.this, "비밀번호가 성공적으로 변경되었습니다.", Toast.LENGTH_SHORT).show();
 
-                    // 로그인 화면으로 이동하는 Intent 추가
-                    Intent intent = new Intent(PwActivity.this, LoginActivity.class);
-                    startActivity(intent);
-                    finish(); // 현재 액티비티를 종료하여 뒤로가기 시 비밀번호 화면으로 돌아가지 않게 함
+                        // 로그인 화면으로 이동하는 Intent 추가
+                        Intent intent = new Intent(PwActivity.this, LoginActivity.class);
+                        startActivity(intent);
+                        finish(); // 현재 액티비티를 종료하여 뒤로가기 시 비밀번호 화면으로 돌아가지 않게 함
+                    } else {
+                        Toast.makeText(PwActivity.this, "인증이 완료되지 않았습니다.", Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
         });
@@ -107,7 +113,7 @@ public class PwActivity extends BaseActivity {
     // 전화번호 유효성 검사
     private boolean validatePhone() {
         String phone = phoneField.getText().toString();
-        if (TextUtils.isEmpty(phone)) {
+        if (TextUtils.isEmpty((phone))) {
             Toast.makeText(this, "전화번호를 입력하세요.", Toast.LENGTH_SHORT).show();
             return false;
         }

@@ -15,16 +15,18 @@
         android:textSize="30sp"
         android:textColor="#333"
         android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="20dp"/>
+        android:layout_marginBottom="30dp"/>
 
     <EditText
         android:id="@+id/email"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="43dp"
         android:hint="@string/email_hint"
+        android:layout_marginTop="20dp"
+        android:background="#EFEFEF"
         android:padding="10dp"
-        android:background="@android:drawable/edit_text"
-        android:layout_marginBottom="10dp"
+        android:textSize="16sp"
+        android:layout_marginBottom="15dp"
         android:inputType="textEmailAddress"
         android:autofillHints="emailAddress"/>
 
@@ -32,77 +34,79 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginBottom="10dp">
+        android:layout_marginBottom="15dp">
 
         <EditText
             android:id="@+id/phone"
             android:layout_width="0dp"
+            android:layout_height="43dp"
             android:layout_weight="0.7"
-            android:layout_height="wrap_content"
-            android:hint="@string/phone_hint"
+            android:autofillHints="phone"
+            android:background="#EFEFEF"
             android:padding="10dp"
-            android:background="@android:drawable/edit_text"
-            android:inputType="phone"
-            android:autofillHints="phone"/>
+            android:textSize="16sp"
+            android:hint="@string/phone_hint"
+            android:inputType="phone" />
 
         <Button
             android:id="@+id/send_code"
             android:layout_width="0dp"
+            android:layout_height="43dp"
             android:layout_weight="0.3"
-            android:layout_height="48dp"
-            android:text="@string/send_code"
             android:background="#65B120"
-            android:textColor="#FFFFFF"
-            android:padding="10dp"/>
+            android:text="@string/send_code"
+            android:textColor="#FFFFFF" />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginBottom="10dp">
+        android:layout_marginBottom="15dp">
 
         <EditText
             android:id="@+id/verification_code"
             android:layout_width="0dp"
+            android:layout_height="43dp"
             android:layout_weight="0.7"
-            android:layout_height="wrap_content"
-            android:hint="@string/verification_code_hint"
+            android:autofillHints="smsVerificationCode"
+            android:background="#EFEFEF"
+            android:textSize="16sp"
             android:padding="10dp"
-            android:background="@android:drawable/edit_text"
-            android:inputType="number"
-            android:autofillHints="smsVerificationCode"/>
+            android:hint="@string/verification_code_hint"
+            android:inputType="number" />
 
         <Button
             android:id="@+id/verify"
             android:layout_width="0dp"
             android:layout_weight="0.3"
-            android:layout_height="48dp"
+            android:layout_height="43dp"
             android:text="@string/verify"
             android:background="#65B120"
-            android:textColor="#FFFFFF"
-            android:padding="10dp"/>
+            android:textColor="#FFFFFF"/>
     </LinearLayout>
 
     <EditText
         android:id="@+id/new_password"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="43dp"
         android:hint="@string/new_password_hint"
+        android:background="#EFEFEF"
         android:padding="10dp"
-        android:background="@android:drawable/edit_text"
-        android:layout_marginBottom="10dp"
+        android:textSize="16sp"
+        android:layout_marginBottom="15dp"
         android:inputType="textPassword"
         android:autofillHints="password"/>
 
     <EditText
         android:id="@+id/confirm_new_password"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="43dp"
         android:hint="@string/confirm_new_password_hint"
+        android:background="#EFEFEF"
         android:padding="10dp"
-        android:background="@android:drawable/edit_text"
-        android:layout_marginBottom="20dp"
+        android:textSize="16sp"
+        android:layout_marginBottom="30dp"
         android:inputType="textPassword"
         android:autofillHints="password"/>
 
@@ -113,5 +117,6 @@
         android:text="@string/save"
         android:background="#65B120"
         android:textColor="#FFFFFF"
-        android:padding="10dp"/>
+        android:padding="10dp"
+        android:textSize="16sp"/>
 </LinearLayout>
