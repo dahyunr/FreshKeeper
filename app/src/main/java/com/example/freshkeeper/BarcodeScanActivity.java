@@ -158,9 +158,8 @@ public class BarcodeScanActivity extends BaseActivity {
                         }
 
                         Intent intent = new Intent(BarcodeScanActivity.this, AddItemActivity.class);
-                        intent.putExtra("barcodeValue", barcode);
-                        intent.putExtra("productName", productName);  // 상품명 전달
-                        intent.putExtra("productImage", productImage);
+                        intent.putExtra("itemName", productName);  // 상품명 전달
+                        intent.putExtra("imagePath", productImage); // 이미지 경로 전달
 
                         // 로그로 데이터 전달 확인
                         Log.d(TAG, "상품명: " + productName);

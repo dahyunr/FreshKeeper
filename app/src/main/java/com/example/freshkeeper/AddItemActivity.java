@@ -99,7 +99,7 @@ public class AddItemActivity extends BaseActivity {
             if (productName != null && !productName.isEmpty()) {
                 itemName.setText(productName);
             } else {
-                itemName.setText("상품명을 입력하세요");
+                itemName.setHint("상품명을 입력하세요");  // 수정된 부분: 기본 안내 문구를 힌트로 설정
             }
             if (regDate != null && !regDate.isEmpty()) {
                 itemRegDate.setText(regDate);
@@ -130,6 +130,13 @@ public class AddItemActivity extends BaseActivity {
                 }
             }
         }
+
+        // 상품명 입력 필드 클릭 시 기본 안내 문구 제거
+        itemName.setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus && itemName.getText().toString().equals("상품명을 입력하세요")) {
+                itemName.setText("");
+            }
+        });
 
         itemQuantityMinus.setOnClickListener(v -> {
             if (quantity > 1) {

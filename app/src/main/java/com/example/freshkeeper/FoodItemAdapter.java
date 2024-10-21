@@ -74,7 +74,7 @@ public class FoodItemAdapter extends RecyclerView.Adapter<FoodItemAdapter.FoodIt
 
         holder.nameTextView.setText(currentItem.getName());
         holder.regDateTextView.setText("등록일: " + currentItem.getRegDate());
-        holder.expDateTextView.setText("유퇴금지한: " + currentItem.getExpDate());
+        holder.expDateTextView.setText("유통기한: " + currentItem.getExpDate());
 
         // 이미지 URI 설정 (Glide 사용)
         if (currentItem.getImagePath() != null && !currentItem.getImagePath().isEmpty()) {
