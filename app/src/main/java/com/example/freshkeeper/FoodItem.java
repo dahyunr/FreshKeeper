@@ -3,6 +3,7 @@ package com.example.freshkeeper;
 import java.io.Serializable;
 
 public class FoodItem implements Serializable {
+    private int id;  // ID 필드 추가
     private int imageResource; // 이미지 리소스
     private String name;
     private String regDate;
@@ -13,7 +14,8 @@ public class FoodItem implements Serializable {
     private int quantity;      // 수량 필드 추가
     private int storageMethod; // 저장 방법 추가
 
-    public FoodItem(int imageResource, String name, String regDate, String expDate, String countdown, String memo, String imagePath, int quantity, int storageMethod) {
+    public FoodItem(int id, int imageResource, String name, String regDate, String expDate, String countdown, String memo, String imagePath, int quantity, int storageMethod) {
+        this.id = id;  // ID 필드 추가
         this.imageResource = imageResource;
         this.name = name;
         this.regDate = regDate;
@@ -25,7 +27,28 @@ public class FoodItem implements Serializable {
         this.storageMethod = storageMethod; // 저장 방법 추가
     }
 
+    // 두 번째 생성자 추가 (ID 없이 생성)
+    public FoodItem(int imageResource, String name, String regDate, String expDate, String countdown, String memo, String imagePath, int quantity, int storageMethod) {
+        this.imageResource = imageResource;
+        this.name = name;
+        this.regDate = regDate;
+        this.expDate = expDate;
+        this.countdown = countdown;
+        this.memo = memo;
+        this.imagePath = imagePath;
+        this.quantity = quantity;
+        this.storageMethod = storageMethod;
+    }
+
     // Getters and Setters
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public int getImageResource() {
         return imageResource;
     }

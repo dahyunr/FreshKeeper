@@ -76,6 +76,10 @@ public class LoginActivity extends BaseActivity {
                         editor.putString("userName", userName);  // 사용자 이름을 저장
                         editor.putString("userEmail", email);    // 사용자 이메일을 저장
                         editor.putBoolean("isLoggedIn", true);  // 로그인 상태 저장
+
+                        // 비회원 데이터 삭제
+                        editor.remove("guestId");
+
                         editor.apply();
 
                         // FkmainActivity로 이동
@@ -107,7 +111,17 @@ public class LoginActivity extends BaseActivity {
                 int randomNumber = random.nextInt(100001);
                 String guestId = "guest" + randomNumber;
                 Toast.makeText(LoginActivity.this, guestId + "으로 로그인합니다", Toast.LENGTH_SHORT).show();
+
+                // guestId를 SharedPreferences에 저장
+                SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putString("guestId", guestId);
+                editor.putBoolean("isLoggedIn", true);  // 로그인 상태 저장
+                editor.apply();
+
+                // FkmainActivity로 이동
                 Intent intent = new Intent(LoginActivity.this, FkmainActivity.class);
+                intent.putExtra("GUEST_ID", guestId);  // Intent로 guestId 전달
                 startActivity(intent);
                 finish(); // 로그인 액티비티 종료
             }

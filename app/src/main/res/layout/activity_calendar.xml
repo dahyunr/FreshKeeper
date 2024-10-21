@@ -6,6 +6,18 @@
     android:layout_height="match_parent"
     tools:context=".CalendarActivity">
 
+    <!-- 이전 달 화살표 아이콘 -->
+    <ImageView
+        android:id="@+id/previous_month_arrow"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:src="@drawable/baseline_chevron_left_24"
+        android:contentDescription="@string/previous_month" />
+
     <!-- 연도 및 월을 표시하는 TextView -->
     <TextView
         android:id="@+id/year_month_text_view"
@@ -17,38 +29,40 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="16dp" />
 
+    <!-- 다음 달 화살표 아이콘 -->
+    <ImageView
+        android:id="@+id/next_month_arrow"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="16dp"
+        android:src="@drawable/baseline_chevron_right_24"
+        android:contentDescription="@string/next_month" />
+
     <!-- CompactCalendarView -->
     <com.github.sundeepk.compactcalendarview.CompactCalendarView
         android:id="@+id/compactcalendar_view"
         android:layout_width="match_parent"
         android:layout_height="370.5dp"
         android:layout_below="@id/year_month_text_view"
-        android:layout_margin="16dp"
+        android:layout_marginTop="16dp"
         android:background="#F0F0F0"
         app:compactCalendarBackgroundColor="@android:color/white"
         app:compactCalendarCurrentSelectedDayBackgroundColor="@android:color/holo_green_light"
         app:compactCalendarTextColor="#000000" />
 
-    <!-- 날짜 선택 버튼 -->
-    <Button
-        android:id="@+id/date_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/select_date"
-        android:layout_below="@id/compactcalendar_view"
-        android:layout_marginTop="16dp"
-        android:layout_centerHorizontal="true"
-        android:background="?attr/selectableItemBackground" />
-
-    <!-- 아이템 리스트 레이아웃 추가 -->
-    <LinearLayout
-        android:id="@+id/item_list_layout"
+    <!-- 아이템 리스트 RecyclerView 추가 -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/item_list_recycler_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_below="@id/date_button"
-        android:layout_marginTop="16dp"
-        android:padding="16dp" />
+        android:layout_height="0dp"
+        android:layout_below="@id/compactcalendar_view"
+        android:layout_marginTop="8dp"
+        android:layout_above="@id/footer"
+        android:layout_weight="1"
+        android:padding="8dp" />
 
     <!-- 하단바 -->
     <LinearLayout

@@ -7,6 +7,8 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.KeyEvent;
+import android.view.inputmethod.EditorInfo;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -125,19 +127,15 @@ public class FkmainActivity extends BaseActivity {
             Intent intent = new Intent(FkmainActivity.this, AddItemActivity.class);
             FoodItem clickedItem = allItems.get(position);
 
-            // 이미지 경로를 파일로 저장하고 경로 전달
-            String imagePath = clickedItem.getImagePath();
-            if (imagePath != null) {
-                String filePath = FileUtils.saveDataToFile(this, imagePath, "imagePath.txt");
-                intent.putExtra("filePath", filePath);
-            }
-
+            // 수정된 부분: ID 값을 인텐트로 전달
+            intent.putExtra("itemId", clickedItem.getId());
             intent.putExtra("itemName", clickedItem.getName());
             intent.putExtra("regDate", clickedItem.getRegDate());
             intent.putExtra("expDate", clickedItem.getExpDate());
             intent.putExtra("memo", clickedItem.getMemo());
             intent.putExtra("quantity", clickedItem.getQuantity());
             intent.putExtra("storageMethod", clickedItem.getStorageMethod());
+            intent.putExtra("imagePath", clickedItem.getImagePath());
 
             startActivity(intent);
         });
@@ -154,6 +152,14 @@ public class FkmainActivity extends BaseActivity {
 
             @Override
             public void afterTextChanged(Editable s) {}
+        });
+
+        // 엔터 키 입력 방지
+        searchEditText.setOnEditorActionListener((v, actionId, event) -> {
+            return actionId == EditorInfo.IME_ACTION_SEARCH ||
+                    actionId == EditorInfo.IME_ACTION_DONE ||
+                    event != null && event.getAction() == KeyEvent.ACTION_DOWN &&
+                            event.getKeyCode() == KeyEvent.KEYCODE_ENTER;
         });
 
         // 정렬 버튼 클릭 시 정렬 옵션을 표시
@@ -190,7 +196,7 @@ public class FkmainActivity extends BaseActivity {
         // 삭제 기능 구현
         adapter.setOnItemDeleteListener(position -> {
             FoodItem itemToDelete = allItems.get(position);
-            if (dbHelper.deleteItem(itemToDelete.getName())) { // 데이터베이스에서 삭제
+            if (dbHelper.deleteItem(itemToDelete.getId())) { // 수정된 부분: ID를 사용하여 데이터베이스에서 삭제
                 allItems.remove(position); // 목록에서 삭제
                 adapter.notifyItemRemoved(position); // UI 업데이트
                 Log.d("FkmainActivity", "항목이 성공적으로 삭제되었습니다.");
@@ -198,6 +204,13 @@ public class FkmainActivity extends BaseActivity {
                 Log.e("FkmainActivity", "데이터베이스에서 항목 삭제에 실패했습니다.");
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // 화면으로 돌아올 때 아이템 리스트 새로고침
+        loadItemsFromDatabase();
     }
 
     private void requestPermissions() {
@@ -235,6 +248,7 @@ public class FkmainActivity extends BaseActivity {
         Cursor cursor = dbHelper.getAllItems();
         if (cursor.moveToFirst()) {
             do {
+                int id = cursor.getInt(cursor.getColumnIndexOrThrow("item_id")); // 수정된 부분: ID 값 추가
                 String name = cursor.getString(cursor.getColumnIndexOrThrow("name"));
                 String regDate = cursor.getString(cursor.getColumnIndexOrThrow("reg_date"));
                 String expDate = cursor.getString(cursor.getColumnIndexOrThrow("exp_date"));
@@ -244,7 +258,7 @@ public class FkmainActivity extends BaseActivity {
                 int storageMethodValue = cursor.getInt(cursor.getColumnIndexOrThrow("storage_method"));
 
                 String countdown = calculateDDay(expDate);
-                allItems.add(new FoodItem(R.drawable.fk_placeholder, name, regDate, expDate, countdown, memo, imagePath, quantity, storageMethodValue));
+                allItems.add(new FoodItem(id, R.drawable.fk_placeholder, name, regDate, expDate, countdown, memo, imagePath, quantity, storageMethodValue)); // 수정된 부분: ID 값 추가
             } while (cursor.moveToNext());
         }
         cursor.close();
@@ -256,6 +270,7 @@ public class FkmainActivity extends BaseActivity {
         Cursor cursor = dbHelper.getItemsByStorageMethod(storageMethod);
         if (cursor.moveToFirst()) {
             do {
+                int id = cursor.getInt(cursor.getColumnIndexOrThrow("item_id")); // 수정된 부분: ID 값 추가
                 String name = cursor.getString(cursor.getColumnIndexOrThrow("name"));
                 String regDate = cursor.getString(cursor.getColumnIndexOrThrow("reg_date"));
                 String expDate = cursor.getString(cursor.getColumnIndexOrThrow("exp_date"));
@@ -265,7 +280,7 @@ public class FkmainActivity extends BaseActivity {
                 int storageMethodValue = cursor.getInt(cursor.getColumnIndexOrThrow("storage_method"));
 
                 String countdown = calculateDDay(expDate);
-                allItems.add(new FoodItem(R.drawable.fk_placeholder, name, regDate, expDate, countdown, memo, imagePath, quantity, storageMethodValue));
+                allItems.add(new FoodItem(id, R.drawable.fk_placeholder, name, regDate, expDate, countdown, memo, imagePath, quantity, storageMethodValue)); // 수정된 부분: ID 값 추가
             } while (cursor.moveToNext());
         }
         cursor.close();
@@ -285,7 +300,11 @@ public class FkmainActivity extends BaseActivity {
                 return "D-??";
             }
 
+            // Resetting the time component to midnight for comparison
             Date today = new Date();
+            today = dateFormat8.parse(dateFormat8.format(today));
+            expirationDate = dateFormat8.parse(dateFormat8.format(expirationDate));
+
             long diffInMillis = expirationDate.getTime() - today.getTime();
             long daysLeft = TimeUnit.MILLISECONDS.toDays(diffInMillis);
 

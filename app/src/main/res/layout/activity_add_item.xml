@@ -44,6 +44,7 @@
                 android:textColor="#000000"
                 android:textSize="16sp"
                 android:layout_marginStart="16dp"
+                android:layout_marginTop="20dp"
                 android:inputType="text"
                 android:maxLength="100" />
         </LinearLayout>
@@ -77,6 +78,7 @@
                 android:id="@+id/storage_method_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
                 android:src="@drawable/fk_arrow_drop_down_24"
                 android:contentDescription="저장 방법 아이콘" />
         </LinearLayout>
@@ -98,8 +100,9 @@
 
             <ImageView
                 android:id="@+id/item_quantity_minus"
-                android:layout_width="48dp"
+                android:layout_width="35dp"
                 android:layout_height="48dp"
+                android:layout_marginLeft="27dp"
                 android:src="@drawable/fk_remove"
                 android:contentDescription="수량 감소" />
 
@@ -108,6 +111,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:layout_marginTop="4dp"
                 android:hint="0"
                 android:background="@android:color/transparent"
                 android:gravity="center"
@@ -117,7 +121,7 @@
 
             <ImageView
                 android:id="@+id/item_quantity_plus"
-                android:layout_width="48dp"
+                android:layout_width="35dp"
                 android:layout_height="48dp"
                 android:src="@drawable/fk_control"
                 android:contentDescription="수량 증가" />
@@ -152,8 +156,9 @@
 
             <ImageView
                 android:id="@+id/item_reg_date_icon"
-                android:layout_width="48dp"
+                android:layout_width="35dp"
                 android:layout_height="48dp"
+                android:layout_marginTop="-5dp"
                 android:src="@drawable/fk_calendar_month"
                 android:contentDescription="등록 날짜 아이콘" />
         </LinearLayout>
@@ -187,8 +192,9 @@
 
             <ImageView
                 android:id="@+id/item_exp_date_icon"
-                android:layout_width="48dp"
+                android:layout_width="35dp"
                 android:layout_height="48dp"
+                android:layout_marginTop="-5dp"
                 android:src="@drawable/fk_calendar_month"
                 android:contentDescription="유통 기한 아이콘" />
         </LinearLayout>

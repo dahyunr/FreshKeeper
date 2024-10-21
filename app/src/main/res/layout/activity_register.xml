@@ -14,7 +14,7 @@
         android:textSize="30sp"
         android:textStyle="bold"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="90dp"/>
+        android:layout_marginTop="90dp" />
 
     <!-- 이름 입력칸 -->
     <EditText
@@ -25,10 +25,12 @@
         android:background="#F5F5F5"
         android:padding="10dp"
         android:textSize="14sp"
+        android:singleLine="true"
+        android:maxLines="1"
         android:layout_below="@id/textViewRegister"
         android:layout_marginTop="30dp"
         android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"/>
+        android:layout_marginEnd="16dp" />
 
     <!-- 이메일 입력칸 -->
     <EditText
@@ -39,10 +41,12 @@
         android:background="#F5F5F5"
         android:padding="10dp"
         android:textSize="14sp"
+        android:singleLine="true"
+        android:maxLines="1"
         android:layout_below="@id/editTextName"
         android:layout_marginTop="10dp"
         android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"/>
+        android:layout_marginEnd="16dp" />
 
     <!-- 전화번호 입력칸 -->
     <EditText
@@ -54,10 +58,12 @@
         android:padding="10dp"
         android:textSize="14sp"
         android:inputType="phone"
+        android:singleLine="true"
+        android:maxLines="1"
         android:layout_below="@id/editTextEmail"
         android:layout_marginTop="10dp"
         android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"/>
+        android:layout_marginEnd="16dp" />
 
     <!-- 비밀번호 입력칸 -->
     <EditText
@@ -69,10 +75,12 @@
         android:padding="10dp"
         android:textSize="14sp"
         android:inputType="textPassword"
+        android:singleLine="true"
+        android:maxLines="1"
         android:layout_below="@id/editTextPhone"
         android:layout_marginTop="10dp"
         android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"/>
+        android:layout_marginEnd="16dp" />
 
     <!-- 비밀번호 확인 입력칸 -->
     <EditText
@@ -84,10 +92,12 @@
         android:padding="10dp"
         android:textSize="14sp"
         android:inputType="textPassword"
+        android:singleLine="true"
+        android:maxLines="1"
         android:layout_below="@id/editTextPassword"
         android:layout_marginTop="10dp"
         android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"/>
+        android:layout_marginEnd="16dp" />
 
     <!-- 회원가입 버튼 -->
     <Button

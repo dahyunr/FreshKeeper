@@ -45,4 +45,7 @@
         <item>이름순</item>
         <item>등록순</item>
     </string-array>
+
+    <string name="previous_month">이전 달</string>
+    <string name="next_month">다음 달</string>
 </resources>

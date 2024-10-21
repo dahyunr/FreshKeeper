@@ -5,31 +5,39 @@ import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.Button;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
-
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import com.example.freshkeeper.FoodItemAdapter;
+import com.example.freshkeeper.FoodItem;
 import com.github.sundeepk.compactcalendarview.CompactCalendarView;
 import com.github.sundeepk.compactcalendarview.domain.Event;
 import com.example.freshkeeper.database.DatabaseHelper;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 public class CalendarActivity extends BaseActivity {
 
     private CompactCalendarView compactCalendarView;
     private TextView yearMonthTextView;
-    private LinearLayout itemListLayout;
+    private ImageView prevMonthArrow;
+    private ImageView nextMonthArrow;
+    private RecyclerView itemListRecyclerView;
     private Date selectedDate;
     private Date todayDate = new Date();
     private DatabaseHelper dbHelper;
     private Event todayEvent;
+    private FoodItemAdapter adapter;
+    private List<FoodItem> foodItems;
 
     private static final String TAG = "CalendarActivity";
 
@@ -46,8 +54,9 @@ public class CalendarActivity extends BaseActivity {
         // Find views by ID
         compactCalendarView = findViewById(R.id.compactcalendar_view);
         yearMonthTextView = findViewById(R.id.year_month_text_view);
-        itemListLayout = findViewById(R.id.item_list_layout);
-        Button dateButton = findViewById(R.id.date_button);
+        prevMonthArrow = findViewById(R.id.previous_month_arrow);
+        nextMonthArrow = findViewById(R.id.next_month_arrow);
+        itemListRecyclerView = findViewById(R.id.item_list_recycler_view);
 
         // Set current date on CompactCalendarView
         compactCalendarView.setUseThreeLetterAbbreviation(true);
@@ -100,12 +109,33 @@ public class CalendarActivity extends BaseActivity {
             }
         });
 
+        // Set click listeners for arrows
+        prevMonthArrow.setOnClickListener(v -> {
+            compactCalendarView.scrollLeft();
+            updateYearMonthText(compactCalendarView.getFirstDayOfCurrentMonth());
+            Log.d(TAG, "onClick: Previous month displayed");
+        });
+
+        nextMonthArrow.setOnClickListener(v -> {
+            compactCalendarView.scrollRight();
+            updateYearMonthText(compactCalendarView.getFirstDayOfCurrentMonth());
+            Log.d(TAG, "onClick: Next month displayed");
+        });
+
         // Set the initial year and month text for the calendar
         updateYearMonthText(todayDate);
         Log.d(TAG, "onCreate: Year and month text updated");
 
         // Setup the footer navigation
         setupFooterNavigation();
+
+        // Setup RecyclerView
+        setupRecyclerView();
+
+        // Load items for today's date initially
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.getDefault());
+        String todayDateFormatted = dateFormat.format(todayDate);
+        loadItemsForSelectedDate(todayDateFormatted);
     }
 
     // Method to update the year and month displayed above the calendar
@@ -117,18 +147,21 @@ public class CalendarActivity extends BaseActivity {
 
     // Method to load items for the selected date from the database
     private void loadItemsForSelectedDate(String selectedDate) {
-        itemListLayout.removeAllViews(); // Clear any previous items
+        foodItems.clear(); // Clear any previous items
 
         Cursor cursor = dbHelper.getItemsByExpDate(selectedDate); // Fetch items for the selected date
         if (cursor.moveToFirst()) {
             do {
                 String itemName = cursor.getString(cursor.getColumnIndexOrThrow("name"));
                 String itemMemo = cursor.getString(cursor.getColumnIndexOrThrow("memo"));
+                String itemExpDate = cursor.getString(cursor.getColumnIndexOrThrow("exp_date"));
+                String itemRegDate = cursor.getString(cursor.getColumnIndexOrThrow("reg_date"));
+                String itemImagePath = cursor.getString(cursor.getColumnIndexOrThrow("image_path"));
+                int itemQuantity = cursor.getInt(cursor.getColumnIndexOrThrow("quantity"));
+                int storageMethod = cursor.getInt(cursor.getColumnIndexOrThrow("storage_method"));
 
-                // Create a new TextView for each item
-                TextView itemTextView = new TextView(this);
-                itemTextView.setText(itemName + ": " + itemMemo);
-                itemListLayout.addView(itemTextView); // Add the TextView to the layout
+                String countdown = calculateDDay(itemExpDate);
+                foodItems.add(new FoodItem(R.drawable.fk_placeholder, itemName, itemRegDate, itemExpDate, countdown, itemMemo, itemImagePath, itemQuantity, storageMethod));
 
             } while (cursor.moveToNext());
         } else {
@@ -136,6 +169,7 @@ public class CalendarActivity extends BaseActivity {
             Toast.makeText(this, "해당 날짜에 등록된 상품이 없습니다.", Toast.LENGTH_SHORT).show();
         }
         cursor.close();
+        adapter.notifyDataSetChanged();
     }
 
     // Setup footer navigation buttons
@@ -157,5 +191,45 @@ public class CalendarActivity extends BaseActivity {
             Intent intent = new Intent(CalendarActivity.this, MypageActivity.class);
             startActivity(intent);
         });
+    }
+
+    // Setup RecyclerView
+    private void setupRecyclerView() {
+        itemListRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        itemListRecyclerView.setHasFixedSize(true);
+        foodItems = new ArrayList<>();
+        adapter = new FoodItemAdapter(this, foodItems);
+        itemListRecyclerView.setAdapter(adapter);
+    }
+
+    // Method to calculate D-Day
+    private String calculateDDay(String expDate) {
+        SimpleDateFormat dateFormat8 = new SimpleDateFormat("yyyyMMdd", Locale.getDefault());
+        SimpleDateFormat dateFormat6 = new SimpleDateFormat("yyMMdd", Locale.getDefault());
+        try {
+            Date expirationDate;
+            if (expDate.length() == 8) {
+                expirationDate = dateFormat8.parse(expDate);
+            } else if (expDate.length() == 6) {
+                expirationDate = dateFormat6.parse(expDate);
+            } else {
+                return "D-??";
+            }
+
+            Date today = new Date();
+            long diffInMillis = expirationDate.getTime() - today.getTime();
+            long daysLeft = diffInMillis / (1000 * 60 * 60 * 24);
+
+            if (daysLeft == 0) {
+                return "D-day";
+            } else if (daysLeft > 0) {
+                return "D-" + daysLeft;
+            } else {
+                return "D+" + Math.abs(daysLeft);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "D-??";
     }
 }

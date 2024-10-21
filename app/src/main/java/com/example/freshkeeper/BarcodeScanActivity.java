@@ -153,6 +153,10 @@ public class BarcodeScanActivity extends BaseActivity {
                             productImage = "default_image_url";
                         }
 
+                        if (productName == null || productName.isEmpty()) {
+                            productName = "Unknown Product";
+                        }
+
                         Intent intent = new Intent(BarcodeScanActivity.this, AddItemActivity.class);
                         intent.putExtra("barcodeValue", barcode);
                         intent.putExtra("productName", productName);  // 상품명 전달
@@ -162,6 +166,7 @@ public class BarcodeScanActivity extends BaseActivity {
                         Log.d(TAG, "상품명: " + productName);
                         Log.d(TAG, "상품 이미지: " + productImage);
 
+                        // AddItemActivity로 이동하고 저장 후 FkmainActivity로 이동
                         startActivityForResult(intent, ADD_ITEM_REQUEST_CODE);
                     } else {
                         Toast.makeText(BarcodeScanActivity.this, "상품 정보를 찾을 수 없습니다.", Toast.LENGTH_SHORT).show();
@@ -176,6 +181,18 @@ public class BarcodeScanActivity extends BaseActivity {
                 Log.e(TAG, "API 호출 실패: " + t.getMessage());
             }
         });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @NonNull Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == ADD_ITEM_REQUEST_CODE && resultCode == RESULT_OK) {
+            // AddItemActivity에서 상품이 성공적으로 등록된 후 FkmainActivity로 이동
+            Intent intent = new Intent(BarcodeScanActivity.this, FkmainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+            finish();
+        }
     }
 
     @Override

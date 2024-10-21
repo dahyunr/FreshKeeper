@@ -20,7 +20,7 @@
         android:id="@+id/dialog_message"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="탈퇴 처리 후 모든 데이터가 삭제되며, 언제라도 다시 가입 가능합니다."
+        android:text="회원 탈퇴 후에도 언제든지 동일한 이메일로 재가입할 수 있으나, 기존에 저장된 데이터는 복구되지 않습니다."
         android:textSize="16sp"
         android:gravity="center" />
 </LinearLayout>

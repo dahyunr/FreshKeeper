@@ -35,6 +35,7 @@ public class AddItemActivity extends BaseActivity {
 
     private static final int PICK_IMAGE_REQUEST = 1;
     private static final int REQUEST_CODE_STORAGE_PERMISSION = 100;
+    private static final String TAG = "AddItemActivity";
 
     private EditText itemName, itemRegDate, itemExpDate, itemMemo, itemQuantity;
     private Spinner storageMethodSpinner;
@@ -45,6 +46,7 @@ public class AddItemActivity extends BaseActivity {
     private int quantity = 1;
     private Uri imageUri;
     private String imagePath = null;
+    private int itemId = -1;  // 아이템 ID를 저장하기 위한 변수
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +83,7 @@ public class AddItemActivity extends BaseActivity {
         // 전달된 Intent 데이터로부터 상품명과 기타 정보 설정
         Intent intent = getIntent();
         if (intent != null) {
+            itemId = intent.getIntExtra("itemId", -1);  // 수정된 부분: 아이템 ID를 인텐트로부터 가져옴
             String productName = intent.getStringExtra("itemName");
             String regDate = intent.getStringExtra("regDate");
             String expDate = intent.getStringExtra("expDate");
@@ -88,10 +91,15 @@ public class AddItemActivity extends BaseActivity {
             int quantityValue = intent.getIntExtra("quantity", 1);
             int storageMethod = intent.getIntExtra("storageMethod", 0);
             String filePath = intent.getStringExtra("filePath");
+            imagePath = intent.getStringExtra("imagePath");
 
             // 전달된 정보를 뷰에 설정
+            Log.d(TAG, "Intent로부터 전달된 데이터 - 상품명: " + productName + ", 등록일: " + regDate + ", 유통기한: " + expDate);
+
             if (productName != null && !productName.isEmpty()) {
                 itemName.setText(productName);
+            } else {
+                itemName.setText("상품명을 입력하세요");
             }
             if (regDate != null && !regDate.isEmpty()) {
                 itemRegDate.setText(regDate);
@@ -106,9 +114,20 @@ public class AddItemActivity extends BaseActivity {
             storageMethodSpinner.setSelection(storageMethod);
 
             // 이미지 로드
-            if (filePath != null && !filePath.isEmpty()) {
-                Uri imageUri = Uri.parse(FileUtils.readFileToString(filePath));
-                Glide.with(this).load(imageUri).into(itemImage);
+            if (imagePath != null && !imagePath.isEmpty()) {
+                try {
+                    Uri imageUri = Uri.parse(imagePath);
+                    Glide.with(this).load(imageUri).into(itemImage);
+                } catch (Exception e) {
+                    Log.e(TAG, "이미지 로드 실패: " + e.getMessage());
+                }
+            } else if (filePath != null && !filePath.isEmpty()) {
+                try {
+                    Uri imageUri = Uri.parse(FileUtils.readFileToString(filePath));
+                    Glide.with(this).load(imageUri).into(itemImage);
+                } catch (Exception e) {
+                    Log.e(TAG, "이미지 로드 실패: " + e.getMessage());
+                }
             }
         }
 
@@ -157,9 +176,12 @@ public class AddItemActivity extends BaseActivity {
             int storageMethod = storageMethodSpinner.getSelectedItemPosition();
 
             if (!name.isEmpty() && isValidDate(regDate) && isValidDate(expDate)) {
-                long result = dbHelper.insertOrUpdateItem(name, regDate, expDate, memo, quantity, storageMethod, imagePath);
+                long result = dbHelper.insertOrUpdateItem(itemId, name, regDate, expDate, memo, quantity, storageMethod, imagePath);  // 수정된 부분: 아이템 ID를 전달하여 업데이트
                 if (result != -1) {
                     Toast.makeText(AddItemActivity.this, "상품이 성공적으로 등록되었습니다.", Toast.LENGTH_SHORT).show();
+                    Intent fkmainIntent = new Intent(AddItemActivity.this, FkmainActivity.class);
+                    fkmainIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(fkmainIntent);
                     finish();
                 } else {
                     Toast.makeText(AddItemActivity.this, "상품 등록에 실패했습니다.", Toast.LENGTH_SHORT).show();
@@ -227,7 +249,7 @@ public class AddItemActivity extends BaseActivity {
     }
 
     private void showCustomDatePickerDialog(final EditText dateField) {
-        Log.d("AddItemActivity", "showCustomDatePickerDialog called");
+        Log.d(TAG, "showCustomDatePickerDialog called");
         final View dialogView = View.inflate(this, R.layout.custom_date_picker, null);
         final AlertDialog alertDialog = new AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert).create();
 
@@ -242,11 +264,11 @@ public class AddItemActivity extends BaseActivity {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.getDefault());
             dateField.setText(dateFormat.format(selectedDate.getTime()));
 
-            Log.d("AddItemActivity", "Date selected: " + dateField.getText().toString());
+            Log.d(TAG, "Date selected: " + dateField.getText().toString());
             alertDialog.dismiss();
         });
         dialogView.findViewById(R.id.btn_cancel).setOnClickListener(view -> {
-            Log.d("AddItemActivity", "DatePicker canceled");
+            Log.d(TAG, "DatePicker canceled");
             alertDialog.dismiss();
         });
 

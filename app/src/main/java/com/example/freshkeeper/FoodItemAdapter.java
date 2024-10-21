@@ -8,8 +8,10 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
+import com.bumptech.glide.Glide;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -20,13 +22,29 @@ public class FoodItemAdapter extends RecyclerView.Adapter<FoodItemAdapter.FoodIt
     private List<FoodItem> foodItems;
     private Context context;
     private OnItemClickListener clickListener;
-    private OnItemDeleteListener deleteListener; // 삭제 리스너 추가
+    private OnItemDeleteListener deleteListener; // 결제 리스너 추가
+
+    public String getItemName(int position) {
+        if (position >= 0 && position < foodItems.size()) {
+            return foodItems.get(position).getName();
+        }
+        return null;
+    }
+
+    // getItemId 메소드 추가 (RecyclerView.Adapter에서 오버라이디는 형태)
+    @Override
+    public long getItemId(int position) {
+        if (position >= 0 && position < foodItems.size()) {
+            return (long) foodItems.get(position).getId(); // 아이템의 ID 반환
+        }
+        return RecyclerView.NO_ID;
+    }
 
     public interface OnItemClickListener {
         void onItemClick(int position);
     }
 
-    public interface OnItemDeleteListener { // 삭제 리스너 인터페이스 추가
+    public interface OnItemDeleteListener { // 결제 리스너 인터페이스 추가
         void onItemDelete(int position);
     }
 
@@ -34,7 +52,7 @@ public class FoodItemAdapter extends RecyclerView.Adapter<FoodItemAdapter.FoodIt
         this.clickListener = listener;
     }
 
-    public void setOnItemDeleteListener(OnItemDeleteListener listener) { // 삭제 리스너 설정 메서드 추가
+    public void setOnItemDeleteListener(OnItemDeleteListener listener) { // 결제 리스너 설정 메서드 추가
         this.deleteListener = listener;
     }
 
@@ -47,7 +65,7 @@ public class FoodItemAdapter extends RecyclerView.Adapter<FoodItemAdapter.FoodIt
     public FoodItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_food, parent, false);
-        return new FoodItemViewHolder(itemView, clickListener, deleteListener); // 삭제 리스너 전달
+        return new FoodItemViewHolder(itemView, clickListener, deleteListener); // 결제 리스너 전달
     }
 
     @Override
@@ -56,12 +74,12 @@ public class FoodItemAdapter extends RecyclerView.Adapter<FoodItemAdapter.FoodIt
 
         holder.nameTextView.setText(currentItem.getName());
         holder.regDateTextView.setText("등록일: " + currentItem.getRegDate());
-        holder.expDateTextView.setText("유통기한: " + currentItem.getExpDate());
+        holder.expDateTextView.setText("유퇴금지한: " + currentItem.getExpDate());
 
-        // 이미지 URI 설정
+        // 이미지 URI 설정 (Glide 사용)
         if (currentItem.getImagePath() != null && !currentItem.getImagePath().isEmpty()) {
             Uri imageUri = Uri.parse(currentItem.getImagePath());
-            holder.imageView.setImageURI(imageUri);
+            Glide.with(context).load(imageUri).into(holder.imageView);
         } else {
             holder.imageView.setImageResource(R.drawable.fk_gallery); // 기본 이미지
         }
@@ -69,7 +87,9 @@ public class FoodItemAdapter extends RecyclerView.Adapter<FoodItemAdapter.FoodIt
         // D-Day 계산 및 설정
         String countdown = calculateDDay(currentItem.getExpDate());
         holder.countdownTextView.setText(countdown);
-        if (countdown.equals("D-day") || countdown.startsWith("D+")) {
+        if (countdown.equals("D-day")) {
+            holder.countdownTextView.setTextColor(holder.itemView.getContext().getResources().getColor(android.R.color.holo_red_dark));
+        } else if (countdown.startsWith("D+")) {
             holder.countdownTextView.setTextColor(holder.itemView.getContext().getResources().getColor(android.R.color.holo_red_dark));
         } else {
             holder.countdownTextView.setTextColor(holder.itemView.getContext().getResources().getColor(android.R.color.black));
@@ -104,7 +124,23 @@ public class FoodItemAdapter extends RecyclerView.Adapter<FoodItemAdapter.FoodIt
                 return "D-??";
             }
 
-            Date today = new Date();
+            // 오늘 날짜를 0시로 설정
+            Calendar todayCalendar = Calendar.getInstance();
+            todayCalendar.set(Calendar.HOUR_OF_DAY, 0);
+            todayCalendar.set(Calendar.MINUTE, 0);
+            todayCalendar.set(Calendar.SECOND, 0);
+            todayCalendar.set(Calendar.MILLISECOND, 0);
+            Date today = todayCalendar.getTime();
+
+            // 유퇴금지한 날짜도 0시로 설정
+            Calendar expirationCalendar = Calendar.getInstance();
+            expirationCalendar.setTime(expirationDate);
+            expirationCalendar.set(Calendar.HOUR_OF_DAY, 0);
+            expirationCalendar.set(Calendar.MINUTE, 0);
+            expirationCalendar.set(Calendar.SECOND, 0);
+            expirationCalendar.set(Calendar.MILLISECOND, 0);
+            expirationDate = expirationCalendar.getTime();
+
             long diffInMillis = expirationDate.getTime() - today.getTime();
             long daysLeft = TimeUnit.MILLISECONDS.toDays(diffInMillis);
 
@@ -149,7 +185,7 @@ public class FoodItemAdapter extends RecyclerView.Adapter<FoodItemAdapter.FoodIt
                 if (deleteListener != null) {
                     int position = getAdapterPosition();
                     if (position != RecyclerView.NO_POSITION) {
-                        deleteListener.onItemDelete(position); // 삭제 이벤트 전달
+                        deleteListener.onItemDelete(position); // 결제 이벤트 전달
                     }
                 }
                 return true;

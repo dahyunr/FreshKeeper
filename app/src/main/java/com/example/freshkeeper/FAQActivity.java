@@ -84,7 +84,8 @@ public class FAQActivity extends BaseActivity {
         faqAnswers.put(faqQuestions.get(3), answer4);
     }
 
-    private void showWithdrawalDialog() {
+    // 회원 탈퇴 다이얼로그를 호출하는 메서드 - public으로 변경
+    public void showWithdrawalDialog() {
         LayoutInflater inflater = LayoutInflater.from(this);
         View dialogView = inflater.inflate(R.layout.activity_dialog_withdrawal, null);
 
