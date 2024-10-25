@@ -2,6 +2,7 @@ package com.example.freshkeeper;
 
 import android.content.Context;
 import android.net.Uri;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -104,6 +105,10 @@ public class FoodItemAdapter extends RecyclerView.Adapter<FoodItemAdapter.FoodIt
     public void updateList(List<FoodItem> newList) {
         foodItems = newList;
         notifyDataSetChanged();
+        Log.d("FoodItemAdapter", "updateList: 새로운 리스트로 업데이트됨, 총 항목 수: " + foodItems.size());
+        for (int i = 0; i < foodItems.size(); i++) {
+            notifyItemChanged(i);
+        }
     }
 
     public void removeItem(int position) {
@@ -153,6 +158,7 @@ public class FoodItemAdapter extends RecyclerView.Adapter<FoodItemAdapter.FoodIt
             }
         } catch (ParseException e) {
             e.printStackTrace();
+            Log.e("FoodItemAdapter", "calculateDDay: 날짜 파싱 오류 - " + e.getMessage());
         }
         return "D-??";
     }

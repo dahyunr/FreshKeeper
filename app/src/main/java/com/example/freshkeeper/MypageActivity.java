@@ -30,6 +30,7 @@ public class MypageActivity extends BaseActivity {
     private TextView notificationSettingsTextView;
     private TextView contactUsButton;  // 문의하기 버튼 변수 추가
     private TextView faqTextView;  // 자주 묻는 질문 버튼
+    private TextView noticeButton;  // 공지사항 버튼 추가
     private TextView logoutTextView;  // 로그아웃 버튼 변수 추가
     private DatabaseHelper dbHelper;
     private boolean isGuestUser;  // 비회원 여부 체크 변수 추가
@@ -72,6 +73,16 @@ public class MypageActivity extends BaseActivity {
 
         // 문의하기 버튼 초기화
         contactUsButton = findViewById(R.id.button_contact_us);
+
+        // 공지사항 버튼 초기화 및 클릭 리스너 추가
+        noticeButton = findViewById(R.id.button_notice);
+        noticeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent noticeIntent = new Intent(MypageActivity.this, NoticeActivity.class);
+                startActivity(noticeIntent);
+            }
+        });
 
         // 비회원 로그인 여부 확인
         SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);

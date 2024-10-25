@@ -13,8 +13,10 @@ public class FoodItem implements Serializable {
     private String imagePath;  // 이미지 경로 필드 추가
     private int quantity;      // 수량 필드 추가
     private int storageMethod; // 저장 방법 추가
+    private String createdAt;  // 등록 시간 필드 추가
 
-    public FoodItem(int id, int imageResource, String name, String regDate, String expDate, String countdown, String memo, String imagePath, int quantity, int storageMethod) {
+    // 생성자 수정: createdAt 필드 추가
+    public FoodItem(int id, int imageResource, String name, String regDate, String expDate, String countdown, String memo, String imagePath, int quantity, int storageMethod, String createdAt) {
         this.id = id;  // ID 필드 추가
         this.imageResource = imageResource;
         this.name = name;
@@ -25,9 +27,10 @@ public class FoodItem implements Serializable {
         this.imagePath = imagePath;
         this.quantity = quantity;    // 생성자에 수량 추가
         this.storageMethod = storageMethod; // 저장 방법 추가
+        this.createdAt = createdAt; // 생성자에 등록 시간 추가
     }
 
-    // 두 번째 생성자 추가 (ID 없이 생성)
+    // 두 번째 생성자 추가 (ID와 createdAt 없이 생성)
     public FoodItem(int imageResource, String name, String regDate, String expDate, String countdown, String memo, String imagePath, int quantity, int storageMethod) {
         this.imageResource = imageResource;
         this.name = name;
@@ -121,5 +124,10 @@ public class FoodItem implements Serializable {
 
     public void setStorageMethod(int storageMethod) {
         this.storageMethod = storageMethod;
+    }
+
+    // 등록 시간 관련 Getter 추가
+    public String getCreatedAt() {
+        return createdAt;
     }
 }

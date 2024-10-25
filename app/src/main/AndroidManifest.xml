@@ -78,5 +78,6 @@
         <activity android:name=".PwActivity" android:exported="false"/>
         <activity android:name=".FAQActivity" android:exported="false"/>
 
+        <activity android:name=".NoticeActivity" />
     </application>
 </manifest>

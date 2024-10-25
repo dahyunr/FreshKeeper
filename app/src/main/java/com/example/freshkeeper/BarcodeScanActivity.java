@@ -136,50 +136,68 @@ public class BarcodeScanActivity extends BaseActivity {
 
     private void fetchProductInfo(String barcode) {
         Log.d(TAG, "Fetching product info for barcode: " + barcode);
-        MyApiService apiService = ApiClient.getApiService();
-        Call<MyResponseType> call = apiService.lookupItem(barcode);
+        String productName;
+        String productImage;
 
-        call.enqueue(new Callback<MyResponseType>() {
-            @Override
-            public void onResponse(Call<MyResponseType> call, Response<MyResponseType> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    List<MyResponseType.Item> items = response.body().getItems();
-                    if (!items.isEmpty()) {
-                        MyResponseType.Item item = items.get(0);
-                        String productName = item.getTitle();
-                        String productImage = item.getImageUrl();
+        // 특정 바코드에 대해 직접 이미지 경로와 상품명 설정
+        if ("8801111187916".equals(barcode)) {
+            productName = "마이쮸 사과맛";
+            productImage = "android.resource://" + getPackageName() + "/drawable/crown";
+        } else {
+            // 만약 다른 API 서비스를 사용한다면 API 호출 코드 여기에 추가
+            MyApiService apiService = ApiClient.getApiService();
+            Call<MyResponseType> call = apiService.lookupItem(barcode);
 
-                        if (productImage == null || productImage.isEmpty()) {
-                            productImage = "default_image_url";
+            call.enqueue(new Callback<MyResponseType>() {
+                @Override
+                public void onResponse(Call<MyResponseType> call, Response<MyResponseType> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        List<MyResponseType.Item> items = response.body().getItems();
+                        if (!items.isEmpty()) {
+                            MyResponseType.Item item = items.get(0);
+                            String productName = item.getTitle();
+                            String productImage = item.getImageUrl();
+
+                            if (productImage == null || productImage.isEmpty()) {
+                                productImage = "default_image_url";
+                            }
+
+                            if (productName == null || productName.isEmpty()) {
+                                productName = "Unknown Product";
+                            }
+
+                            navigateToAddItemActivity(productName, productImage);
+                        } else {
+                            Toast.makeText(BarcodeScanActivity.this, "상품 정보를 찾을 수 없습니다.", Toast.LENGTH_SHORT).show();
                         }
-
-                        if (productName == null || productName.isEmpty()) {
-                            productName = "Unknown Product";
-                        }
-
-                        Intent intent = new Intent(BarcodeScanActivity.this, AddItemActivity.class);
-                        intent.putExtra("itemName", productName);  // 상품명 전달
-                        intent.putExtra("imagePath", productImage); // 이미지 경로 전달
-
-                        // 로그로 데이터 전달 확인
-                        Log.d(TAG, "상품명: " + productName);
-                        Log.d(TAG, "상품 이미지: " + productImage);
-
-                        // AddItemActivity로 이동하고 저장 후 FkmainActivity로 이동
-                        startActivityForResult(intent, ADD_ITEM_REQUEST_CODE);
                     } else {
-                        Toast.makeText(BarcodeScanActivity.this, "상품 정보를 찾을 수 없습니다.", Toast.LENGTH_SHORT).show();
+                        Log.e(TAG, "API 실패, 오류 코드: " + response.code());
                     }
-                } else {
-                    Log.e(TAG, "API 실패, 오류 코드: " + response.code());
                 }
-            }
 
-            @Override
-            public void onFailure(Call<MyResponseType> call, Throwable t) {
-                Log.e(TAG, "API 호출 실패: " + t.getMessage());
-            }
-        });
+                @Override
+                public void onFailure(Call<MyResponseType> call, Throwable t) {
+                    Log.e(TAG, "API 호출 실패: " + t.getMessage());
+                }
+            });
+            return;  // API 콜백을 통해서만 수행되기 때문에 여기서 메소드를 종료합니다.
+        }
+
+        // API 호출 없이 특정 바코드인 경우 바로 AddItemActivity로 이동
+        navigateToAddItemActivity(productName, productImage);
+    }
+
+    private void navigateToAddItemActivity(String productName, String productImage) {
+        Intent intent = new Intent(BarcodeScanActivity.this, AddItemActivity.class);
+        intent.putExtra("itemName", productName);  // 상품명 전달
+        intent.putExtra("imagePath", productImage); // 이미지 경로 전달
+
+        // 로그로 데이터 전달 확인
+        Log.d(TAG, "상품명: " + productName);
+        Log.d(TAG, "상품 이미지: " + productImage);
+
+        // AddItemActivity로 이동하고 저장 후 FkmainActivity로 이동
+        startActivityForResult(intent, ADD_ITEM_REQUEST_CODE);
     }
 
     @Override

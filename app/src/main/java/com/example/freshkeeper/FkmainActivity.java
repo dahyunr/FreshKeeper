@@ -82,10 +82,12 @@ public class FkmainActivity extends BaseActivity {
 
         activateTab(tabAll);
         loadItemsFromDatabase(); // 전체 항목을 불러옴
+        sortItemsByCreatedAt(); // 기본 정렬을 등록순으로 설정
 
         tabAll.setOnClickListener(v -> {
             activateTab(tabAll);
             loadItemsFromDatabase(); // 전체 탭 클릭 시 전체 항목 불러오기
+            sortItemsByCreatedAt(); // 등록순으로 정렬
         });
 
         tabFrozen.setOnClickListener(v -> {
@@ -179,7 +181,7 @@ public class FkmainActivity extends BaseActivity {
         });
 
         findViewById(R.id.sort_reg_date).setOnClickListener(v -> {
-            sortItemsByRegDate();
+            sortItemsByCreatedAt();
             sortOrder.setText("등록순");
             sortOptions.setVisibility(View.GONE); // 정렬 후 옵션 숨김
         });
@@ -209,8 +211,9 @@ public class FkmainActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        // 화면으로 돌아올 때 아이템 리스트 새로고침
+        // 화면으로 돌아올 때 아이템 리스트 새로고침 및 등록순으로 정렬
         loadItemsFromDatabase();
+        sortItemsByCreatedAt();
     }
 
     private void requestPermissions() {
@@ -256,9 +259,10 @@ public class FkmainActivity extends BaseActivity {
                 String imagePath = cursor.getString(cursor.getColumnIndexOrThrow("image_path"));
                 int quantity = cursor.getInt(cursor.getColumnIndexOrThrow("quantity"));
                 int storageMethodValue = cursor.getInt(cursor.getColumnIndexOrThrow("storage_method"));
+                String createdAt = cursor.getString(cursor.getColumnIndexOrThrow("created_at")); // created_at 필드 추가
 
                 String countdown = calculateDDay(expDate);
-                allItems.add(new FoodItem(id, R.drawable.fk_placeholder, name, regDate, expDate, countdown, memo, imagePath, quantity, storageMethodValue)); // 수정된 부분: ID 값 추가
+                allItems.add(new FoodItem(id, R.drawable.fk_placeholder, name, regDate, expDate, countdown, memo, imagePath, quantity, storageMethodValue, createdAt)); // 수정된 부분: created_at 추가
             } while (cursor.moveToNext());
         }
         cursor.close();
@@ -278,9 +282,10 @@ public class FkmainActivity extends BaseActivity {
                 String imagePath = cursor.getString(cursor.getColumnIndexOrThrow("image_path"));
                 int quantity = cursor.getInt(cursor.getColumnIndexOrThrow("quantity"));
                 int storageMethodValue = cursor.getInt(cursor.getColumnIndexOrThrow("storage_method"));
+                String createdAt = cursor.getString(cursor.getColumnIndexOrThrow("created_at")); // created_at 필드 추가
 
                 String countdown = calculateDDay(expDate);
-                allItems.add(new FoodItem(id, R.drawable.fk_placeholder, name, regDate, expDate, countdown, memo, imagePath, quantity, storageMethodValue)); // 수정된 부분: ID 값 추가
+                allItems.add(new FoodItem(id, R.drawable.fk_placeholder, name, regDate, expDate, countdown, memo, imagePath, quantity, storageMethodValue, createdAt)); // 수정된 부분: created_at 추가
             } while (cursor.moveToNext());
         }
         cursor.close();
@@ -337,9 +342,9 @@ public class FkmainActivity extends BaseActivity {
         adapter.notifyDataSetChanged();
     }
 
-    // 등록순 정렬
-    private void sortItemsByRegDate() {
-        Collections.sort(allItems, (item1, item2) -> item1.getRegDate().compareTo(item2.getRegDate()));
+    // 등록순 정렬 (created_at 기준으로 내림차순 정렬)
+    private void sortItemsByCreatedAt() {
+        Collections.sort(allItems, (item1, item2) -> item2.getCreatedAt().compareTo(item1.getCreatedAt()));
         adapter.notifyDataSetChanged();
     }
 

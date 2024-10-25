@@ -47,6 +47,7 @@ public class AddItemActivity extends BaseActivity {
     private Uri imageUri;
     private String imagePath = null;
     private int itemId = -1;  // 아이템 ID를 저장하기 위한 변수
+    private String barcode = ""; // 바코드 값을 저장하기 위한 변수
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,6 +93,7 @@ public class AddItemActivity extends BaseActivity {
             int storageMethod = intent.getIntExtra("storageMethod", 0);
             String filePath = intent.getStringExtra("filePath");
             imagePath = intent.getStringExtra("imagePath");
+            barcode = intent.getStringExtra("barcode"); // 수정된 부분: 바코드 값 추가
 
             // 전달된 정보를 뷰에 설정
             Log.d(TAG, "Intent로부터 전달된 데이터 - 상품명: " + productName + ", 등록일: " + regDate + ", 유통기한: " + expDate);
@@ -183,7 +185,7 @@ public class AddItemActivity extends BaseActivity {
             int storageMethod = storageMethodSpinner.getSelectedItemPosition();
 
             if (!name.isEmpty() && isValidDate(regDate) && isValidDate(expDate)) {
-                long result = dbHelper.insertOrUpdateItem(itemId, name, regDate, expDate, memo, quantity, storageMethod, imagePath);  // 수정된 부분: 아이템 ID를 전달하여 업데이트
+                long result = dbHelper.insertOrUpdateItem(itemId, name, regDate, expDate, memo, quantity, storageMethod, imagePath, barcode);
                 if (result != -1) {
                     Toast.makeText(AddItemActivity.this, "상품이 성공적으로 등록되었습니다.", Toast.LENGTH_SHORT).show();
                     Intent fkmainIntent = new Intent(AddItemActivity.this, FkmainActivity.class);

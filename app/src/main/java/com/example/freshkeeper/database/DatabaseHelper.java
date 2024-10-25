@@ -11,7 +11,7 @@ import android.util.Log;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "FreshKeeper.db";
-    private static final int DATABASE_VERSION = 6;
+    private static final int DATABASE_VERSION = 12; // 개선: 버전 실시 증가
 
     // users 테이블 정보 (회원 관련)
     private static final String USERS_TABLE_NAME = "users";
@@ -31,6 +31,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String ITEM_COLUMN_QUANTITY = "quantity";
     private static final String ITEM_COLUMN_STORAGE_METHOD = "storage_method";
     private static final String ITEM_COLUMN_IMAGE_PATH = "image_path";
+    private static final String ITEM_COLUMN_BARCODE = "barcode";
+    private static final String ITEM_COLUMN_CREATED_AT = "created_at"; // 추가: 등록 시간
 
     // users 테이블 생성 SQL 코드
     private static final String USERS_TABLE_CREATE =
@@ -45,25 +47,27 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String ITEMS_TABLE_CREATE =
             "CREATE TABLE " + ITEMS_TABLE_NAME + " (" +
                     ITEM_COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    ITEM_COLUMN_NAME + " TEXT UNIQUE, " +
+                    ITEM_COLUMN_NAME + " TEXT, " +
                     ITEM_COLUMN_REG_DATE + " TEXT, " +
                     ITEM_COLUMN_EXP_DATE + " TEXT, " +
                     ITEM_COLUMN_MEMO + " TEXT, " +
                     ITEM_COLUMN_QUANTITY + " INTEGER, " +
                     ITEM_COLUMN_STORAGE_METHOD + " INTEGER, " +
-                    ITEM_COLUMN_IMAGE_PATH + " TEXT);";
+                    ITEM_COLUMN_IMAGE_PATH + " TEXT, " +
+                    ITEM_COLUMN_BARCODE + " TEXT UNIQUE, " +
+                    ITEM_COLUMN_CREATED_AT + " DATETIME DEFAULT CURRENT_TIMESTAMP);"; // 추가: 등록 시간 코드
 
-    // 데이터베이스 참조용 메버 변수
+    // 데이터베이스 참조용 멤버 변수
     private SQLiteDatabase database;
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
-    // 재구 호출 방지를 위한 getDatabase 메서드
+    // 데이터베이스 객체 얻기
     public SQLiteDatabase getDatabase() {
         if (database == null || !database.isOpen()) {
-            database = this.getReadableDatabase();  // 필요할 때만 데이터베이스를 열다.
+            database = this.getWritableDatabase();  // 쓰기 가능한 데이터베이스 열기
         }
         return database;
     }
@@ -83,9 +87,29 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         if (oldVersion < newVersion) {
-            db.execSQL("DROP TABLE IF EXISTS " + USERS_TABLE_NAME);
-            db.execSQL("DROP TABLE IF EXISTS " + ITEMS_TABLE_NAME);
-            onCreate(db);  // 새 테이블 생성
+            try {
+                if (oldVersion < 12) {
+                    // created_at 필드가 있는지 확인하고 없으면 추가
+                    Cursor cursor = db.rawQuery("PRAGMA table_info(" + ITEMS_TABLE_NAME + ")", null);
+                    boolean columnExists = false;
+
+                    while (cursor.moveToNext()) {
+                        String columnName = cursor.getString(cursor.getColumnIndexOrThrow("name"));
+                        if (ITEM_COLUMN_CREATED_AT.equals(columnName)) {
+                            columnExists = true;
+                            break;
+                        }
+                    }
+                    cursor.close();
+
+                    if (!columnExists) {
+                        db.execSQL("ALTER TABLE " + ITEMS_TABLE_NAME + " ADD COLUMN " + ITEM_COLUMN_CREATED_AT + " DATETIME DEFAULT CURRENT_TIMESTAMP");
+                        Log.d("DatabaseHelper", "created_at 필드 추가 완료");
+                    }
+                }
+            } catch (SQLException e) {
+                Log.e("DatabaseHelper", "테이블 업그레이드 오류: " + e.getMessage());
+            }
         }
     }
 
@@ -155,12 +179,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     // items 테이블에 항목 삽입 또는 업데이트 메서드
-    public long insertOrUpdateItem(Integer id, String name, String regDate, String expDate, String memo, int quantity, int storageMethod, String imagePath) {
+    public long insertOrUpdateItem(Integer id, String name, String regDate, String expDate, String memo, int quantity, int storageMethod, String imagePath, String barcode) {
         SQLiteDatabase db = getDatabase();
         long result = -1;
 
         try {
-            db.beginTransaction();  // 트래내션 시작
+            db.beginTransaction();  // 트랜잭션 시작
             ContentValues values = new ContentValues();
             values.put(ITEM_COLUMN_NAME, name);
             values.put(ITEM_COLUMN_REG_DATE, regDate);
@@ -169,6 +193,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             values.put(ITEM_COLUMN_QUANTITY, quantity);
             values.put(ITEM_COLUMN_STORAGE_METHOD, storageMethod);
             values.put(ITEM_COLUMN_IMAGE_PATH, imagePath);
+            values.put(ITEM_COLUMN_BARCODE, barcode);
 
             Log.d("DatabaseHelper", "삽입/업데이트 시도 - 아이템 이름: " + name);
 
@@ -185,14 +210,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 result = db.insert(ITEMS_TABLE_NAME, null, values);  // 새 아이템 삽입
                 Log.d("DatabaseHelper", "아이템 삽입 성공 - 아이템 이름: " + name);
             }
-            db.setTransactionSuccessful();  // 트래내션 성공
+            db.setTransactionSuccessful();  // 트랜잭션 성공
         } catch (SQLException e) {
             Log.e("DatabaseHelper", "아이템 삽입 또는 업데이트 오류: " + e.getMessage());
         } finally {
-            db.endTransaction();  // 트래내션 종료
+            db.endTransaction();  // 트랜잭션 종료
         }
 
         return result;
+    }
+
+    // items 테이블에서 바코드로 항목 검색 메서드 추가
+    public Cursor getItemByBarcode(String barcode) {
+        SQLiteDatabase db = getDatabase();
+        String selection = ITEM_COLUMN_BARCODE + " = ?";
+        String[] selectionArgs = {barcode};
+        return db.query(ITEMS_TABLE_NAME, null, selection, selectionArgs, null, null, null);
     }
 
     // items 테이블에서 항목 삭제 메서드 (ID 기반으로 수정)
@@ -217,33 +250,41 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return result;
     }
 
-    // items 테이블에서 모든 항목을 검색하는 메서드
+    // items 테이블에서 모든 항목을 검색하는 메서드 (created_at을 기준으로 내림차순 정리)
     public Cursor getAllItems() {
         SQLiteDatabase db = getDatabase();
-        return db.query(ITEMS_TABLE_NAME, null, null, null, null, null, null);
+        Cursor cursor = db.query(ITEMS_TABLE_NAME, null, null, null, null, null, ITEM_COLUMN_CREATED_AT + " DESC");
+        Log.d("DatabaseHelper", "getAllItems 호출 - 항목 수: " + cursor.getCount());
+        return cursor;
     }
 
-    // 저장 방법에 따라 items 테이블 항목을 검색하는 메서드
+    // 저장 방법에 따른 items 테이블 항목을 검색하는 메서드 (created_at을 기준으로 내림차순 정리)
     public Cursor getItemsByStorageMethod(int storageMethod) {
         SQLiteDatabase db = getDatabase();
         String selection = ITEM_COLUMN_STORAGE_METHOD + " = ?";
         String[] selectionArgs = {String.valueOf(storageMethod)};
-        return db.query(ITEMS_TABLE_NAME, null, selection, selectionArgs, null, null, null);
+        Cursor cursor = db.query(ITEMS_TABLE_NAME, null, selection, selectionArgs, null, null, ITEM_COLUMN_CREATED_AT + " DESC");
+        Log.d("DatabaseHelper", "getItemsByStorageMethod 호출 - 저장 방식: " + storageMethod + ", 항목 수: " + cursor.getCount());
+        return cursor;
     }
 
-    // items 테이블에서 특정 유통기현을 가지는 항목을 검색하는 메서드 (카레드 기능)
+    // items 테이블에서 특정 유통기한을 갖지는 항목을 검색하는 메서드 (카레디너 기능)
     public Cursor getItemsByExpDate(String expDate) {
         SQLiteDatabase db = getDatabase();
         String selection = ITEM_COLUMN_EXP_DATE + " = ?";
         String[] selectionArgs = {expDate};
-        return db.query(ITEMS_TABLE_NAME, null, selection, selectionArgs, null, null, null);
+        Cursor cursor = db.query(ITEMS_TABLE_NAME, null, selection, selectionArgs, null, null, ITEM_COLUMN_CREATED_AT + " DESC");
+        Log.d("DatabaseHelper", "getItemsByExpDate 호출 - 유통기한: " + expDate + ", 항목 수: " + cursor.getCount());
+        return cursor;
     }
 
-    // 특정 기간 내 유통기현을 가지는 항목을 검색하는 메서드 (카레드 기능 확장)
+    // 특정 기간 내 유통기한을 갖는 항목을 검색하는 메서드 (카레디너 기능 확장)
     public Cursor getItemsByExpDateRange(String startDate, String endDate) {
         SQLiteDatabase db = getDatabase();
         String selection = ITEM_COLUMN_EXP_DATE + " BETWEEN ? AND ?";
         String[] selectionArgs = {startDate, endDate};
-        return db.query(ITEMS_TABLE_NAME, null, selection, selectionArgs, null, null, null);
+        Cursor cursor = db.query(ITEMS_TABLE_NAME, null, selection, selectionArgs, null, null, ITEM_COLUMN_CREATED_AT + " DESC");
+        Log.d("DatabaseHelper", "getItemsByExpDateRange 호출 - 시작 날짜: " + startDate + ", 종료 날짜: " + endDate + ", 항목 수: " + cursor.getCount());
+        return cursor;
     }
 }

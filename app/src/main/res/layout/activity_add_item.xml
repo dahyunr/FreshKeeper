@@ -100,18 +100,19 @@
 
             <ImageView
                 android:id="@+id/item_quantity_minus"
-                android:layout_width="35dp"
+                android:layout_width="30dp"
                 android:layout_height="48dp"
-                android:layout_marginLeft="27dp"
-                android:src="@drawable/fk_remove"
-                android:contentDescription="수량 감소" />
+                android:layout_marginLeft="30dp"
+                android:alpha="0.4"
+                android:contentDescription="수량 감소"
+                android:src="@drawable/fk_remove" />
 
             <EditText
                 android:id="@+id/item_quantity"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="3dp"
                 android:hint="0"
                 android:background="@android:color/transparent"
                 android:gravity="center"
@@ -121,10 +122,11 @@
 
             <ImageView
                 android:id="@+id/item_quantity_plus"
-                android:layout_width="35dp"
+                android:layout_width="30dp"
                 android:layout_height="48dp"
                 android:src="@drawable/fk_control"
-                android:contentDescription="수량 증가" />
+                android:contentDescription="수량 증가"
+                android:alpha="0.4"/>
         </LinearLayout>
 
         <!-- 등록 날짜 -->
@@ -156,11 +158,12 @@
 
             <ImageView
                 android:id="@+id/item_reg_date_icon"
-                android:layout_width="35dp"
+                android:layout_width="30dp"
                 android:layout_height="48dp"
-                android:layout_marginTop="-5dp"
+                android:layout_marginTop="0dp"
                 android:src="@drawable/fk_calendar_month"
-                android:contentDescription="등록 날짜 아이콘" />
+                android:contentDescription="등록 날짜 아이콘"
+                android:alpha="0.4"/>
         </LinearLayout>
 
         <!-- 유통 기한 -->
@@ -174,7 +177,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="유통 기한"
+                android:text="유통기한"
                 android:textColor="#000000"
                 android:textSize="16sp" />
 
@@ -183,7 +186,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:hint="유통 기한"
+                android:hint="유통기한"
                 android:background="@android:color/transparent"
                 android:padding="8dp"
                 android:textColor="#000000"
@@ -192,11 +195,12 @@
 
             <ImageView
                 android:id="@+id/item_exp_date_icon"
-                android:layout_width="35dp"
+                android:layout_width="30dp"
                 android:layout_height="48dp"
-                android:layout_marginTop="-5dp"
+                android:layout_marginTop="0dp"
                 android:src="@drawable/fk_calendar_month"
-                android:contentDescription="유통 기한 아이콘" />
+                android:contentDescription="유통 기한 아이콘"
+                android:alpha="0.4"/>
         </LinearLayout>
 
         <!-- 메모 -->

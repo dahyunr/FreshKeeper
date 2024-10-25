@@ -166,6 +166,7 @@
                         android:orientation="horizontal">
 
                         <TextView
+                            android:id="@+id/button_notice"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
@@ -225,7 +226,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
                         android:layout_marginBottom="4dp"
-                        android:text="개인 정보 처리 방침"
+                        android:text="개인정보 처리방침"
                         android:textColor="#000000"
                         android:textSize="16sp" />
 
