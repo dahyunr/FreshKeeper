@@ -61,6 +61,17 @@ public class FkmainActivity extends BaseActivity {
         dbHelper = new DatabaseHelper(this);
 
         searchEditText = findViewById(R.id.search_edit_text);
+
+        // 검색창 포커스 해제 설정
+        searchEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (!hasFocus) {
+                    searchEditText.clearFocus();
+                }
+            }
+        });
+
         tabAll = findViewById(R.id.tab_all);
         tabFrozen = findViewById(R.id.tab_frozen);
         tabRefrigerated = findViewById(R.id.tab_refrigerated);
@@ -185,6 +196,17 @@ public class FkmainActivity extends BaseActivity {
             sortItemsByExpDate();
             sortOrder.setText("유통기한순");
             sortOptions.setVisibility(View.GONE);
+        });
+
+        // 검색창 외부 터치 시 포커스 해제
+        recyclerView.setOnTouchListener((v, event) -> {
+            searchEditText.clearFocus();
+            return false;
+        });
+
+        sortOptions.setOnTouchListener((v, event) -> {
+            searchEditText.clearFocus();
+            return false;
         });
 
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new SwipeToDeleteCallback(adapter, this));

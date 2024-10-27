@@ -32,6 +32,8 @@ public class MypageActivity extends BaseActivity {
     private TextView faqTextView;  // 자주 묻는 질문 버튼
     private TextView noticeButton;  // 공지사항 버튼 추가
     private TextView logoutTextView;  // 로그아웃 버튼 변수 추가
+    private TextView privacyPolicyButton;  // 개인정보 처리방침 버튼
+    private TextView termsOfServiceButton;  // 이용약관 버튼
     private DatabaseHelper dbHelper;
     private boolean isGuestUser;  // 비회원 여부 체크 변수 추가
 
@@ -51,37 +53,38 @@ public class MypageActivity extends BaseActivity {
         iconBarcode = findViewById(R.id.icon_barcode);
         iconMypage = findViewById(R.id.icon_mypage);
         notificationSettingsTextView = findViewById(R.id.notification_settings);
+        contactUsButton = findViewById(R.id.button_contact_us);
+        faqTextView = findViewById(R.id.button_faq);
+        noticeButton = findViewById(R.id.button_notice);
+        logoutTextView = findViewById(R.id.logout);
+        privacyPolicyButton = findViewById(R.id.button_privacy_policy);
+        termsOfServiceButton = findViewById(R.id.button_terms_of_service);
 
         // 로그아웃 텍스트뷰 초기화 및 클릭 리스너 추가
-        logoutTextView = findViewById(R.id.logout);
-        logoutTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                logout();  // 로그아웃 처리
-            }
-        });
+        logoutTextView.setOnClickListener(v -> logout());
 
-        // "자주 물어보는 질문" 텍스트뷰 초기화 및 클릭 리스너 추가
-        faqTextView = findViewById(R.id.button_faq);
-        faqTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent faqIntent = new Intent(MypageActivity.this, FAQActivity.class);
-                startActivity(faqIntent);
-            }
+        // "자주 묻는 질문" 텍스트뷰 초기화 및 클릭 리스너 추가
+        faqTextView.setOnClickListener(v -> {
+            Intent faqIntent = new Intent(MypageActivity.this, FAQActivity.class);
+            startActivity(faqIntent);
         });
-
-        // 문의하기 버튼 초기화
-        contactUsButton = findViewById(R.id.button_contact_us);
 
         // 공지사항 버튼 초기화 및 클릭 리스너 추가
-        noticeButton = findViewById(R.id.button_notice);
-        noticeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent noticeIntent = new Intent(MypageActivity.this, NoticeActivity.class);
-                startActivity(noticeIntent);
-            }
+        noticeButton.setOnClickListener(v -> {
+            Intent noticeIntent = new Intent(MypageActivity.this, NoticeActivity.class);
+            startActivity(noticeIntent);
+        });
+
+        // 개인정보 처리방침 버튼 초기화 및 클릭 리스너 추가
+        privacyPolicyButton.setOnClickListener(v -> {
+            Intent privacyPolicyIntent = new Intent(MypageActivity.this, PrivacyPolicyActivity.class);
+            startActivity(privacyPolicyIntent);
+        });
+
+        // 이용약관 버튼 초기화 및 클릭 리스너 추가
+        termsOfServiceButton.setOnClickListener(v -> {
+            Intent termsIntent = new Intent(MypageActivity.this, TermsOfServiceActivity.class);
+            startActivity(termsIntent);
         });
 
         // 비회원 로그인 여부 확인
@@ -94,21 +97,16 @@ public class MypageActivity extends BaseActivity {
         } else {
             isGuestUser = false;  // 회원 로그인 상태
             // 문의하기 버튼 클릭 리스너 추가 (비회원이 아닐 경우에만 활성화)
-            contactUsButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent contactIntent = new Intent(MypageActivity.this, QnaActivity.class);
-                    startActivity(contactIntent);
-                }
+            contactUsButton.setOnClickListener(v -> {
+                Intent contactIntent = new Intent(MypageActivity.this, QnaActivity.class);
+                startActivity(contactIntent);
             });
         }
 
         profileImage.setOnClickListener(v -> openGallery());
 
         // 닉네임 클릭 리스너 - 다이얼로그로 변경
-        nicknameTextView.setOnClickListener(v -> {
-            showEditDialog("닉네임 변경", nicknameTextView);
-        });
+        nicknameTextView.setOnClickListener(v -> showEditDialog("닉네임 변경", nicknameTextView));
 
         // 하단바 아이콘 클릭 리스너
         final Intent intent = new Intent();  // Intent 변수 재사용
@@ -183,24 +181,21 @@ public class MypageActivity extends BaseActivity {
     }
 
     private void showEditDialog(String title, TextView textViewToEdit) {
-        if (textViewToEdit != null) {  // Null 체크 추가
+        if (textViewToEdit != null) {
             EditText input = new EditText(MypageActivity.this);
             input.setText(textViewToEdit.getText());
 
             new AlertDialog.Builder(MypageActivity.this)
                     .setTitle(title)
                     .setView(input)
-                    .setPositiveButton("확인", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            String newText = input.getText().toString();
-                            if (!newText.isEmpty()) {
-                                textViewToEdit.setText(newText);
-                                saveNickname(newText);  // 닉네임 저장 메서드 호출
-                                Toast.makeText(MypageActivity.this, title + "이(가) 변경되었습니다.", Toast.LENGTH_SHORT).show();
-                            } else {
-                                Toast.makeText(MypageActivity.this, "입력 값이 비어 있습니다.", Toast.LENGTH_SHORT).show();
-                            }
+                    .setPositiveButton("확인", (dialog, which) -> {
+                        String newText = input.getText().toString();
+                        if (!newText.isEmpty()) {
+                            textViewToEdit.setText(newText);
+                            saveNickname(newText);
+                            Toast.makeText(MypageActivity.this, title + "이(가) 변경되었습니다.", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(MypageActivity.this, "입력 값이 비어 있습니다.", Toast.LENGTH_SHORT).show();
                         }
                     })
                     .setNegativeButton("취소", null)
@@ -217,22 +212,18 @@ public class MypageActivity extends BaseActivity {
         editor.apply();
     }
 
-    // 로그아웃 메서드 (회원 정보는 삭제하지 않음)
     private void logout() {
-        // 로그인 상태를 false로 설정 (로그아웃 처리)
         SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putBoolean("isLoggedIn", false);  // 로그아웃 상태 저장
-        editor.remove("userName");  // 사용자 이름 삭제
-        editor.remove("guestId");  // 비회원 정보 삭제
+        editor.putBoolean("isLoggedIn", false);
+        editor.remove("userName");
+        editor.remove("guestId");
         editor.apply();
 
-        // 로그아웃 되었습니다. 메시지 표시
         Toast.makeText(MypageActivity.this, "로그아웃 되었습니다.", Toast.LENGTH_SHORT).show();
 
-        // LoginActivity로 이동하고 기존 액티비티 스택을 모두 지우기
         Intent intent = new Intent(MypageActivity.this, LoginActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);  // 기존 스택 제거
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
     }

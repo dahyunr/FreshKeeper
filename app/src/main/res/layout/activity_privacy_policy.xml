@@ -28,7 +28,7 @@
             android:id="@+id/title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="서비스 이용약관"
+            android:text="개인정보 처리방침"
             android:textSize="20sp"
             android:textColor="#000"
             android:textStyle="bold"
@@ -38,7 +38,7 @@
             app:layout_constraintEnd_toEndOf="parent"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- 서비스 이용약관 내용 -->
+    <!-- 개인정보 처리방침 내용 -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -47,7 +47,7 @@
         android:paddingTop="16dp">
 
         <TextView
-            android:id="@+id/terms_text"
+            android:id="@+id/privacy_policy_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="16sp"

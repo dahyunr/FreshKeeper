@@ -6,7 +6,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import androidx.appcompat.app.AppCompatActivity;
 
-public class NoticeActivity extends AppCompatActivity {
+public class NoticeActivity extends BaseActivity {
 
     private ListView noticeListView;
 

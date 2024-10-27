@@ -1,5 +1,6 @@
 package com.example.freshkeeper;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -82,6 +83,12 @@ public class QnaActivity extends BaseActivity {
                     // 필요 시 입력값 초기화
                     categorySpinner.setSelection(0); // 스피너 초기화
                     inquiryContent.setText("");      // 문의 내용 초기화
+
+                    // MyPageActivity로 돌아가기
+                    Intent intent = new Intent(QnaActivity.this, MypageActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP); // 스택에서 MyPageActivity를 찾으면 해당 액티비티를 사용
+                    startActivity(intent);
+                    finish(); // QnaActivity 종료
                 }
             }
         });
