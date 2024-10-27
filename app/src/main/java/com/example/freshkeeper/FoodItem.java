@@ -3,21 +3,21 @@ package com.example.freshkeeper;
 import java.io.Serializable;
 
 public class FoodItem implements Serializable {
-    private int id;  // ID 필드 추가
-    private int imageResource; // 이미지 리소스
+    private int id;             // ID 필드
+    private int imageResource;  // 이미지 리소스
     private String name;
     private String regDate;
     private String expDate;
-    private String countdown; // 남은 기한 계산을 위한 필드
+    private String countdown;   // 남은 기한 계산을 위한 필드
     private String memo;
-    private String imagePath;  // 이미지 경로 필드 추가
-    private int quantity;      // 수량 필드 추가
-    private int storageMethod; // 저장 방법 추가
-    private String createdAt;  // 등록 시간 필드 추가
+    private String imagePath;   // 이미지 경로 필드
+    private int quantity;       // 수량 필드
+    private int storageMethod;  // 저장 방법 필드
+    private String createdAt;   // 등록 시간 필드
 
-    // 생성자 수정: createdAt 필드 추가
+    // 생성자 (ID와 createdAt 포함)
     public FoodItem(int id, int imageResource, String name, String regDate, String expDate, String countdown, String memo, String imagePath, int quantity, int storageMethod, String createdAt) {
-        this.id = id;  // ID 필드 추가
+        this.id = id;
         this.imageResource = imageResource;
         this.name = name;
         this.regDate = regDate;
@@ -25,12 +25,12 @@ public class FoodItem implements Serializable {
         this.countdown = countdown;
         this.memo = memo;
         this.imagePath = imagePath;
-        this.quantity = quantity;    // 생성자에 수량 추가
-        this.storageMethod = storageMethod; // 저장 방법 추가
-        this.createdAt = createdAt; // 생성자에 등록 시간 추가
+        this.quantity = quantity;
+        this.storageMethod = storageMethod;
+        this.createdAt = createdAt;
     }
 
-    // 두 번째 생성자 추가 (ID와 createdAt 없이 생성)
+    // 두 번째 생성자 (ID와 createdAt 없이 생성)
     public FoodItem(int imageResource, String name, String regDate, String expDate, String countdown, String memo, String imagePath, int quantity, int storageMethod) {
         this.imageResource = imageResource;
         this.name = name;
@@ -108,7 +108,6 @@ public class FoodItem implements Serializable {
         this.imagePath = imagePath;
     }
 
-    // 수량 관련 Getter 및 Setter 추가
     public int getQuantity() {
         return quantity;
     }
@@ -117,7 +116,6 @@ public class FoodItem implements Serializable {
         this.quantity = quantity;
     }
 
-    // 저장 방법 관련 Getter 및 Setter 추가
     public int getStorageMethod() {
         return storageMethod;
     }
@@ -126,8 +124,11 @@ public class FoodItem implements Serializable {
         this.storageMethod = storageMethod;
     }
 
-    // 등록 시간 관련 Getter 추가
     public String getCreatedAt() {
         return createdAt;
+    }
+
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
     }
 }

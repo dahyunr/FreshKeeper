@@ -52,7 +52,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="소비기한 임박 알림"
+                android:text="유통기한 임박 알림"
                 android:textColor="#000000"
                 android:textSize="16sp" />
 
@@ -120,5 +120,17 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="#C9C9C9" />
+
+        <!-- 저장 버튼 -->
+        <Button
+            android:id="@+id/save_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="저장"
+            android:textColor="@android:color/white"
+            android:background="#65B120"
+            android:layout_marginTop="16dp"
+            android:padding="16dp"
+            android:textSize="16sp"/>
     </LinearLayout>
 </RelativeLayout>

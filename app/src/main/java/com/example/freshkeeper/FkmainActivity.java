@@ -81,28 +81,28 @@ public class FkmainActivity extends BaseActivity {
         recyclerView.setAdapter(adapter);
 
         activateTab(tabAll);
-        loadItemsFromDatabase(); // 전체 항목을 불러옴
-        sortItemsByCreatedAt(); // 기본 정렬을 등록순으로 설정
+        loadItemsFromDatabase();
+        sortItemsByCreatedAt();
 
         tabAll.setOnClickListener(v -> {
             activateTab(tabAll);
-            loadItemsFromDatabase(); // 전체 탭 클릭 시 전체 항목 불러오기
-            sortItemsByCreatedAt(); // 등록순으로 정렬
+            loadItemsFromDatabase();
+            sortItemsByCreatedAt();
         });
 
         tabFrozen.setOnClickListener(v -> {
             activateTab(tabFrozen);
-            loadItemsByCategory(0); // 0: 냉동
+            loadItemsByCategory(0);
         });
 
         tabRefrigerated.setOnClickListener(v -> {
             activateTab(tabRefrigerated);
-            loadItemsByCategory(1); // 1: 냉장
+            loadItemsByCategory(1);
         });
 
         tabRoomTemp.setOnClickListener(v -> {
             activateTab(tabRoomTemp);
-            loadItemsByCategory(2); // 2: 상온
+            loadItemsByCategory(2);
         });
 
         plusButton.setOnClickListener(v -> {
@@ -129,7 +129,6 @@ public class FkmainActivity extends BaseActivity {
             Intent intent = new Intent(FkmainActivity.this, AddItemActivity.class);
             FoodItem clickedItem = allItems.get(position);
 
-            // 수정된 부분: ID 값을 인텐트로 전달
             intent.putExtra("itemId", clickedItem.getId());
             intent.putExtra("itemName", clickedItem.getName());
             intent.putExtra("regDate", clickedItem.getRegDate());
@@ -142,21 +141,19 @@ public class FkmainActivity extends BaseActivity {
             startActivity(intent);
         });
 
-        // 검색 기능 구현
         searchEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                filter(s.toString()); // 입력 시 필터링
+                filter(s.toString());
             }
 
             @Override
             public void afterTextChanged(Editable s) {}
         });
 
-        // 엔터 키 입력 방지
         searchEditText.setOnEditorActionListener((v, actionId, event) -> {
             return actionId == EditorInfo.IME_ACTION_SEARCH ||
                     actionId == EditorInfo.IME_ACTION_DONE ||
@@ -164,7 +161,6 @@ public class FkmainActivity extends BaseActivity {
                             event.getKeyCode() == KeyEvent.KEYCODE_ENTER;
         });
 
-        // 정렬 버튼 클릭 시 정렬 옵션을 표시
         sortOrder.setOnClickListener(v -> {
             if (sortOptions.getVisibility() == View.GONE) {
                 sortOptions.setVisibility(View.VISIBLE);
@@ -173,34 +169,32 @@ public class FkmainActivity extends BaseActivity {
             }
         });
 
-        // 정렬 옵션 클릭 이벤트 설정
         findViewById(R.id.sort_name).setOnClickListener(v -> {
             sortItemsByName();
             sortOrder.setText("이름순");
-            sortOptions.setVisibility(View.GONE); // 정렬 후 옵션 숨김
+            sortOptions.setVisibility(View.GONE);
         });
 
         findViewById(R.id.sort_reg_date).setOnClickListener(v -> {
             sortItemsByCreatedAt();
             sortOrder.setText("등록순");
-            sortOptions.setVisibility(View.GONE); // 정렬 후 옵션 숨김
+            sortOptions.setVisibility(View.GONE);
         });
 
         findViewById(R.id.sort_exp_date).setOnClickListener(v -> {
             sortItemsByExpDate();
             sortOrder.setText("유통기한순");
-            sortOptions.setVisibility(View.GONE); // 정렬 후 옵션 숨김
+            sortOptions.setVisibility(View.GONE);
         });
 
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new SwipeToDeleteCallback(adapter, this));
         itemTouchHelper.attachToRecyclerView(recyclerView);
 
-        // 삭제 기능 구현
         adapter.setOnItemDeleteListener(position -> {
             FoodItem itemToDelete = allItems.get(position);
-            if (dbHelper.deleteItem(itemToDelete.getId())) { // 수정된 부분: ID를 사용하여 데이터베이스에서 삭제
-                allItems.remove(position); // 목록에서 삭제
-                adapter.notifyItemRemoved(position); // UI 업데이트
+            if (dbHelper.deleteItem(itemToDelete.getId())) {
+                allItems.remove(position);
+                adapter.notifyItemRemoved(position);
                 Log.d("FkmainActivity", "항목이 성공적으로 삭제되었습니다.");
             } else {
                 Log.e("FkmainActivity", "데이터베이스에서 항목 삭제에 실패했습니다.");
@@ -211,7 +205,6 @@ public class FkmainActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        // 화면으로 돌아올 때 아이템 리스트 새로고침 및 등록순으로 정렬
         loadItemsFromDatabase();
         sortItemsByCreatedAt();
     }
@@ -230,7 +223,7 @@ public class FkmainActivity extends BaseActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == CAMERA_REQUEST_CODE || requestCode == STORAGE_REQUEST_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // 권한이 허용된 경우
+                // Permissions granted
             } else {
                 Toast.makeText(this, "권한을 허용해야 기능을 사용할 수 있습니다.", Toast.LENGTH_SHORT).show();
             }
@@ -251,7 +244,7 @@ public class FkmainActivity extends BaseActivity {
         Cursor cursor = dbHelper.getAllItems();
         if (cursor.moveToFirst()) {
             do {
-                int id = cursor.getInt(cursor.getColumnIndexOrThrow("item_id")); // 수정된 부분: ID 값 추가
+                int id = cursor.getInt(cursor.getColumnIndexOrThrow("item_id"));
                 String name = cursor.getString(cursor.getColumnIndexOrThrow("name"));
                 String regDate = cursor.getString(cursor.getColumnIndexOrThrow("reg_date"));
                 String expDate = cursor.getString(cursor.getColumnIndexOrThrow("exp_date"));
@@ -259,10 +252,10 @@ public class FkmainActivity extends BaseActivity {
                 String imagePath = cursor.getString(cursor.getColumnIndexOrThrow("image_path"));
                 int quantity = cursor.getInt(cursor.getColumnIndexOrThrow("quantity"));
                 int storageMethodValue = cursor.getInt(cursor.getColumnIndexOrThrow("storage_method"));
-                String createdAt = cursor.getString(cursor.getColumnIndexOrThrow("created_at")); // created_at 필드 추가
+                String createdAt = cursor.getString(cursor.getColumnIndexOrThrow("created_at"));
 
                 String countdown = calculateDDay(expDate);
-                allItems.add(new FoodItem(id, R.drawable.fk_placeholder, name, regDate, expDate, countdown, memo, imagePath, quantity, storageMethodValue, createdAt)); // 수정된 부분: created_at 추가
+                allItems.add(new FoodItem(id, R.drawable.fk_placeholder, name, regDate, expDate, countdown, memo, imagePath, quantity, storageMethodValue, createdAt));
             } while (cursor.moveToNext());
         }
         cursor.close();
@@ -274,7 +267,7 @@ public class FkmainActivity extends BaseActivity {
         Cursor cursor = dbHelper.getItemsByStorageMethod(storageMethod);
         if (cursor.moveToFirst()) {
             do {
-                int id = cursor.getInt(cursor.getColumnIndexOrThrow("item_id")); // 수정된 부분: ID 값 추가
+                int id = cursor.getInt(cursor.getColumnIndexOrThrow("item_id"));
                 String name = cursor.getString(cursor.getColumnIndexOrThrow("name"));
                 String regDate = cursor.getString(cursor.getColumnIndexOrThrow("reg_date"));
                 String expDate = cursor.getString(cursor.getColumnIndexOrThrow("exp_date"));
@@ -282,10 +275,10 @@ public class FkmainActivity extends BaseActivity {
                 String imagePath = cursor.getString(cursor.getColumnIndexOrThrow("image_path"));
                 int quantity = cursor.getInt(cursor.getColumnIndexOrThrow("quantity"));
                 int storageMethodValue = cursor.getInt(cursor.getColumnIndexOrThrow("storage_method"));
-                String createdAt = cursor.getString(cursor.getColumnIndexOrThrow("created_at")); // created_at 필드 추가
+                String createdAt = cursor.getString(cursor.getColumnIndexOrThrow("created_at"));
 
                 String countdown = calculateDDay(expDate);
-                allItems.add(new FoodItem(id, R.drawable.fk_placeholder, name, regDate, expDate, countdown, memo, imagePath, quantity, storageMethodValue, createdAt)); // 수정된 부분: created_at 추가
+                allItems.add(new FoodItem(id, R.drawable.fk_placeholder, name, regDate, expDate, countdown, memo, imagePath, quantity, storageMethodValue, createdAt));
             } while (cursor.moveToNext());
         }
         cursor.close();
@@ -305,7 +298,6 @@ public class FkmainActivity extends BaseActivity {
                 return "D-??";
             }
 
-            // Resetting the time component to midnight for comparison
             Date today = new Date();
             today = dateFormat8.parse(dateFormat8.format(today));
             expirationDate = dateFormat8.parse(dateFormat8.format(expirationDate));
@@ -336,19 +328,16 @@ public class FkmainActivity extends BaseActivity {
         adapter.updateList(filteredList);
     }
 
-    // 이름순 정렬
     private void sortItemsByName() {
         Collections.sort(allItems, (item1, item2) -> item1.getName().compareToIgnoreCase(item2.getName()));
         adapter.notifyDataSetChanged();
     }
 
-    // 등록순 정렬 (created_at 기준으로 내림차순 정렬)
     private void sortItemsByCreatedAt() {
         Collections.sort(allItems, (item1, item2) -> item2.getCreatedAt().compareTo(item1.getCreatedAt()));
         adapter.notifyDataSetChanged();
     }
 
-    // 유통기한순 정렬
     private void sortItemsByExpDate() {
         Collections.sort(allItems, (item1, item2) -> item1.getExpDate().compareTo(item2.getExpDate()));
         adapter.notifyDataSetChanged();

@@ -72,7 +72,6 @@ public class AddItemActivity extends BaseActivity {
 
         // 기본 이미지 로드
         Glide.with(this).load(R.drawable.fk_gallery).into(itemImage);
-
         itemQuantity.setText(String.valueOf(quantity));
 
         // Spinner 설정에서 "전체" 옵션을 제거하고 "냉장", "냉동", "상온"만 남김
@@ -84,7 +83,7 @@ public class AddItemActivity extends BaseActivity {
         // 전달된 Intent 데이터로부터 상품명과 기타 정보 설정
         Intent intent = getIntent();
         if (intent != null) {
-            itemId = intent.getIntExtra("itemId", -1);  // 수정된 부분: 아이템 ID를 인텐트로부터 가져옴
+            itemId = intent.getIntExtra("itemId", -1);
             String productName = intent.getStringExtra("itemName");
             String regDate = intent.getStringExtra("regDate");
             String expDate = intent.getStringExtra("expDate");
@@ -93,15 +92,13 @@ public class AddItemActivity extends BaseActivity {
             int storageMethod = intent.getIntExtra("storageMethod", 0);
             String filePath = intent.getStringExtra("filePath");
             imagePath = intent.getStringExtra("imagePath");
-            barcode = intent.getStringExtra("barcode"); // 수정된 부분: 바코드 값 추가
+            barcode = intent.getStringExtra("barcode");
 
             // 전달된 정보를 뷰에 설정
-            Log.d(TAG, "Intent로부터 전달된 데이터 - 상품명: " + productName + ", 등록일: " + regDate + ", 유통기한: " + expDate);
-
             if (productName != null && !productName.isEmpty()) {
                 itemName.setText(productName);
             } else {
-                itemName.setHint("상품명을 입력하세요");  // 수정된 부분: 기본 안내 문구를 힌트로 설정
+                itemName.setHint("상품명을 입력하세요");
             }
             if (regDate != null && !regDate.isEmpty()) {
                 itemRegDate.setText(regDate);

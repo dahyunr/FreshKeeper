@@ -9,7 +9,7 @@
         android:layout_width="80dp"
         android:layout_height="80dp"
         android:scaleType="centerCrop"
-        android:src="@android:drawable/ic_menu_gallery" />
+        android:src="@drawable/fk_default_image" /> <!-- 기본 이미지 fk_default_image로 수정 -->
 
     <LinearLayout
         android:layout_width="0dp"

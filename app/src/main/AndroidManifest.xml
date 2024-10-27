@@ -8,6 +8,7 @@
     <!-- 카메라 및 저장소 접근 권한 -->
     <uses-permission android:name="android.permission.CAMERA"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
 
     <!-- Android 10 이하에서만 WRITE_EXTERNAL_STORAGE 사용 -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
@@ -29,7 +30,8 @@
     <!-- 카메라 하드웨어 사용 명시 -->
     <uses-feature android:name="android.hardware.camera" android:required="false"/>
 
-    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
+    <!-- 정확한 알람 설정 권한 -->
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
 
     <application
         android:allowBackup="true"
@@ -52,10 +54,7 @@
         </activity>
 
         <!-- 로그인 및 회원가입 액티비티 -->
-        <activity
-            android:name=".LoginActivity"
-            android:exported="true"/>
-
+        <activity android:name=".LoginActivity" android:exported="true"/>
         <activity android:name=".RegisterActivity" android:exported="false"/>
 
         <!-- 메인 화면 및 아이템 추가 관련 액티비티 -->
@@ -77,7 +76,21 @@
         <activity android:name=".QnaActivity" android:exported="false"/>
         <activity android:name=".PwActivity" android:exported="false"/>
         <activity android:name=".FAQActivity" android:exported="false"/>
+        <activity android:name=".NoticeActivity" android:exported="false"/>
 
-        <activity android:name=".NoticeActivity" />
+        <!-- 개인정보 처리방침 및 서비스 이용약관 액티비티 -->
+        <activity
+            android:name=".PrivacyPolicyActivity"
+            android:label="개인정보 처리방침"
+            android:parentActivityName=".MypageActivity"
+            android:exported="false"/>
+        <activity
+            android:name=".TermsOfServiceActivity"
+            android:label="서비스 이용약관"
+            android:parentActivityName=".MypageActivity"
+            android:exported="false"/>
+
+        <!-- 알람 수신기 -->
+        <receiver android:name=".AlarmReceiver"/>
     </application>
 </manifest>
