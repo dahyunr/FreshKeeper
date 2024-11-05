@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <!-- 상단 레이아웃: 뒤로가기 버튼과 문의하기 내역 타이틀 -->
+    <RelativeLayout
+        android:id="@+id/top_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp">
+
+        <ImageView
+            android:id="@+id/back_button_history"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/fk_back"
+            android:contentDescription="Back Button"
+            android:layout_alignParentStart="true" />
+
+        <TextView
+            android:id="@+id/history_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="문의하기 내역"
+            android:textColor="#000000"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_centerHorizontal="true"/>
+    </RelativeLayout>
+
+    <!-- 문의 내역이 없을 때 표시할 텍스트 -->
+    <TextView
+        android:id="@+id/empty_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="문의 내역이 없습니다."
+        android:textSize="16sp"
+        android:textColor="#888888"
+        android:visibility="gone"
+        android:layout_centerInParent="true"/>
+
+    <!-- 문의 내역 리스트 -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/inquiry_history_recyclerview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/top_bar"
+        android:layout_marginTop="16dp"/>
+</RelativeLayout>

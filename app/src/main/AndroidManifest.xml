@@ -92,5 +92,7 @@
 
         <!-- 알람 수신기 -->
         <receiver android:name=".AlarmReceiver"/>
+
+        <activity android:name=".InquiryHistoryActivity" />
     </application>
 </manifest>

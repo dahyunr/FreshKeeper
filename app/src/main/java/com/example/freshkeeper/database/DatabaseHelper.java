@@ -8,11 +8,16 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.example.freshkeeper.InquiryItem;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     // 데이터베이스 이름 및 버전 설정
     private static final String DATABASE_NAME = "FreshKeeper.db";
-    private static final int DATABASE_VERSION = 13;
+    private static final int DATABASE_VERSION = 14;
 
     // Users 테이블 컬럼 정보 설정
     private static final String USERS_TABLE_NAME = "users";
@@ -34,6 +39,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String ITEM_COLUMN_IMAGE_PATH = "image_path";
     private static final String ITEM_COLUMN_BARCODE = "barcode";
     private static final String ITEM_COLUMN_CREATED_AT = "created_at";
+
+    // Inquiries 테이블 컬럼 정보 설정 (문의 내역 저장)
+    private static final String INQUIRIES_TABLE_NAME = "inquiries";
+    private static final String INQUIRY_COLUMN_ID = "id";
+    private static final String INQUIRY_COLUMN_CATEGORY = "category";
+    private static final String INQUIRY_COLUMN_CONTENT = "content";
+    private static final String INQUIRY_COLUMN_TIMESTAMP = "timestamp";
+    private static final String INQUIRY_COLUMN_RESPONSE = "response";
+    private static final String INQUIRY_COLUMN_STATUS = "status";
 
     // Users 테이블 생성 SQL 코드
     private static final String USERS_TABLE_CREATE =
@@ -58,6 +72,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     ITEM_COLUMN_BARCODE + " TEXT UNIQUE, " +
                     ITEM_COLUMN_CREATED_AT + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP);";
 
+    // Inquiries 테이블 생성 SQL 코드 수정
+    private static final String INQUIRIES_TABLE_CREATE =
+            "CREATE TABLE IF NOT EXISTS " + INQUIRIES_TABLE_NAME + " (" +
+                    INQUIRY_COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    INQUIRY_COLUMN_CATEGORY + " TEXT, " +
+                    INQUIRY_COLUMN_CONTENT + " TEXT, " +
+                    INQUIRY_COLUMN_TIMESTAMP + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " +
+                    INQUIRY_COLUMN_RESPONSE + " TEXT, " +   // 답변 내용을 저장할 열 추가
+                    INQUIRY_COLUMN_STATUS + " TEXT DEFAULT '답변예정');"; // 답변 상태 열 추가 (기본값 '답변예정')
+
     private SQLiteDatabase database;
 
     // 생성자
@@ -78,6 +102,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // 테이블 생성
         db.execSQL(USERS_TABLE_CREATE);
         db.execSQL(ITEMS_TABLE_CREATE);
+        db.execSQL(INQUIRIES_TABLE_CREATE); // Inquiries 테이블 생성
     }
 
     @Override
@@ -85,6 +110,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // 데이터베이스 업그레이드 시 테이블을 삭제 후 재생성
         db.execSQL("DROP TABLE IF EXISTS " + USERS_TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + ITEMS_TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + INQUIRIES_TABLE_NAME); // Inquiries 테이블 삭제
         onCreate(db);
     }
 
@@ -250,4 +276,44 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String[] selectionArgs = {startDate, endDate};
         return db.query(ITEMS_TABLE_NAME, null, selection, selectionArgs, null, null, ITEM_COLUMN_CREATED_AT + " DESC");
     }
+
+    // 문의 내용 저장 메서드 추가
+    public void insertInquiry(String category, String content) {
+        SQLiteDatabase db = getDatabase();
+        ContentValues values = new ContentValues();
+        values.put(INQUIRY_COLUMN_CATEGORY, category);
+        values.put(INQUIRY_COLUMN_CONTENT, content);
+        values.put(INQUIRY_COLUMN_STATUS, "답변예정"); // 기본 상태 설정
+        db.insert(INQUIRIES_TABLE_NAME, null, values);
+    }
+
+    // 모든 문의 내역 조회 메서드 추가
+    // DatabaseHelper.java
+
+    public List<InquiryItem> getAllInquiries() {
+        List<InquiryItem> inquiries = new ArrayList<>();
+        String selectQuery = "SELECT * FROM " + INQUIRIES_TABLE_NAME + " ORDER BY " + INQUIRY_COLUMN_TIMESTAMP + " DESC";
+
+        SQLiteDatabase db = getDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                String category = cursor.getString(cursor.getColumnIndexOrThrow(INQUIRY_COLUMN_CATEGORY));
+                String content = cursor.getString(cursor.getColumnIndexOrThrow(INQUIRY_COLUMN_CONTENT));
+                String response = cursor.getString(cursor.getColumnIndexOrThrow(INQUIRY_COLUMN_RESPONSE));
+                String status = cursor.getString(cursor.getColumnIndexOrThrow(INQUIRY_COLUMN_STATUS));
+
+                boolean isAnswered = "답변 완료".equals(status);
+                InquiryItem inquiryItem = new InquiryItem(category, content, response, isAnswered);
+
+                inquiries.add(inquiryItem);
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+
+        return inquiries;
+    }
+
+
 }

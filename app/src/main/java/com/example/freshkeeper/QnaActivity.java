@@ -1,6 +1,7 @@
 package com.example.freshkeeper;
 
 import android.content.Intent;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -9,16 +10,24 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.freshkeeper.database.DatabaseHelper;
+
 public class QnaActivity extends BaseActivity {
+
+    private DatabaseHelper databaseHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_qna);
+
+        // DatabaseHelper 초기화
+        databaseHelper = new DatabaseHelper(this);
 
         // 뒤로가기 버튼 설정
         ImageView backButton = findViewById(R.id.back_button);
@@ -77,7 +86,8 @@ public class QnaActivity extends BaseActivity {
                 } else if (inquiryText.isEmpty()) {
                     Toast.makeText(QnaActivity.this, "문의 내용을 입력하세요.", Toast.LENGTH_SHORT).show();
                 } else {
-                    // 여기에서 문의 내용을 서버로 전송하거나, 데이터베이스에 저장할 수 있습니다.
+                    // 문의 내용을 데이터베이스에 저장
+                    databaseHelper.insertInquiry(selectedCategory, inquiryText);
                     Toast.makeText(QnaActivity.this, "문의가 성공적으로 제출되었습니다.", Toast.LENGTH_SHORT).show();
 
                     // 필요 시 입력값 초기화
@@ -90,6 +100,17 @@ public class QnaActivity extends BaseActivity {
                     startActivity(intent);
                     finish(); // QnaActivity 종료
                 }
+            }
+        });
+
+        // "문의하기 내역" 텍스트 설정 및 클릭 이벤트 설정
+        TextView inquiryHistoryText = findViewById(R.id.inquiry_history_text);
+        inquiryHistoryText.setPaintFlags(inquiryHistoryText.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+        inquiryHistoryText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(QnaActivity.this, InquiryHistoryActivity.class);
+                startActivity(intent);
             }
         });
     }
