@@ -71,7 +71,7 @@ public class AddItemActivity extends BaseActivity {
         dbHelper = new DatabaseHelper(this);
 
         // 기본 이미지 로드
-        Glide.with(this).load(R.drawable.fk_gallery).into(itemImage);
+        Glide.with(this).load(R.drawable.fk_ppp).into(itemImage);
         itemQuantity.setText(String.valueOf(quantity));
 
         // Spinner 설정에서 "전체" 옵션을 제거하고 "냉장", "냉동", "상온"만 남김
@@ -246,7 +246,10 @@ public class AddItemActivity extends BaseActivity {
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
             imageUri = data.getData();
             try {
-                Glide.with(this).load(imageUri).into(itemImage);
+                Glide.with(this)
+                        .load(imageUri)
+                        .into(itemImage);
+                itemImage.setAlpha(1.0f); // 투명도를 초기화
                 imagePath = imageUri.toString();
             } catch (Exception e) {
                 e.printStackTrace();

@@ -3,7 +3,6 @@ package com.example.freshkeeper;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -11,6 +10,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 
 public class EditItemActivity extends BaseActivity {
 
@@ -40,9 +40,16 @@ public class EditItemActivity extends BaseActivity {
         if (item != null) {
             imagePath = item.getImagePath();  // 이미지 경로 설정
             if (imagePath != null && !imagePath.isEmpty()) {
-                Glide.with(this).load(Uri.parse(imagePath)).into(itemImage);  // 이미지 로드
+                // 이미지 경로가 있을 때 불투명하게 표시
+                Glide.with(this)
+                        .load(Uri.parse(imagePath))
+                        .apply(new RequestOptions().dontTransform()) // 이미지 변형 없이 불러오기
+                        .into(itemImage);
+                itemImage.setAlpha(1.0f);  // 이미지 투명도 완전히 불투명하게 설정
             } else {
-                itemImage.setImageResource(item.getImageResource());  // 기본 이미지 설정
+                // 기본 아이콘은 약간 투명하게 표시
+                itemImage.setImageResource(item.getImageResource());
+                itemImage.setAlpha(0.24f);  // 기본 이미지 투명도 설정
             }
             editName.setText(item.getName());
             editRegDate.setText(item.getRegDate());

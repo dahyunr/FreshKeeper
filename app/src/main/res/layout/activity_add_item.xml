@@ -34,7 +34,6 @@
                 android:layout_height="80dp"
                 android:scaleType="centerCrop"
                 android:contentDescription="상품 이미지"
-                android:alpha="0.24"
                 android:background="@drawable/fk_ppp"/>
 
             <!-- 상품명 (수정 가능) -->
