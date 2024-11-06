@@ -20,6 +20,7 @@ import com.example.freshkeeper.database.DatabaseHelper;
 public class QnaActivity extends BaseActivity {
 
     private DatabaseHelper databaseHelper;
+    private EditText emailInput; // 이메일 입력 필드 선언
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +29,9 @@ public class QnaActivity extends BaseActivity {
 
         // DatabaseHelper 초기화
         databaseHelper = new DatabaseHelper(this);
+
+        // 이메일 입력 필드 초기화
+        emailInput = findViewById(R.id.email_input); // 여기에서 emailInput 초기화
 
         // 뒤로가기 버튼 설정
         ImageView backButton = findViewById(R.id.back_button);
@@ -79,19 +83,23 @@ public class QnaActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 String selectedCategory = categorySpinner.getSelectedItem().toString();
+                String emailText = emailInput.getText().toString().trim(); // 이메일 입력 필드 가져오기
                 String inquiryText = inquiryContent.getText().toString();
 
                 if (selectedCategory.equals("문의 유형을 선택하세요")) {
                     Toast.makeText(QnaActivity.this, "문의 유형을 선택하세요.", Toast.LENGTH_SHORT).show();
+                } else if (emailText.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(emailText).matches()) {
+                    Toast.makeText(QnaActivity.this, "올바른 이메일 주소를 입력하세요.", Toast.LENGTH_SHORT).show(); // 이메일 형식 검사
                 } else if (inquiryText.isEmpty()) {
                     Toast.makeText(QnaActivity.this, "문의 내용을 입력하세요.", Toast.LENGTH_SHORT).show();
                 } else {
                     // 문의 내용을 데이터베이스에 저장
-                    databaseHelper.insertInquiry(selectedCategory, inquiryText);
-                    Toast.makeText(QnaActivity.this, "문의가 성공적으로 제출되었습니다.", Toast.LENGTH_SHORT).show();
+                    databaseHelper.insertInquiry(selectedCategory, emailText, inquiryText);
+                    Toast.makeText(QnaActivity.this, "문의한 내용의 답변은 이메일로 발송됩니다.", Toast.LENGTH_SHORT).show();
 
                     // 필요 시 입력값 초기화
                     categorySpinner.setSelection(0); // 스피너 초기화
+                    emailInput.setText("");           // 이메일 입력 초기화
                     inquiryContent.setText("");      // 문의 내용 초기화
 
                     // MyPageActivity로 돌아가기

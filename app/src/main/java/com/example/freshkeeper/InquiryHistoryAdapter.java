@@ -27,6 +27,7 @@ public class InquiryHistoryAdapter extends RecyclerView.Adapter<InquiryHistoryAd
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         InquiryItem inquiry = inquiryList.get(position);
 
+        // 문의 유형과 내용을 설정
         holder.categoryTextView.setText(inquiry.getCategory());
         holder.contentTextView.setText(inquiry.getContent());
 
@@ -42,7 +43,7 @@ public class InquiryHistoryAdapter extends RecyclerView.Adapter<InquiryHistoryAd
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView categoryTextView;
         TextView contentTextView;
-        TextView statusTextView;
+        TextView statusTextView; // 답변 상태 텍스트뷰
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);

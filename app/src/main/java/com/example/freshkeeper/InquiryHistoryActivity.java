@@ -47,6 +47,7 @@ public class InquiryHistoryActivity extends BaseActivity {
         if (inquiryList == null || inquiryList.isEmpty()) {
             emptyTextView.setVisibility(View.VISIBLE); // 문의 내역이 없을 때 텍스트뷰 표시
             recyclerView.setVisibility(View.GONE); // RecyclerView 숨기기
+            emptyTextView.setText("문의 내역이 없습니다"); // 추가: 텍스트뷰에 메시지 설정
         } else {
             emptyTextView.setVisibility(View.GONE); // 문의 내역이 있을 때 텍스트뷰 숨기기
             recyclerView.setVisibility(View.VISIBLE); // RecyclerView 표시

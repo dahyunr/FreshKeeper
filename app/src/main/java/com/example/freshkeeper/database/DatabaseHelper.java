@@ -17,7 +17,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     // 데이터베이스 이름 및 버전 설정
     private static final String DATABASE_NAME = "FreshKeeper.db";
-    private static final int DATABASE_VERSION = 14;
+    private static final int DATABASE_VERSION = 16; // 버전 증가
 
     // Users 테이블 컬럼 정보 설정
     private static final String USERS_TABLE_NAME = "users";
@@ -44,6 +44,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String INQUIRIES_TABLE_NAME = "inquiries";
     private static final String INQUIRY_COLUMN_ID = "id";
     private static final String INQUIRY_COLUMN_CATEGORY = "category";
+    private static final String INQUIRY_COLUMN_EMAIL = "email"; // 이메일 컬럼 추가
     private static final String INQUIRY_COLUMN_CONTENT = "content";
     private static final String INQUIRY_COLUMN_TIMESTAMP = "timestamp";
     private static final String INQUIRY_COLUMN_RESPONSE = "response";
@@ -72,15 +73,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     ITEM_COLUMN_BARCODE + " TEXT UNIQUE, " +
                     ITEM_COLUMN_CREATED_AT + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP);";
 
-    // Inquiries 테이블 생성 SQL 코드 수정
+    // Inquiries 테이블 생성 SQL 코드 (email 컬럼 추가)
     private static final String INQUIRIES_TABLE_CREATE =
             "CREATE TABLE IF NOT EXISTS " + INQUIRIES_TABLE_NAME + " (" +
                     INQUIRY_COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     INQUIRY_COLUMN_CATEGORY + " TEXT, " +
+                    INQUIRY_COLUMN_EMAIL + " TEXT, " + // email 컬럼 추가
                     INQUIRY_COLUMN_CONTENT + " TEXT, " +
                     INQUIRY_COLUMN_TIMESTAMP + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " +
-                    INQUIRY_COLUMN_RESPONSE + " TEXT, " +   // 답변 내용을 저장할 열 추가
-                    INQUIRY_COLUMN_STATUS + " TEXT DEFAULT '답변예정');"; // 답변 상태 열 추가 (기본값 '답변예정')
+                    INQUIRY_COLUMN_RESPONSE + " TEXT, " +
+                    INQUIRY_COLUMN_STATUS + " TEXT DEFAULT '답변예정');";
 
     private SQLiteDatabase database;
 
@@ -277,19 +279,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return db.query(ITEMS_TABLE_NAME, null, selection, selectionArgs, null, null, ITEM_COLUMN_CREATED_AT + " DESC");
     }
 
-    // 문의 내용 저장 메서드 추가
-    public void insertInquiry(String category, String content) {
+    // 문의 내용 저장 메서드 (이메일 포함)
+    public void insertInquiry(String category, String email, String content) {
         SQLiteDatabase db = getDatabase();
         ContentValues values = new ContentValues();
         values.put(INQUIRY_COLUMN_CATEGORY, category);
+        values.put(INQUIRY_COLUMN_EMAIL, email); // email 컬럼 설정
         values.put(INQUIRY_COLUMN_CONTENT, content);
         values.put(INQUIRY_COLUMN_STATUS, "답변예정"); // 기본 상태 설정
-        db.insert(INQUIRIES_TABLE_NAME, null, values);
+
+        try {
+            db.insert(INQUIRIES_TABLE_NAME, null, values);
+        } catch (SQLException e) {
+            Log.e("DatabaseHelper", "문의 삽입 오류: " + e.getMessage());
+        }
     }
 
-    // 모든 문의 내역 조회 메서드 추가
-    // DatabaseHelper.java
-
+    // 모든 문의 내역 조회 메서드
     public List<InquiryItem> getAllInquiries() {
         List<InquiryItem> inquiries = new ArrayList<>();
         String selectQuery = "SELECT * FROM " + INQUIRIES_TABLE_NAME + " ORDER BY " + INQUIRY_COLUMN_TIMESTAMP + " DESC";
@@ -300,12 +306,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if (cursor.moveToFirst()) {
             do {
                 String category = cursor.getString(cursor.getColumnIndexOrThrow(INQUIRY_COLUMN_CATEGORY));
+                String email = cursor.getString(cursor.getColumnIndexOrThrow(INQUIRY_COLUMN_EMAIL));
                 String content = cursor.getString(cursor.getColumnIndexOrThrow(INQUIRY_COLUMN_CONTENT));
                 String response = cursor.getString(cursor.getColumnIndexOrThrow(INQUIRY_COLUMN_RESPONSE));
                 String status = cursor.getString(cursor.getColumnIndexOrThrow(INQUIRY_COLUMN_STATUS));
 
                 boolean isAnswered = "답변 완료".equals(status);
-                InquiryItem inquiryItem = new InquiryItem(category, content, response, isAnswered);
+                InquiryItem inquiryItem = new InquiryItem(category, email, content, response, isAnswered);
 
                 inquiries.add(inquiryItem);
             } while (cursor.moveToNext());
@@ -314,6 +321,4 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         return inquiries;
     }
-
-
 }

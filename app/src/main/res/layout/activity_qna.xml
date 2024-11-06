@@ -70,6 +70,48 @@
             android:layout_marginTop="4dp"
             android:layout_marginBottom="16dp"/>
 
+        <!-- 이메일 입력 텍스트 -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="이메일"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="#000000"
+            android:paddingBottom="4dp" /> <!-- 이메일 텍스트와 아래 요소 간격을 조정 -->
+
+        <!-- 이메일 입력 영역을 LinearLayout으로 감싸기 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="12dp"> <!-- 아래 간격 조정 -->
+
+            <!-- 이메일 입력 EditText -->
+            <EditText
+                android:id="@+id/email_input"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="답변 받을 이메일을 입력하세요"
+                android:inputType="textEmailAddress"
+                android:textColorHint="#C8C8C8"
+                android:textSize="14sp"
+                android:paddingStart="8dp"
+                android:paddingTop="8dp"
+                android:gravity="top|start"
+                android:translationY="3.4dp"
+                android:background="@android:color/transparent" />
+        </LinearLayout>
+
+        <!-- 이메일 밑줄 -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#C8C8C8"
+            android:layout_marginBottom="12dp"/> <!-- 이메일과 문의 내용 간격 조정 -->
+
         <!-- 문의 내용 텍스트 -->
         <TextView
             android:layout_width="wrap_content"
@@ -78,7 +120,7 @@
             android:textSize="16sp"
             android:textStyle="bold"
             android:textColor="#000000"
-            android:paddingBottom="8dp"/>
+            android:paddingBottom="4dp" /> <!-- 문의 내용 텍스트와 아래 요소 간격 조정 -->
 
         <!-- 내용 입력 EditText -->
         <EditText

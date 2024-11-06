@@ -1,3 +1,5 @@
+package com.example.freshkeeper;
+
 public class Inquiry {
     private String category;
     private String content;
