@@ -91,9 +91,8 @@
             <!-- 이메일 입력 EditText -->
             <EditText
                 android:id="@+id/email_input"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:hint="답변 받을 이메일을 입력하세요"
                 android:inputType="textEmailAddress"
                 android:textColorHint="#C8C8C8"
@@ -101,8 +100,8 @@
                 android:paddingStart="8dp"
                 android:paddingTop="8dp"
                 android:gravity="top|start"
-                android:translationY="3.4dp"
                 android:background="@android:color/transparent" />
+
         </LinearLayout>
 
         <!-- 이메일 밑줄 -->
