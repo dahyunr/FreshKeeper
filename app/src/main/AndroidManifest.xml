@@ -90,6 +90,11 @@
             android:parentActivityName=".MypageActivity"
             android:exported="false"/>
 
+        <!-- 커뮤니티 기능 관련 액티비티 -->
+        <activity android:name=".WritePostActivity" android:exported="false"/>
+        <activity android:name=".MyPostsActivity" android:exported="false"/>
+        <activity android:name=".CommunityActivity" android:exported="false"/>
+
         <!-- 알람 수신기 -->
         <receiver android:name=".AlarmReceiver"/>
 

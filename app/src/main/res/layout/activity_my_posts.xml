@@ -1,0 +1,14 @@
+<!-- activity_my_posts.xml -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- My Posts 화면에 표시할 UI 요소들 추가 -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="My Posts 화면"
+        android:textSize="20sp"/>
+</LinearLayout>

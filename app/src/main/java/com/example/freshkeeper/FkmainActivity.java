@@ -44,7 +44,7 @@ public class FkmainActivity extends BaseActivity {
     private Button tabAll, tabFrozen, tabRefrigerated, tabRoomTemp;
     private TextView sortOrder;
     private LinearLayout sortOptions;
-    private ImageView plusButton, barcodeButton, myPageButton, calendarButton;
+    private ImageView plusButton, barcodeButton, myPageButton, calendarButton, communityButton;
 
     private List<FoodItem> allItems;
     private DatabaseHelper dbHelper;
@@ -83,6 +83,7 @@ public class FkmainActivity extends BaseActivity {
         barcodeButton = findViewById(R.id.icon_barcode);
         myPageButton = findViewById(R.id.icon_mypage);
         calendarButton = findViewById(R.id.icon_calendar);
+        communityButton = findViewById(R.id.icon_community); // 커뮤니티 아이콘 추가
 
         allItems = new ArrayList<>();
 
@@ -133,6 +134,11 @@ public class FkmainActivity extends BaseActivity {
 
         myPageButton.setOnClickListener(v -> {
             Intent intent = new Intent(FkmainActivity.this, MypageActivity.class);
+            startActivity(intent);
+        });
+
+        communityButton.setOnClickListener(v -> { // 커뮤니티 페이지로 이동하는 클릭 리스너 추가
+            Intent intent = new Intent(FkmainActivity.this, CommunityActivity.class);
             startActivity(intent);
         });
 

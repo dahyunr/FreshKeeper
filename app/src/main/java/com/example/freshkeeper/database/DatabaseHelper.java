@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.example.freshkeeper.CommunityPost;
 import com.example.freshkeeper.InquiryItem;
 
 import java.util.ArrayList;
@@ -17,7 +18,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     // 데이터베이스 이름 및 버전 설정
     private static final String DATABASE_NAME = "FreshKeeper.db";
-    private static final int DATABASE_VERSION = 16; // 버전 증가
+    private static final int DATABASE_VERSION = 17; // 버전 증가
 
     // Users 테이블 컬럼 정보 설정
     private static final String USERS_TABLE_NAME = "users";
@@ -50,6 +51,25 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String INQUIRY_COLUMN_RESPONSE = "response";
     private static final String INQUIRY_COLUMN_STATUS = "status";
 
+    // CommunityPost 테이블 컬럼 정보 설정
+    private static final String COMMUNITY_POSTS_TABLE_NAME = "community_posts";
+    private static final String POST_COLUMN_ID = "post_id";
+    private static final String POST_COLUMN_TITLE = "title";
+    private static final String POST_COLUMN_CONTENT = "content";
+    private static final String POST_COLUMN_IMAGE_RES_ID = "image_res_id";
+    private static final String POST_COLUMN_LIKE_COUNT = "like_count";
+    private static final String POST_COLUMN_COMMENT_COUNT = "comment_count";
+
+    // CommunityPost 테이블 생성 SQL 코드
+    private static final String COMMUNITY_POSTS_TABLE_CREATE =
+            "CREATE TABLE IF NOT EXISTS " + COMMUNITY_POSTS_TABLE_NAME + " (" +
+                    POST_COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    POST_COLUMN_TITLE + " TEXT, " +
+                    POST_COLUMN_CONTENT + " TEXT, " +
+                    POST_COLUMN_IMAGE_RES_ID + " INTEGER, " +
+                    POST_COLUMN_LIKE_COUNT + " INTEGER DEFAULT 0, " +
+                    POST_COLUMN_COMMENT_COUNT + " INTEGER DEFAULT 0);";
+
     // Users 테이블 생성 SQL 코드
     private static final String USERS_TABLE_CREATE =
             "CREATE TABLE IF NOT EXISTS " + USERS_TABLE_NAME + " (" +
@@ -78,7 +98,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             "CREATE TABLE IF NOT EXISTS " + INQUIRIES_TABLE_NAME + " (" +
                     INQUIRY_COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     INQUIRY_COLUMN_CATEGORY + " TEXT, " +
-                    INQUIRY_COLUMN_EMAIL + " TEXT, " + // email 컬럼 추가
+                    INQUIRY_COLUMN_EMAIL + " TEXT, " + // email 컬럼 설정
                     INQUIRY_COLUMN_CONTENT + " TEXT, " +
                     INQUIRY_COLUMN_TIMESTAMP + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " +
                     INQUIRY_COLUMN_RESPONSE + " TEXT, " +
@@ -104,15 +124,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // 테이블 생성
         db.execSQL(USERS_TABLE_CREATE);
         db.execSQL(ITEMS_TABLE_CREATE);
-        db.execSQL(INQUIRIES_TABLE_CREATE); // Inquiries 테이블 생성
+        db.execSQL(INQUIRIES_TABLE_CREATE);
+        db.execSQL(COMMUNITY_POSTS_TABLE_CREATE); // CommunityPost 테이블 생성
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // 데이터베이스 업그레이드 시 테이블을 삭제 후 재생성
-        db.execSQL("DROP TABLE IF EXISTS " + USERS_TABLE_NAME);
-        db.execSQL("DROP TABLE IF EXISTS " + ITEMS_TABLE_NAME);
-        db.execSQL("DROP TABLE IF EXISTS " + INQUIRIES_TABLE_NAME); // Inquiries 테이블 삭제
+        if (oldVersion < 17) {
+            // 커뮤니티 게시글 테이블을 추가하는 코드
+            db.execSQL(COMMUNITY_POSTS_TABLE_CREATE);
+        }
         onCreate(db);
     }
 
@@ -321,4 +343,44 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         return inquiries;
     }
+
+    // 게시글 추가 메서드
+    public void addCommunityPost(CommunityPost post) {
+        SQLiteDatabase db = getDatabase();
+        ContentValues values = new ContentValues();
+        values.put(POST_COLUMN_TITLE, post.getTitle());
+        values.put(POST_COLUMN_CONTENT, post.getContent());
+        values.put(POST_COLUMN_IMAGE_RES_ID, post.getImageResId());
+        values.put(POST_COLUMN_LIKE_COUNT, post.getLikeCount());
+        values.put(POST_COLUMN_COMMENT_COUNT, post.getCommentCount());
+
+        try {
+            db.insert(COMMUNITY_POSTS_TABLE_NAME, null, values);
+        } catch (SQLException e) {
+            Log.e("DatabaseHelper", "게시글 삽입 오류: " + e.getMessage());
+        }
+    }
+
+    // 모든 게시글 가져오기 메서드
+    public List<CommunityPost> getAllCommunityPosts() {
+        List<CommunityPost> postList = new ArrayList<>();
+        SQLiteDatabase db = getDatabase();
+        Cursor cursor = db.query(COMMUNITY_POSTS_TABLE_NAME, null, null, null, null, null, POST_COLUMN_ID + " DESC");
+
+        if (cursor.moveToFirst()) {
+            do {
+                CommunityPost post = new CommunityPost(
+                        cursor.getString(cursor.getColumnIndexOrThrow(POST_COLUMN_TITLE)),
+                        cursor.getString(cursor.getColumnIndexOrThrow(POST_COLUMN_CONTENT)),
+                        cursor.getInt(cursor.getColumnIndexOrThrow(POST_COLUMN_IMAGE_RES_ID)),
+                        cursor.getInt(cursor.getColumnIndexOrThrow(POST_COLUMN_LIKE_COUNT)),
+                        cursor.getInt(cursor.getColumnIndexOrThrow(POST_COLUMN_COMMENT_COUNT))
+                );
+                postList.add(post);
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        return postList;
+    }
+
 }
