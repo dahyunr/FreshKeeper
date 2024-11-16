@@ -9,6 +9,7 @@
         android:orientation="vertical"
         android:padding="16dp">
 
+        <!-- 상단 바 (뒤로 가기 버튼 및 제목) -->
         <RelativeLayout
             android:id="@+id/top_bar"
             android:layout_width="match_parent"
@@ -34,27 +35,14 @@
                 android:layout_centerHorizontal="true"/>
         </RelativeLayout>
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="20dp"/>
-
         <!-- 제목 입력 EditText -->
         <EditText
             android:id="@+id/title_input"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="제목을 입력하세요."
-            android:textColorHint="#C8C8C8"
+            android:hint="제목을 입력하세요"
             android:textSize="16sp"
-            android:textStyle="bold"
-            android:background="@android:color/transparent"
-            android:paddingBottom="8dp"/>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="#C8C8C8"
-            android:layout_marginBottom="12dp"/>
+            android:textStyle="bold"/>
 
         <!-- 내용 입력 EditText -->
         <EditText
@@ -63,11 +51,11 @@
             android:layout_height="250dp"
             android:background="#EBEAEA"
             android:hint="내용을 입력하세요"
-            android:textColorHint="#C8C8C8"
             android:textSize="14sp"
             android:gravity="top|start"
             android:padding="8dp"/>
 
+        <!-- 사진 추가를 위한 photo_icon ImageView와 텍스트 -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -82,17 +70,24 @@
                 android:layout_height="30dp"
                 android:src="@drawable/fk_image"
                 android:tint="#BBBBBB"
-                android:contentDescription="사진"/>
+                android:contentDescription="사진 추가 아이콘"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="사진"
+                android:text="사진 추가"
                 android:textColor="#BBBBBB"
                 android:textSize="16sp"
                 android:layout_marginStart="8dp"/>
         </LinearLayout>
 
+        <!-- 선택한 이미지를 표시할 RecyclerView -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/image_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"/>
+
+        <!-- 작성하기 버튼 -->
         <Button
             android:id="@+id/submit_button"
             android:layout_width="match_parent"
@@ -102,5 +97,6 @@
             android:background="#65B120"
             android:padding="16dp"
             android:textSize="16sp"/>
+
     </LinearLayout>
 </FrameLayout>

@@ -1,7 +1,6 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.freshkeeper">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- 캘린더 접근 권한 -->
+<!-- 캘린더 접근 권한 -->
     <uses-permission android:name="android.permission.READ_CALENDAR"/>
     <uses-permission android:name="android.permission.WRITE_CALENDAR"/>
 
@@ -94,10 +93,12 @@
         <activity android:name=".WritePostActivity" android:exported="false"/>
         <activity android:name=".MyPostsActivity" android:exported="false"/>
         <activity android:name=".CommunityActivity" android:exported="false"/>
+        <activity android:name=".CommentActivity" />
 
         <!-- 알람 수신기 -->
         <receiver android:name=".AlarmReceiver"/>
 
         <activity android:name=".InquiryHistoryActivity" />
+
     </application>
 </manifest>

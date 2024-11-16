@@ -21,4 +21,5 @@
     <color name="gray">#BDBDBD</color>
     <color name="black">#000000</color>
     <color name="tab_active">#65B120</color>
+    <color name="light_gray">#D3D3D3</color>
 </resources>
