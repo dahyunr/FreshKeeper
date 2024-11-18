@@ -33,22 +33,19 @@ public class CommunityActivity extends BaseActivity {
                     Intent data = result.getData();
                     String title = data.getStringExtra("title");
                     String content = data.getStringExtra("content");
-                    String imageUri = data.getStringExtra("imageUri");
+                    String imageUri = data.getStringExtra("firstImageUri");
                     String userId = data.getStringExtra("userId");
 
-                    // Convert imageUri to List<String> for CommunityPost
-                    List<String> imageUris = imageUri != null
+                    List<String> imageUris = (imageUri != null && !imageUri.isEmpty())
                             ? Collections.singletonList(imageUri)
                             : new ArrayList<>();
 
-                    // Create a new CommunityPost and save to the database
                     CommunityPost newPost = new CommunityPost(title, content, imageUris, userId, 0, 0);
                     dbHelper.addCommunityPost(newPost);
 
-                    // Add the new post to the list and update RecyclerView
-                    postList.add(0, newPost); // Add to the top of the list
+                    postList.add(0, newPost);
                     communityAdapter.notifyItemInserted(0);
-                    recyclerView.scrollToPosition(0); // Scroll to the top to show the new post
+                    recyclerView.scrollToPosition(0);
                 }
             }
     );

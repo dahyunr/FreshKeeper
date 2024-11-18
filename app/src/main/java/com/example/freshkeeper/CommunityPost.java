@@ -36,6 +36,7 @@ public class CommunityPost {
         this(0, title, content, imageUris, userId, likeCount, commentCount, false);
     }
 
+
     // Getter와 Setter
     public int getId() {
         return id;

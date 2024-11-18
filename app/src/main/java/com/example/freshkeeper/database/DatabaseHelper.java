@@ -362,8 +362,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(POST_COLUMN_TITLE, post.getTitle());
         values.put(POST_COLUMN_CONTENT, post.getContent());
 
-        // `imageUris` 리스트를 쉼표로 구분된 문자열로 변환하여 저장
-        values.put(POST_COLUMN_IMAGE_URI, String.join(",", post.getImageUris()));
+        // 이미지가 없는 경우 빈 문자열로 저장
+        String imageUris = post.getImageUris() != null && !post.getImageUris().isEmpty()
+                ? String.join(",", post.getImageUris())
+                : "";
+        values.put(POST_COLUMN_IMAGE_URI, imageUris);
 
         values.put(POST_COLUMN_USER_ID, post.getUserId());
         values.put(POST_COLUMN_LIKE_COUNT, post.getLikeCount());
@@ -385,9 +388,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             do {
                 String title = cursor.getString(cursor.getColumnIndexOrThrow(POST_COLUMN_TITLE));
                 String content = cursor.getString(cursor.getColumnIndexOrThrow(POST_COLUMN_CONTENT));
-
-                // 쉼표로 구분된 문자열을 `List<String>`로 변환
-                List<String> imageUris = Arrays.asList(cursor.getString(cursor.getColumnIndexOrThrow(POST_COLUMN_IMAGE_URI)).split(","));
+                String imageUrisString = cursor.getString(cursor.getColumnIndexOrThrow(POST_COLUMN_IMAGE_URI));
+                List<String> imageUris = (imageUrisString != null && !imageUrisString.isEmpty())
+                        ? Arrays.asList(imageUrisString.split(","))
+                        : new ArrayList<>();
 
                 String userId = cursor.getString(cursor.getColumnIndexOrThrow(POST_COLUMN_USER_ID));
                 int likeCount = cursor.getInt(cursor.getColumnIndexOrThrow(POST_COLUMN_LIKE_COUNT));

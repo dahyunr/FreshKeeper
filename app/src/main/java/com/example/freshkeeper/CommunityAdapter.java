@@ -90,17 +90,19 @@ public class CommunityAdapter extends RecyclerView.Adapter<CommunityAdapter.View
             likeCountTextView.setText(String.valueOf(post.getLikeCount()));
             commentCountTextView.setText(String.valueOf(post.getCommentCount()));
 
-            // Load first image using Glide (updated to handle multiple images)
+            // 이미지가 있을 경우에만 표시
             String firstImageUri = post.getFirstImageUri();
             if (firstImageUri != null && !firstImageUri.isEmpty()) {
+                imageView.setVisibility(View.VISIBLE);
                 Glide.with(context).load(firstImageUri).into(imageView);
             } else {
-                imageView.setImageResource(R.drawable.default_image); // Default placeholder image
+                imageView.setVisibility(View.GONE); // 이미지가 없을 경우 숨김
             }
 
-            // Set heart icon based on like status
+            // 좋아요 아이콘 설정
             heartIcon.setImageResource(post.isLiked() ? R.drawable.fk_heartfff : R.drawable.fk_heart);
         }
+
 
         public void onHeartClick(View view) {
             int position = getAdapterPosition();

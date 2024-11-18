@@ -104,21 +104,19 @@ public class WritePostActivity extends BaseActivity {
     }
 
     private void savePost(String title, String content) {
-        if (imageUris.isEmpty()) {
-            Toast.makeText(this, "최소 한 개의 이미지를 선택하세요.", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        // 첫 번째 이미지 URI를 따로 저장
-        Uri firstImageUri = imageUris.get(0);
-
         Toast.makeText(this, "게시글이 작성되었습니다.", Toast.LENGTH_SHORT).show();
 
         Intent intent = new Intent();
         intent.putExtra("title", title);
         intent.putExtra("content", content);
-        intent.putExtra("firstImageUri", firstImageUri.toString()); // 첫 번째 이미지 URI 전달
-        intent.putParcelableArrayListExtra("imageUris", imageUris); // 전체 이미지 URI 리스트 전달
+
+        // 이미지가 있을 경우에만 전달
+        if (!imageUris.isEmpty()) {
+            Uri firstImageUri = imageUris.get(0);
+            intent.putExtra("firstImageUri", firstImageUri.toString());
+            intent.putParcelableArrayListExtra("imageUris", imageUris);
+        }
+
         setResult(RESULT_OK, intent);
         finish();
     }
