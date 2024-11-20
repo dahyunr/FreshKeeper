@@ -1,7 +1,5 @@
 package com.example.freshkeeper;
 
-import android.util.Log;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -77,17 +75,15 @@ public class CommunityPost {
         this.imageUris = imageUris != null ? imageUris : new ArrayList<>(); // 기본값 처리
     }
 
-    // Get the first image URI
+    // Get the first valid image URI
     public String getFirstImageUri() {
         if (imageUris != null && !imageUris.isEmpty()) {
             for (String uri : imageUris) {
                 if (uri != null && !uri.isEmpty()) {
-                    Log.d("CommunityPost", "First image URI: " + uri);
                     return uri;
                 }
             }
         }
-        Log.d("CommunityPost", "No valid image URIs found. Returning empty string.");
         return ""; // 안전한 기본값
     }
 
@@ -146,7 +142,7 @@ public class CommunityPost {
 
     @Override
     public String toString() {
-        return "CommunityPost{" +
+        return "CommunityPost {" +
                 "id=" + id +
                 ", title='" + title + '\'' +
                 ", content='" + content + '\'' +

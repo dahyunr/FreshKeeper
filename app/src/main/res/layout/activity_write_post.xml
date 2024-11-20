@@ -42,7 +42,8 @@
             android:layout_height="wrap_content"
             android:hint="제목을 입력하세요"
             android:textSize="16sp"
-            android:textStyle="bold"/>
+            android:textStyle="bold"
+            android:padding="8dp"/>
 
         <!-- 내용 입력 EditText -->
         <EditText
@@ -85,7 +86,10 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/image_recycler_view"
             android:layout_width="match_parent"
-            android:layout_height="100dp"/>
+            android:layout_height="100dp"
+            android:padding="8dp"
+            android:clipToPadding="false"
+            android:scrollbars="horizontal"/>
 
         <!-- 작성하기 버튼 위에 공백 추가 -->
         <View
@@ -102,6 +106,5 @@
             android:background="#65B120"
             android:padding="16dp"
             android:textSize="16sp"/>
-
     </LinearLayout>
 </FrameLayout>

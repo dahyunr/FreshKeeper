@@ -1,6 +1,7 @@
 package com.example.freshkeeper;
 
 import android.content.Context;
+import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,23 +13,22 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.example.freshkeeper.R;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class CommunityAdapter extends RecyclerView.Adapter<CommunityAdapter.ViewHolder> {
 
     private List<CommunityPost> postList;
     private Context context;
-    private OnItemClickListener onItemClickListener;
-    private Set<String> postTitlesSet;
 
+    // 클릭 이벤트 인터페이스
     public interface OnItemClickListener {
         void onItemClick(CommunityPost post);
     }
 
+    private OnItemClickListener onItemClickListener;
+
+    // 클릭 이벤트 리스너 설정 메서드
     public void setOnItemClickListener(OnItemClickListener listener) {
         this.onItemClickListener = listener;
     }
@@ -36,12 +36,6 @@ public class CommunityAdapter extends RecyclerView.Adapter<CommunityAdapter.View
     public CommunityAdapter(Context context, List<CommunityPost> postList) {
         this.context = context;
         this.postList = postList;
-        this.postTitlesSet = new HashSet<>();
-        if (postList != null) {
-            for (CommunityPost post : postList) {
-                postTitlesSet.add(post.getTitle());
-            }
-        }
     }
 
     @NonNull
@@ -65,33 +59,14 @@ public class CommunityAdapter extends RecyclerView.Adapter<CommunityAdapter.View
         return postList != null ? postList.size() : 0;
     }
 
-    public void addNewPost(CommunityPost newPost) {
-        if (!postTitlesSet.contains(newPost.getTitle())) {
-            postList.add(0, newPost);
-            postTitlesSet.add(newPost.getTitle());
-            notifyItemInserted(0);
-        }
-    }
-
-    public void updateList(List<CommunityPost> filteredList) {
-        postList = filteredList;
-        notifyDataSetChanged();
-    }
-
-    public void updateCommentCount(int postId, int newCommentCount) {
-        for (int i = 0; i < postList.size(); i++) {
-            CommunityPost post = postList.get(i);
-            if (post.getId() == postId) {
-                post.setCommentCount(newCommentCount);
-                notifyItemChanged(i);
-                break;
-            }
-        }
+    public void updateList(List<CommunityPost> updatedList) {
+        postList = updatedList;
+        notifyDataSetChanged(); // RecyclerView 데이터 업데이트
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
         TextView titleTextView, contentTextView, likeCountTextView, commentCountTextView;
-        ImageView imageView, heartIcon, authorIcon;
+        ImageView imageView, heartIcon;
 
         ViewHolder(View itemView) {
             super(itemView);
@@ -101,18 +76,16 @@ public class CommunityAdapter extends RecyclerView.Adapter<CommunityAdapter.View
             commentCountTextView = itemView.findViewById(R.id.commentCountTextView);
             imageView = itemView.findViewById(R.id.imageView);
             heartIcon = itemView.findViewById(R.id.heartIcon);
-            authorIcon = itemView.findViewById(R.id.postAuthorIcon);
 
+            // 아이템 전체 클릭 리스너
             itemView.setOnClickListener(v -> {
                 int position = getAdapterPosition();
-                if (position != RecyclerView.NO_POSITION && position < postList.size()) {
-                    CommunityPost selectedPost = postList.get(position);
-                    if (onItemClickListener != null) {
-                        onItemClickListener.onItemClick(selectedPost);
-                    }
+                if (position != RecyclerView.NO_POSITION && onItemClickListener != null) {
+                    onItemClickListener.onItemClick(postList.get(position));
                 }
             });
 
+            // 좋아요 버튼 클릭 리스너
             heartIcon.setOnClickListener(this::onHeartClick);
         }
 
@@ -122,25 +95,23 @@ public class CommunityAdapter extends RecyclerView.Adapter<CommunityAdapter.View
             likeCountTextView.setText(String.valueOf(post.getLikeCount()));
             commentCountTextView.setText(String.valueOf(post.getCommentCount()));
 
-            // Post Image 처리
-            Glide.with(context).clear(imageView); // 이전 이미지 정리
+            // 이미지 로드 처리
+            Glide.with(context).clear(imageView);
             String firstImageUri = post.getFirstImageUri();
             if (firstImageUri != null && !firstImageUri.isEmpty()) {
                 imageView.setVisibility(View.VISIBLE);
                 Glide.with(context)
-                        .load(firstImageUri)
-                        .error(R.drawable.fk_mmm) // 에러 시 기본 이미지
+                        .load(Uri.parse(firstImageUri))
+                        .placeholder(R.drawable.fk_mmm)
+                        .error(R.drawable.fk_mmm)
                         .into(imageView);
             } else {
-                imageView.setVisibility(View.GONE); // 이미지가 없으면 숨김
+                imageView.setVisibility(View.GONE);
             }
 
-            // 좋아요 상태에 따라 아이콘 설정
+            // 좋아요 상태에 따른 아이콘 설정
             heartIcon.setImageResource(post.isLiked() ? R.drawable.fk_heartfff : R.drawable.fk_heart);
         }
-
-
-
 
         public void onHeartClick(View view) {
             int position = getAdapterPosition();
@@ -153,6 +124,5 @@ public class CommunityAdapter extends RecyclerView.Adapter<CommunityAdapter.View
             likeCountTextView.setText(String.valueOf(post.getLikeCount()));
             heartIcon.setImageResource(post.isLiked() ? R.drawable.fk_heartfff : R.drawable.fk_heart);
         }
-
     }
 }

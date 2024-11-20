@@ -1,0 +1,14 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/option_edit"
+        android:title="글 수정하기"
+        android:orderInCategory="100"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/option_delete"
+        android:title="글 삭제하기"
+        android:orderInCategory="101"
+        app:showAsAction="never" />
+</menu>

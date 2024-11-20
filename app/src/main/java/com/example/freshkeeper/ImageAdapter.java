@@ -10,12 +10,19 @@ import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+
 import java.util.ArrayList;
 
 public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHolder> {
 
     private ArrayList<Uri> imageUris;
+    private Context context;
     private OnImageRemoveListener onImageRemoveListener;
+
+    public interface OnImageRemoveListener {
+        void onImageRemove(Uri uri);
+    }
 
     public ImageAdapter(ArrayList<Uri> imageUris, OnImageRemoveListener onImageRemoveListener) {
         this.imageUris = imageUris;
@@ -26,15 +33,21 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
     @Override
     public ImageViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_image, parent, false);
+        context = parent.getContext();
         return new ImageViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ImageViewHolder holder, int position) {
         Uri uri = imageUris.get(position);
-        holder.imageView.setImageURI(uri);
 
-        holder.deleteButton.setOnClickListener(v -> {
+        // Glide로 이미지 로드
+        Glide.with(context)
+                .load(uri)
+                .into(holder.imageView);
+
+        // 삭제 버튼 클릭 리스너
+        holder.removeButton.setOnClickListener(v -> {
             if (onImageRemoveListener != null) {
                 onImageRemoveListener.onImageRemove(uri);
             }
@@ -46,18 +59,13 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
         return imageUris.size();
     }
 
-    static class ImageViewHolder extends RecyclerView.ViewHolder {
-        ImageView imageView;
-        ImageView deleteButton;
+    public static class ImageViewHolder extends RecyclerView.ViewHolder {
+        ImageView imageView, removeButton;
 
         public ImageViewHolder(@NonNull View itemView) {
             super(itemView);
             imageView = itemView.findViewById(R.id.image_view);
-            deleteButton = itemView.findViewById(R.id.delete_button);
+            removeButton = itemView.findViewById(R.id.remove_button);
         }
-    }
-
-    public interface OnImageRemoveListener {
-        void onImageRemove(Uri uri);
     }
 }

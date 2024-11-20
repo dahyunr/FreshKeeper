@@ -4,18 +4,23 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.freshkeeper.database.DatabaseHelper;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class CommentActivity extends BaseActivity {
@@ -24,11 +29,13 @@ public class CommentActivity extends BaseActivity {
     private List<Comment> commentList;
     private DatabaseHelper dbHelper;
     private EditText commentInput;
-    private ImageView sendButton;
-    private ImageView postImage, postAuthorIcon;
-    private TextView postTitle, postAuthor, postContent;
-    private TextView noCommentsTextView;
+    private ImageView sendButton, postImage, postAuthorIcon;
+    private TextView postTitle, postAuthor, postContent, noCommentsTextView;
     private ScrollView scrollView;
+
+    private int postId;
+    private String postTitleText, postContentText;
+    private List<String> imageUris;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,11 +59,11 @@ public class CommentActivity extends BaseActivity {
         scrollView = findViewById(R.id.scrollView);
 
         // Intent 데이터 수신
-        int postId = getIntent().getIntExtra("postId", -1);
-        String title = getIntent().getStringExtra("postTitle");
-        String content = getIntent().getStringExtra("postContent");
+        postId = getIntent().getIntExtra("postId", -1);
+        postTitleText = getIntent().getStringExtra("postTitle");
+        postContentText = getIntent().getStringExtra("postContent");
         String authorName = getIntent().getStringExtra("postAuthor");
-        String imageUri = getIntent().getStringExtra("postImage");
+        String imageUriString = getIntent().getStringExtra("postImage");
 
         // 게시글 데이터 유효성 확인
         if (postId == -1) {
@@ -65,16 +72,21 @@ public class CommentActivity extends BaseActivity {
         }
 
         // 게시글 데이터 표시
-        postTitle.setText(title != null && !title.isEmpty() ? title : "제목 없음");
-        postContent.setText(content != null && !content.isEmpty() ? content : "내용 없음");
+        postTitle.setText(postTitleText != null && !postTitleText.isEmpty() ? postTitleText : "제목 없음");
+        postContent.setText(postContentText != null && !postContentText.isEmpty() ? postContentText : "내용 없음");
         postAuthor.setText(authorName != null && !authorName.isEmpty() ? authorName : "익명 사용자");
 
         // 게시글 이미지 표시
-        if (imageUri != null && !imageUri.isEmpty()) {
+        if (imageUriString != null && !imageUriString.isEmpty()) {
             postImage.setVisibility(View.VISIBLE);
-            Glide.with(this).load(imageUri).into(postImage);
+            Glide.with(this).load(imageUriString).into(postImage);
+
+            // 이미지 URI를 리스트로 변환
+            imageUris = new ArrayList<>();
+            imageUris.add(imageUriString); // 단일 URI를 리스트로 처리
         } else {
             postImage.setVisibility(View.GONE);
+            imageUris = new ArrayList<>();
         }
 
         // 작성자 아이콘 설정
@@ -101,81 +113,114 @@ public class CommentActivity extends BaseActivity {
         sendButton = findViewById(R.id.send_button);
         sendButton.setOnClickListener(this::onSendClick);
 
-        // 댓글 입력창 포커스 처리: 키보드가 올라올 때만 댓글창을 위로 올리기
-        commentInput.setOnFocusChangeListener((view, hasFocus) -> {
-            if (hasFocus) {
-                scrollView.smoothScrollTo(0, commentInput.getBottom());
+        // fk_vert 버튼 클릭 이벤트 처리
+        ImageView fkVertIcon = findViewById(R.id.fk_vert_icon);
+        fkVertIcon.setOnClickListener(this::showOptionMenu);
+    }
+
+    // fk_vert 클릭 시 옵션 메뉴 표시
+    private void showOptionMenu(View view) {
+        PopupMenu popupMenu = new PopupMenu(this, view);
+        MenuInflater inflater = popupMenu.getMenuInflater();
+        inflater.inflate(R.menu.post_options_menu, popupMenu.getMenu());
+
+        popupMenu.setOnMenuItemClickListener(item -> {
+            if (item.getItemId() == R.id.option_edit) {
+                editPost();
+                return true;
+            } else if (item.getItemId() == R.id.option_delete) {
+                deletePost();
+                return true;
             }
+            return false;
         });
+
+        popupMenu.show();
+    }
+
+    // 글 수정 메서드
+    private void editPost() {
+        Intent intent = new Intent(this, WritePostActivity.class);
+        intent.putExtra("postId", postId);
+        intent.putExtra("title", postTitleText);
+        intent.putExtra("content", postContentText);
+        intent.putStringArrayListExtra("imageUris", (ArrayList<String>) imageUris); // 이미지 URI 리스트 전달
+        startActivityForResult(intent, 2000);
+    }
+
+    // 글 삭제 메서드
+    private void deletePost() {
+        boolean isDeleted = dbHelper.deletePost(postId);
+
+        if (isDeleted) {
+            Toast.makeText(this, "게시글이 삭제되었습니다.", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(); // 삭제된 결과를 전달
+            setResult(RESULT_OK, intent);
+            finish(); // 현재 화면 종료
+        } else {
+            Toast.makeText(this, "게시글 삭제 실패", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        int postId = getIntent().getIntExtra("postId", -1);
-        if (postId != -1) {
-            // 댓글 데이터 다시 로드
-            commentList = dbHelper.getCommentsByPostId(postId);
+        commentList = dbHelper.getCommentsByPostId(postId);
+        commentAdapter.updateCommentList(commentList);
 
-            if (commentAdapter != null) {
-                commentAdapter.updateCommentList(commentList);
+        if (commentList.isEmpty()) {
+            noCommentsTextView.setVisibility(View.VISIBLE);
+        } else {
+            noCommentsTextView.setVisibility(View.GONE);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 2000 && resultCode == RESULT_OK && data != null) {
+            postTitleText = data.getStringExtra("title");
+            postContentText = data.getStringExtra("content");
+
+            postTitle.setText(postTitleText);
+            postContent.setText(postContentText);
+
+            // 이미지 URI 업데이트
+            imageUris = data.getStringArrayListExtra("imageUris");
+            if (imageUris != null && !imageUris.isEmpty()) {
+                postImage.setVisibility(View.VISIBLE);
+                Glide.with(this).load(imageUris.get(0)).into(postImage); // 첫 번째 이미지 표시
             } else {
-                commentAdapter = new CommentAdapter(commentList);
-                commentRecyclerView.setAdapter(commentAdapter);
+                postImage.setVisibility(View.GONE);
             }
-
-            // 댓글이 없을 경우 메시지 표시
-            if (commentList.isEmpty()) {
-                noCommentsTextView.setVisibility(View.VISIBLE);
-            } else {
-                noCommentsTextView.setVisibility(View.GONE);
-            }
-
-            // 로드한 댓글 로그로 확인하기
-            Log.d("CommentActivity", "댓글 로드 완료, 총 댓글 수: " + commentList.size());
         }
     }
 
     private void onSendClick(View view) {
         String commentText = commentInput.getText().toString().trim();
         if (!commentText.isEmpty()) {
-            int postId = getIntent().getIntExtra("postId", -1);
-            if (postId == -1) return;
-
-            // SharedPreferences에서 사용자 정보 가져오기
             SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
             int userId = sharedPreferences.getInt("userId", -1);
-            String nickname = sharedPreferences.getString("userName", "고릴라");  // 로그인된 사용자 이름
-            String iconUri = sharedPreferences.getString("userIcon", "fk_mmm"); // 로그인된 사용자 아이콘 URI
+            String nickname = sharedPreferences.getString("userName", "익명 사용자");
+            String iconUri = sharedPreferences.getString("userIcon", "fk_mmm");
 
-            // 댓글 객체 생성
             Comment newComment = new Comment(
-                    commentText,
-                    userId,
-                    postId,
-                    0,
-                    nickname != null && !nickname.isEmpty() ? nickname : "고릴라", // 닉네임 설정
-                    iconUri != null && !iconUri.isEmpty() ? iconUri : "fk_mmm" // 아이콘 URI 설정
+                    commentText, // 댓글 내용
+                    userId,      // 사용자 ID
+                    postId,      // 게시글 ID
+                    0,           // 좋아요 수
+                    nickname,    // 사용자 닉네임
+                    iconUri      // 사용자 아이콘
             );
 
-            // 댓글을 데이터베이스에 추가
             dbHelper.addComment(newComment);
 
-            // RecyclerView에 댓글 추가 및 업데이트
             commentList.add(newComment);
             commentAdapter.notifyItemInserted(commentList.size() - 1);
             commentInput.setText("");
             commentInput.clearFocus();
 
-            // 댓글이 추가되면 "댓글이 없습니다" 메시지 숨기기
             noCommentsTextView.setVisibility(View.GONE);
-
-            // 업데이트된 댓글 수 전달
-            int newCommentCount = commentList.size();
-            Intent resultIntent = new Intent();
-            resultIntent.putExtra("newCommentCount", newCommentCount);
-            resultIntent.putExtra("position", getIntent().getIntExtra("position", -1));
-            setResult(RESULT_OK, resultIntent);
         }
     }
 }

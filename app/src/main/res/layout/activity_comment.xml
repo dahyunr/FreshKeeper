@@ -28,7 +28,7 @@
             android:src="@drawable/fk_notification"
             android:contentDescription="@string/notification_icon_desc"
             android:layout_alignParentEnd="true"
-            android:layout_marginEnd="50dp" /> <!-- 오른쪽 여백 조정 -->
+            android:layout_marginEnd="50dp" />
 
         <!-- fk_vert 아이콘 -->
         <ImageView
@@ -40,8 +40,6 @@
             android:layout_toEndOf="@id/notification_icon"
             android:layout_marginStart="-40dp" />
     </RelativeLayout>
-
-
 
     <!-- 게시글 제목 -->
     <TextView
@@ -118,7 +116,7 @@
         android:textSize="16sp"
         android:textColor="#757575"
         android:visibility="gone"
-        android:layout_centerHorizontal="true"
+        android:layout_gravity="center"
         android:layout_marginBottom="16dp" />
 
     <!-- 댓글 입력 및 전송을 ScrollView로 감싸기 -->

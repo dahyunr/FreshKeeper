@@ -92,7 +92,6 @@ dependencies {
     // Firebase Analytics 의존성 추가
     implementation("com.google.firebase:firebase-analytics")
 
-    // 필요한 다른 Firebase 서비스 추가 가능
-    // 예: Firestore 사용 시
-    // implementation("com.google.firebase:firebase-firestore")
+    implementation(platform("com.google.firebase:firebase-bom:33.6.0"))
+    implementation("com.google.firebase:firebase-analytics")
 }
