@@ -93,12 +93,14 @@
         <activity android:name=".WritePostActivity" android:exported="false"/>
         <activity android:name=".MyPostsActivity" android:exported="false"/>
         <activity android:name=".CommunityActivity" android:exported="false"/>
-        <activity android:name=".CommentActivity" />
 
         <!-- 알람 수신기 -->
         <receiver android:name=".AlarmReceiver"/>
 
         <activity android:name=".InquiryHistoryActivity" />
 
+        <activity
+            android:name=".CommentActivity"
+            android:windowSoftInputMode="adjustResize" />
     </application>
 </manifest>

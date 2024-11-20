@@ -24,31 +24,25 @@
     <string name="verification_code_hint">인증코드</string>
     <string name="new_password_hint">새 비밀번호</string>
     <string name="confirm_new_password_hint">새 비밀번호 확인</string>
-
     <string name="select_date">날짜 선택</string>
     <string name="fridge_icon">냉장고 아이콘</string>
     <string name="fridge">냉장고</string>
     <string name="calendar">캘린더</string>
     <string name="barcode">바코드</string>
     <string name="mypage">마이페이지</string>
-
-
     <string-array name="category_array">
         <item>카테고리 선택</item>
         <item>건의사항</item>
         <item>이용문의</item>
         <item>기타사항</item>
     </string-array>
-
     <string-array name="sort_options">
         <item>유통기한순</item>
         <item>이름순</item>
         <item>등록순</item>
     </string-array>
-
     <string name="previous_month">이전 달</string>
     <string name="next_month">다음 달</string>
-
     <string name="back_button_desc">뒤로 가기 버튼</string>
     <string name="notification_icon_desc">알림 아이콘</string>
     <string name="post_title_placeholder">게시글 제목</string>
@@ -59,5 +53,9 @@
     <string name="send_button_desc">댓글 전송 버튼</string>
     <string name="app_logo">Fresh Keeper</string>
     <string name="like_button_desc">좋아요 버튼</string>
-
+    <!-- 추가된 부분 -->
+    <string name="author_icon_desc">작성자 아이콘</string>
+    <string name="commenter_icon_desc">댓글 작성자의 아이콘</string>
+    <string name="nickname_placeholder">닉네임</string>
+    <string name="comment_placeholder">댓글 내용</string>
 </resources>

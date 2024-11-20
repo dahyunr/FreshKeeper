@@ -2,6 +2,7 @@ plugins {
     id("com.android.application")
     id("kotlin-android")
     id("kotlin-kapt")
+    id("com.google.gms.google-services") // Google services 플러그인 추가
 }
 
 android {
@@ -84,4 +85,14 @@ dependencies {
 
     // ThreeTenABP 최신화
     implementation("com.jakewharton.threetenabp:threetenabp:1.3.0")
+
+    // Firebase BoM 추가
+    implementation(platform("com.google.firebase:firebase-bom:33.6.0"))
+
+    // Firebase Analytics 의존성 추가
+    implementation("com.google.firebase:firebase-analytics")
+
+    // 필요한 다른 Firebase 서비스 추가 가능
+    // 예: Firestore 사용 시
+    // implementation("com.google.firebase:firebase-firestore")
 }

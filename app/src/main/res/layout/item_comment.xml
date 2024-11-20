@@ -7,28 +7,40 @@
 
     <!-- 사용자 아바타 -->
     <ImageView
-        android:id="@+id/userAvatar"
+        android:id="@+id/commenterIcon"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:src="@drawable/fk_mmm"
-        android:layout_marginEnd="8dp" />
+        android:layout_marginEnd="8dp"
+        android:contentDescription="@string/commenter_icon_desc" />
 
-    <!-- 댓글 내용 및 좋아요 버튼 -->
+    <!-- 댓글 내용 및 닉네임, 좋아요 버튼 -->
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:orientation="vertical">
 
+        <!-- 닉네임 -->
+        <TextView
+            android:id="@+id/commenterName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/nickname_placeholder"
+            android:textSize="14sp"
+            android:textColor="@android:color/black"
+            android:layout_marginBottom="4dp" />
+
         <!-- 댓글 내용 -->
         <TextView
             android:id="@+id/commentContent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="댓글 내용"
+            android:text="@string/comment_placeholder"
             android:textSize="16sp"
             android:textColor="@android:color/black"
-            android:paddingEnd="8dp" />
+            android:paddingEnd="8dp"
+            android:paddingStart="8dp" />
 
         <!-- 좋아요 버튼 -->
         <ImageView

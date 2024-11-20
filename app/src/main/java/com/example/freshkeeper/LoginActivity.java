@@ -10,8 +10,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import com.example.freshkeeper.database.DatabaseHelper;
 
 import java.util.Random;
@@ -24,7 +22,7 @@ public class LoginActivity extends BaseActivity {
     private TextView buttonGuestLogin;
     private TextView buttonForgotPassword;
     private TextView buttonRegister;
-    private DatabaseHelper dbHelper;  // DatabaseHelper 추가
+    private DatabaseHelper dbHelper;
 
     private static final String TAG = "LoginActivity";
 
@@ -47,7 +45,7 @@ public class LoginActivity extends BaseActivity {
         setContentView(R.layout.activity_login);
         Log.d(TAG, "onCreate: 시작");
 
-        dbHelper = new DatabaseHelper(this);  // DatabaseHelper 초기화
+        dbHelper = new DatabaseHelper(this);
 
         editTextEmail = findViewById(R.id.editTextEmail);
         editTextPassword = findViewById(R.id.editTextPassword);
@@ -66,16 +64,16 @@ public class LoginActivity extends BaseActivity {
                 if (email.isEmpty() || password.isEmpty()) {
                     Toast.makeText(LoginActivity.this, "이메일과 비밀번호를 입력하세요", Toast.LENGTH_SHORT).show();
                 } else {
-                    boolean isAuthenticated = dbHelper.authenticateUser(email, password); // 데이터베이스에서 사용자 인증
-                    String userName = dbHelper.getUserNameByEmail(email); // 사용자의 이름을 가져옴
+                    boolean isAuthenticated = dbHelper.authenticateUser(email, password);
+                    String userName = dbHelper.getUserNameByEmail(email);
 
                     if (isAuthenticated) {
                         // 로그인 성공 시 사용자 정보 저장
-                        SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
                         SharedPreferences.Editor editor = sharedPreferences.edit();
-                        editor.putString("userName", userName);  // 사용자 이름을 저장
-                        editor.putString("userEmail", email);    // 사용자 이메일을 저장
-                        editor.putBoolean("isLoggedIn", true);  // 로그인 상태 저장
+                        editor.putString("userName", userName);
+                        editor.putString("userEmail", email);
+                        editor.putBoolean("isLoggedIn", true);
+                        editor.putBoolean("isGuest", false);  // 비회원 아님
 
                         // 비회원 데이터 삭제
                         editor.remove("guestId");
@@ -85,9 +83,8 @@ public class LoginActivity extends BaseActivity {
                         // FkmainActivity로 이동
                         Intent intent = new Intent(LoginActivity.this, FkmainActivity.class);
                         startActivity(intent);
-                        finish(); // 로그인 액티비티 종료
+                        finish();
                     } else {
-                        // 로그인 실패
                         Toast.makeText(LoginActivity.this, "이메일 또는 비밀번호가 잘못되었습니다.", Toast.LENGTH_SHORT).show();
                     }
                 }
@@ -112,18 +109,18 @@ public class LoginActivity extends BaseActivity {
                 String guestId = "guest" + randomNumber;
                 Toast.makeText(LoginActivity.this, guestId + "으로 로그인합니다", Toast.LENGTH_SHORT).show();
 
-                // guestId를 SharedPreferences에 저장
-                SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+                // guestId와 isGuest를 SharedPreferences에 저장
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putString("guestId", guestId);
-                editor.putBoolean("isLoggedIn", true);  // 로그인 상태 저장
+                editor.putBoolean("isLoggedIn", true);
+                editor.putBoolean("isGuest", true);  // 비회원 상태 저장
                 editor.apply();
 
                 // FkmainActivity로 이동
                 Intent intent = new Intent(LoginActivity.this, FkmainActivity.class);
-                intent.putExtra("GUEST_ID", guestId);  // Intent로 guestId 전달
+                intent.putExtra("GUEST_ID", guestId);
                 startActivity(intent);
-                finish(); // 로그인 액티비티 종료
+                finish();
             }
         });
 
@@ -144,7 +141,7 @@ public class LoginActivity extends BaseActivity {
         SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
         String savedEmail = sharedPreferences.getString("userEmail", null);
         if (savedEmail != null) {
-            editTextEmail.setText(savedEmail);  // 저장된 이메일을 자동으로 입력
+            editTextEmail.setText(savedEmail);
         }
     }
 }

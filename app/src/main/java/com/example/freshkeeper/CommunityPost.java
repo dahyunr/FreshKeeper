@@ -13,9 +13,11 @@ public class CommunityPost {
     private int likeCount; // 좋아요 수
     private int commentCount; // 댓글 수
     private boolean isLiked; // 좋아요 여부
+    private String authorName; // 작성자 이름
+    private String authorIcon; // 작성자 아이콘 경로
 
     // 모든 필드를 포함한 생성자
-    public CommunityPost(int id, String title, String content, List<String> imageUris, String userId, int likeCount, int commentCount, boolean isLiked) {
+    public CommunityPost(int id, String title, String content, List<String> imageUris, String userId, int likeCount, int commentCount, boolean isLiked, String authorName, String authorIcon) {
         this.id = id;
         this.title = title;
         this.content = content;
@@ -24,18 +26,33 @@ public class CommunityPost {
         this.likeCount = likeCount;
         this.commentCount = commentCount;
         this.isLiked = isLiked;
+        this.authorName = authorName != null ? authorName : "익명 사용자"; // null일 경우 기본값 설정
+        this.authorIcon = authorIcon != null ? authorIcon : "fk_mmm"; // null일 경우 기본 아이콘 설정
     }
 
     // 기본값으로 `isLiked`를 false로 설정하는 생성자
-    public CommunityPost(int id, String title, String content, List<String> imageUris, String userId, int likeCount, int commentCount) {
-        this(id, title, content, imageUris, userId, likeCount, commentCount, false);
+    public CommunityPost(int id, String title, String content, List<String> imageUris, String userId, int likeCount, int commentCount, String authorName, String authorIcon) {
+        this(id, title, content, imageUris, userId, likeCount, commentCount, false, authorName, authorIcon);
     }
 
     // `id`가 자동 생성되거나 없는 경우에 대한 생성자
-    public CommunityPost(String title, String content, List<String> imageUris, String userId, int likeCount, int commentCount) {
-        this(0, title, content, imageUris, userId, likeCount, commentCount, false);
+    public CommunityPost(String title, String content, List<String> imageUris, String userId, int likeCount, int commentCount, String authorName, String authorIcon) {
+        this(0, title, content, imageUris, userId, likeCount, commentCount, false, authorName, authorIcon);
     }
 
+    // 기본 생성자 (필요 시 추가)
+    public CommunityPost() {
+        this.id = 0;
+        this.title = "";
+        this.content = "";
+        this.imageUris = new ArrayList<>();
+        this.userId = "";
+        this.likeCount = 0;
+        this.commentCount = 0;
+        this.isLiked = false;
+        this.authorName = "익명 사용자"; // 기본 이름
+        this.authorIcon = "fk_mmm"; // 기본 아이콘 설정
+    }
 
     // Getter와 Setter
     public int getId() {
@@ -107,6 +124,22 @@ public class CommunityPost {
         isLiked = liked;
     }
 
+    public String getAuthorName() {
+        return authorName;
+    }
+
+    public void setAuthorName(String authorName) {
+        this.authorName = authorName != null ? authorName : "익명 사용자"; // null일 경우 기본값 설정
+    }
+
+    public String getAuthorIcon() {
+        return authorIcon;
+    }
+
+    public void setAuthorIcon(String authorIcon) {
+        this.authorIcon = authorIcon != null ? authorIcon : "fk_mmm"; // null일 경우 기본 아이콘 설정
+    }
+
     @Override
     public String toString() {
         return "CommunityPost{" +
@@ -118,6 +151,8 @@ public class CommunityPost {
                 ", likeCount=" + likeCount +
                 ", commentCount=" + commentCount +
                 ", isLiked=" + isLiked +
+                ", authorName='" + authorName + '\'' +
+                ", authorIcon='" + authorIcon + '\'' +
                 '}';
     }
 }

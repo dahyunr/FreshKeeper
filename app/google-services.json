@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "958352010138",
+    "project_id": "fresh-keeper-d0115",
+    "storage_bucket": "fresh-keeper-d0115.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:958352010138:android:6efeee04b14c2864aa6823",
+        "android_client_info": {
+          "package_name": "com.example.freshkeeper"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "958352010138-nsmhcaoe2r92vimimvlu0d64j2lfe8n9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyALdxBcC3zx7v1rUBy789T3V8WxKN59nmI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "958352010138-nsmhcaoe2r92vimimvlu0d64j2lfe8n9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

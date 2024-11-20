@@ -87,6 +87,11 @@
             android:layout_width="match_parent"
             android:layout_height="100dp"/>
 
+        <!-- 작성하기 버튼 위에 공백 추가 -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="16dp" />
+
         <!-- 작성하기 버튼 -->
         <Button
             android:id="@+id/submit_button"

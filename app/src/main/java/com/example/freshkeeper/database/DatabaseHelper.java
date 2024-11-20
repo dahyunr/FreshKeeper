@@ -19,7 +19,7 @@ import java.util.List;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "FreshKeeper.db";
-    private static final int DATABASE_VERSION = 18;
+    private static final int DATABASE_VERSION = 20;
 
     private static final String USERS_TABLE_NAME = "users";
     private static final String USER_COLUMN_ID = "user_id";
@@ -66,13 +66,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String COMMENT_COLUMN_LIKE_COUNT = "likeCount";
 
     private static final String COMMENTS_TABLE_CREATE =
-            "CREATE TABLE IF NOT EXISTS " + COMMENTS_TABLE_NAME + " (" +
-                    COMMENT_COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    COMMENT_COLUMN_CONTENT + " TEXT, " +
-                    COMMENT_COLUMN_USER_ID + " INTEGER, " +
-                    COMMENT_COLUMN_POST_ID + " INTEGER, " +
-                    COMMENT_COLUMN_LIKE_COUNT + " INTEGER DEFAULT 0, " +
-                    "FOREIGN KEY(" + COMMENT_COLUMN_POST_ID + ") REFERENCES " + COMMUNITY_POSTS_TABLE_NAME + "(" + POST_COLUMN_ID + "));";
+            "CREATE TABLE IF NOT EXISTS comments (" +
+                    "comment_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    "content TEXT, " +
+                    "userId INTEGER, " +
+                    "postId INTEGER, " +
+                    "likeCount INTEGER DEFAULT 0, " +
+                    "commenter_name TEXT, " +  // 작성자 이름 추가
+                    "commenter_icon TEXT, " +  // 작성자 아이콘 추가
+                    "FOREIGN KEY(postId) REFERENCES community_posts(post_id));";
+
 
     private static final String USERS_TABLE_CREATE =
             "CREATE TABLE IF NOT EXISTS " + USERS_TABLE_NAME + " (" +
@@ -80,7 +83,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     USER_COLUMN_NAME + " TEXT, " +
                     USER_COLUMN_EMAIL + " TEXT UNIQUE, " +
                     USER_COLUMN_PASSWORD + " TEXT, " +
-                    USER_COLUMN_PHONE + " TEXT);";
+                    USER_COLUMN_PHONE + " TEXT, " +
+                    "icon_path TEXT DEFAULT NULL);"; // 아이콘 경로 추가
 
     private static final String ITEMS_TABLE_CREATE =
             "CREATE TABLE IF NOT EXISTS " + ITEMS_TABLE_NAME + " (" +
@@ -141,12 +145,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + COMMENTS_TABLE_NAME); // 댓글 테이블 먼저 삭제
-        db.execSQL("DROP TABLE IF EXISTS " + COMMUNITY_POSTS_TABLE_NAME); // 게시글 테이블 삭제
-        db.execSQL("DROP TABLE IF EXISTS " + USERS_TABLE_NAME);
-        db.execSQL("DROP TABLE IF EXISTS " + ITEMS_TABLE_NAME);
-        db.execSQL("DROP TABLE IF EXISTS " + INQUIRIES_TABLE_NAME);
-        onCreate(db); // 테이블 재생성
+        if (oldVersion < 20) {
+            // users 테이블에 icon_path 컬럼 추가
+            try {
+                db.execSQL("ALTER TABLE " + USERS_TABLE_NAME + " ADD COLUMN icon_path TEXT DEFAULT NULL;");
+            } catch (SQLException e) {
+                Log.e("DatabaseHelper", "onUpgrade 오류: " + e.getMessage());
+            }
+        }
     }
 
     // 이메일 중복 여부 확인 메서드
@@ -356,21 +362,28 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     // 게시글 추가 메서드
+    // 게시글 추가 메서드
     public void addCommunityPost(CommunityPost post) {
         SQLiteDatabase db = getDatabase();
+
+        // 제목으로 중복 체크
+        if (isPostExists(post.getTitle())) {
+            Log.e("DatabaseHelper", "중복된 제목의 게시글이 이미 존재합니다.");
+            return;  // 중복된 게시글은 추가하지 않음
+        }
+
         ContentValues values = new ContentValues();
         values.put(POST_COLUMN_TITLE, post.getTitle());
         values.put(POST_COLUMN_CONTENT, post.getContent());
+        values.put(POST_COLUMN_USER_ID, post.getUserId()); // 작성자 ID 저장
+        values.put(POST_COLUMN_LIKE_COUNT, post.getLikeCount());
+        values.put(POST_COLUMN_COMMENT_COUNT, post.getCommentCount());
 
-        // 이미지가 없는 경우 빈 문자열로 저장
+        // 이미지 URI를 콤마로 구분된 문자열로 저장
         String imageUris = post.getImageUris() != null && !post.getImageUris().isEmpty()
                 ? String.join(",", post.getImageUris())
                 : "";
         values.put(POST_COLUMN_IMAGE_URI, imageUris);
-
-        values.put(POST_COLUMN_USER_ID, post.getUserId());
-        values.put(POST_COLUMN_LIKE_COUNT, post.getLikeCount());
-        values.put(POST_COLUMN_COMMENT_COUNT, post.getCommentCount());
 
         try {
             db.insert(COMMUNITY_POSTS_TABLE_NAME, null, values);
@@ -382,10 +395,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public List<CommunityPost> getAllCommunityPosts() {
         List<CommunityPost> postList = new ArrayList<>();
         SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = db.query(COMMUNITY_POSTS_TABLE_NAME, null, null, null, null, null, POST_COLUMN_ID + " DESC");
+
+        // SELECT 쿼리에 JOIN 추가
+        String query = "SELECT p.*, u." + USER_COLUMN_NAME + " AS author_name, u.icon_path AS author_icon " +
+                "FROM " + COMMUNITY_POSTS_TABLE_NAME + " p " +
+                "LEFT JOIN " + USERS_TABLE_NAME + " u " +
+                "ON p." + POST_COLUMN_USER_ID + " = u." + USER_COLUMN_ID +
+                " ORDER BY p." + POST_COLUMN_ID + " DESC";
+
+        Cursor cursor = db.rawQuery(query, null);
 
         if (cursor.moveToFirst()) {
             do {
+                int id = cursor.getInt(cursor.getColumnIndexOrThrow(POST_COLUMN_ID));
                 String title = cursor.getString(cursor.getColumnIndexOrThrow(POST_COLUMN_TITLE));
                 String content = cursor.getString(cursor.getColumnIndexOrThrow(POST_COLUMN_CONTENT));
                 String imageUrisString = cursor.getString(cursor.getColumnIndexOrThrow(POST_COLUMN_IMAGE_URI));
@@ -397,7 +419,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 int likeCount = cursor.getInt(cursor.getColumnIndexOrThrow(POST_COLUMN_LIKE_COUNT));
                 int commentCount = cursor.getInt(cursor.getColumnIndexOrThrow(POST_COLUMN_COMMENT_COUNT));
 
-                CommunityPost post = new CommunityPost(title, content, imageUris, userId, likeCount, commentCount);
+                // 추가된 필드: 작성자 닉네임과 아이콘
+                String authorName = cursor.getString(cursor.getColumnIndexOrThrow("author_name"));
+                String authorIcon = cursor.getString(cursor.getColumnIndexOrThrow("author_icon"));
+                if (authorIcon == null || authorIcon.isEmpty()) {
+                    authorIcon = "fk_mmm"; // 기본 아이콘 경로
+                }
+
+                CommunityPost post = new CommunityPost(id, title, content, imageUris, userId, likeCount, commentCount, authorName, authorIcon);
+                post.setAuthorName(authorName);
+                post.setAuthorIcon(authorIcon);
+                postList.add(post);
+
                 postList.add(post);
             } while (cursor.moveToNext());
         }
@@ -414,8 +447,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(COMMENT_COLUMN_POST_ID, comment.getPostId());
         values.put(COMMENT_COLUMN_LIKE_COUNT, comment.getLikeCount());
 
+        // 작성자 이름과 아이콘 추가
+        values.put("commenter_name", comment.getCommenterName());
+        values.put("commenter_icon", comment.getCommenterIcon());
+
         try {
             db.insert(COMMENTS_TABLE_NAME, null, values);
+            // 댓글 추가 후 댓글 수 업데이트
+            updateCommentCount(comment.getPostId());
         } catch (SQLException e) {
             Log.e("DatabaseHelper", "댓글 삽입 오류: " + e.getMessage());
         }
@@ -424,15 +463,34 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public List<Comment> getCommentsByPostId(int postId) {
         List<Comment> commentList = new ArrayList<>();
         SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = db.query(COMMENTS_TABLE_NAME, null, COMMENT_COLUMN_POST_ID + " = ?", new String[]{String.valueOf(postId)}, null, null, null);
 
+        // SELECT 쿼리에 작성자 이름과 아이콘 추가
+        String query = "SELECT c.*, u." + USER_COLUMN_NAME + " AS commenter_name, u.icon_path AS commenter_icon " +
+                "FROM " + COMMENTS_TABLE_NAME + " c " +
+                "LEFT JOIN " + USERS_TABLE_NAME + " u " +
+                "ON c." + COMMENT_COLUMN_USER_ID + " = u." + USER_COLUMN_ID + " " +
+                "WHERE c." + COMMENT_COLUMN_POST_ID + " = ?";
+
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(postId)});
+
+        // Comment 생성자 호출 시 매핑 오류가 있는지 확인
         if (cursor.moveToFirst()) {
             do {
+                int id = cursor.getInt(cursor.getColumnIndexOrThrow(COMMENT_COLUMN_ID));
                 String content = cursor.getString(cursor.getColumnIndexOrThrow(COMMENT_COLUMN_CONTENT));
                 int userId = cursor.getInt(cursor.getColumnIndexOrThrow(COMMENT_COLUMN_USER_ID));
                 int likeCount = cursor.getInt(cursor.getColumnIndexOrThrow(COMMENT_COLUMN_LIKE_COUNT));
+                String commenterName = cursor.getString(cursor.getColumnIndexOrThrow("commenter_name"));
+                if (commenterName == null || commenterName.isEmpty()) {
+                    commenterName = "익명 사용자"; // 기본 댓글 작성자 이름
+                }
 
-                Comment comment = new Comment(content, userId, postId, likeCount);
+                String commenterIcon = cursor.getString(cursor.getColumnIndexOrThrow("commenter_icon"));
+                if (commenterIcon == null || commenterIcon.isEmpty()) {
+                    commenterIcon = "fk_mmm"; // 기본 댓글 작성자 아이콘 경로
+                }
+
+                Comment comment = new Comment(id, content, userId, postId, likeCount, commenterName, commenterIcon);
                 commentList.add(comment);
             } while (cursor.moveToNext());
         }
@@ -443,25 +501,95 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     // DatabaseHelper.java
     public CommunityPost getPostById(int postId) {
         SQLiteDatabase db = getDatabase();
-        String selection = POST_COLUMN_ID + " = ?";
+
+        // SELECT 쿼리에 JOIN 추가
+        String query = "SELECT p.*, u." + USER_COLUMN_NAME + " AS author_name, u.icon_path AS author_icon " +
+                "FROM " + COMMUNITY_POSTS_TABLE_NAME + " p " +
+                "LEFT JOIN " + USERS_TABLE_NAME + " u " +
+                "ON p." + POST_COLUMN_USER_ID + " = u." + USER_COLUMN_ID + " " +
+                "WHERE p." + POST_COLUMN_ID + " = ?";
+
         String[] selectionArgs = {String.valueOf(postId)};
-        Cursor cursor = db.query(COMMUNITY_POSTS_TABLE_NAME, null, selection, selectionArgs, null, null, null);
+        Cursor cursor = db.rawQuery(query, selectionArgs);
 
         CommunityPost post = null;
+
+        // CommunityPost 생성자 호출 시 매핑 오류가 있는지 확인
         if (cursor.moveToFirst()) {
             String title = cursor.getString(cursor.getColumnIndexOrThrow(POST_COLUMN_TITLE));
             String content = cursor.getString(cursor.getColumnIndexOrThrow(POST_COLUMN_CONTENT));
-
-            // 쉼표로 구분된 문자열을 `List<String>`로 변환
-            List<String> imageUris = Arrays.asList(cursor.getString(cursor.getColumnIndexOrThrow(POST_COLUMN_IMAGE_URI)).split(","));
+            String imageUrisString = cursor.getString(cursor.getColumnIndexOrThrow(POST_COLUMN_IMAGE_URI));
+            List<String> imageUris = (imageUrisString != null && !imageUrisString.isEmpty())
+                    ? Arrays.asList(imageUrisString.split(","))
+                    : new ArrayList<>();
 
             String userId = cursor.getString(cursor.getColumnIndexOrThrow(POST_COLUMN_USER_ID));
             int likeCount = cursor.getInt(cursor.getColumnIndexOrThrow(POST_COLUMN_LIKE_COUNT));
             int commentCount = cursor.getInt(cursor.getColumnIndexOrThrow(POST_COLUMN_COMMENT_COUNT));
+            String authorName = cursor.getString(cursor.getColumnIndexOrThrow("author_name"));
+            if (authorName == null || authorName.isEmpty()) {
+                authorName = "익명 사용자"; // 기본 작성자 이름
+            }
 
-            post = new CommunityPost(title, content, imageUris, userId, likeCount, commentCount);
+            String authorIcon = cursor.getString(cursor.getColumnIndexOrThrow("author_icon"));
+            if (authorIcon == null || authorIcon.isEmpty()) {
+                authorIcon = "fk_mmm"; // 기본 아이콘 경로
+            }
+
+            post = new CommunityPost(postId, title, content, imageUris, userId, likeCount, commentCount, authorName, authorIcon);
         }
+
         cursor.close();
         return post;
+    }
+
+    public String getNicknameByUserId(String userId) {
+        SQLiteDatabase db = getReadableDatabase();
+        String nickname = "익명 사용자"; // 기본 닉네임
+        Cursor cursor = db.rawQuery("SELECT user_name FROM users WHERE user_id = ?", new String[]{userId});
+        if (cursor.moveToFirst()) {
+            nickname = cursor.getString(cursor.getColumnIndexOrThrow("user_name"));
+        }
+        cursor.close();
+        return nickname;
+    }
+
+    public String getUserIconByUserId(String userId) {
+        SQLiteDatabase db = getReadableDatabase();
+        String iconPath = "fk_mmm"; // 기본 아이콘 경로
+        Cursor cursor = db.rawQuery("SELECT icon_path FROM users WHERE user_id = ?", new String[]{userId});
+        if (cursor.moveToFirst()) {
+            iconPath = cursor.getString(cursor.getColumnIndexOrThrow("icon_path"));
+        }
+        cursor.close();
+        return iconPath;
+    }
+
+    public void updateCommentCount(int postId) {
+        SQLiteDatabase db = getDatabase();
+
+        // 댓글 수 계산
+        String query = "SELECT COUNT(*) AS count FROM " + COMMENTS_TABLE_NAME +
+                " WHERE " + COMMENT_COLUMN_POST_ID + " = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(postId)});
+        int count = 0;
+        if (cursor.moveToFirst()) {
+            count = cursor.getInt(cursor.getColumnIndexOrThrow("count"));
+        }
+        cursor.close();
+
+        // 댓글 수 업데이트
+        ContentValues values = new ContentValues();
+        values.put(POST_COLUMN_COMMENT_COUNT, count);
+
+        db.update(COMMUNITY_POSTS_TABLE_NAME, values, POST_COLUMN_ID + " = ?", new String[]{String.valueOf(postId)});
+    }
+
+    public boolean isPostExists(String title) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM " + COMMUNITY_POSTS_TABLE_NAME + " WHERE " + POST_COLUMN_TITLE + " = ?", new String[]{title});
+        boolean exists = cursor.getCount() > 0;
+        cursor.close();
+        return exists;
     }
 }
