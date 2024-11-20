@@ -25,9 +25,9 @@ public class CommentActivity extends BaseActivity {
     private DatabaseHelper dbHelper;
     private EditText commentInput;
     private ImageView sendButton;
-    private ImageView postImage, postAuthorIcon; // 작성자 아이콘 추가
+    private ImageView postImage, postAuthorIcon;
     private TextView postTitle, postAuthor, postContent;
-    private TextView noCommentsTextView; // "댓글이 없습니다" 메시지 추가
+    private TextView noCommentsTextView;
     private ScrollView scrollView;
 
     @Override
@@ -145,8 +145,8 @@ public class CommentActivity extends BaseActivity {
             // SharedPreferences에서 사용자 정보 가져오기
             SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
             int userId = sharedPreferences.getInt("userId", -1);
-            String nickname = sharedPreferences.getString("userName", "익명 사용자");
-            String iconUri = sharedPreferences.getString("userIcon", "fk_mmm");
+            String nickname = sharedPreferences.getString("userName", "고릴라");  // 로그인된 사용자 이름
+            String iconUri = sharedPreferences.getString("userIcon", "fk_mmm"); // 로그인된 사용자 아이콘 URI
 
             // 댓글 객체 생성
             Comment newComment = new Comment(
@@ -154,8 +154,8 @@ public class CommentActivity extends BaseActivity {
                     userId,
                     postId,
                     0,
-                    nickname != null && !nickname.isEmpty() ? nickname : "익명 사용자",
-                    iconUri != null && !iconUri.isEmpty() ? iconUri : "fk_mmm"
+                    nickname != null && !nickname.isEmpty() ? nickname : "고릴라", // 닉네임 설정
+                    iconUri != null && !iconUri.isEmpty() ? iconUri : "fk_mmm" // 아이콘 URI 설정
             );
 
             // 댓글을 데이터베이스에 추가

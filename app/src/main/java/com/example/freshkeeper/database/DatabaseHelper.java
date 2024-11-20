@@ -414,51 +414,56 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "ON p." + POST_COLUMN_USER_ID + " = u." + USER_COLUMN_ID +
                 " ORDER BY p." + POST_COLUMN_ID + " DESC";
 
-        Cursor cursor = db.rawQuery(query, null);
+        Cursor cursor = null;
 
-        if (cursor != null && cursor.moveToFirst()) {
-            do {
-                int id = cursor.getInt(cursor.getColumnIndexOrThrow(POST_COLUMN_ID));
-                String title = cursor.getString(cursor.getColumnIndexOrThrow(POST_COLUMN_TITLE));
-                String content = cursor.getString(cursor.getColumnIndexOrThrow(POST_COLUMN_CONTENT));
-                String imageUrisString = cursor.getString(cursor.getColumnIndexOrThrow(POST_COLUMN_IMAGE_URI));
-                List<String> imageUris = (imageUrisString != null && !imageUrisString.isEmpty())
-                        ? Arrays.asList(imageUrisString.split(","))
-                        : new ArrayList<>(); // 이미지 없으면 빈 리스트
+        try {
+            cursor = db.rawQuery(query, null);
 
-                String userId = cursor.getString(cursor.getColumnIndexOrThrow(POST_COLUMN_USER_ID));
-                int likeCount = cursor.getInt(cursor.getColumnIndexOrThrow(POST_COLUMN_LIKE_COUNT));
-                int commentCount = cursor.getInt(cursor.getColumnIndexOrThrow(POST_COLUMN_COMMENT_COUNT));
+            if (cursor != null && cursor.moveToFirst()) {
+                do {
+                    int id = cursor.getInt(cursor.getColumnIndexOrThrow(POST_COLUMN_ID));
+                    String title = cursor.getString(cursor.getColumnIndexOrThrow(POST_COLUMN_TITLE));
+                    String content = cursor.getString(cursor.getColumnIndexOrThrow(POST_COLUMN_CONTENT));
+                    String imageUrisString = cursor.getString(cursor.getColumnIndexOrThrow(POST_COLUMN_IMAGE_URI));
+                    List<String> imageUris = (imageUrisString != null && !imageUrisString.isEmpty())
+                            ? Arrays.asList(imageUrisString.split(","))
+                            : new ArrayList<>(); // 이미지 없으면 빈 리스트로 처리
 
-                // 기본값 처리
-                String authorName = cursor.getString(cursor.getColumnIndexOrThrow("author_name"));
-                String authorIcon = cursor.getString(cursor.getColumnIndexOrThrow("author_icon"));
+                    String userId = cursor.getString(cursor.getColumnIndexOrThrow(POST_COLUMN_USER_ID));
+                    int likeCount = cursor.getInt(cursor.getColumnIndexOrThrow(POST_COLUMN_LIKE_COUNT));
+                    int commentCount = cursor.getInt(cursor.getColumnIndexOrThrow(POST_COLUMN_COMMENT_COUNT));
 
-                if (authorName == null || authorName.isEmpty()) {
-                    authorName = "익명 사용자"; // 기본값
-                }
-                if (authorIcon == null || authorIcon.isEmpty()) {
-                    authorIcon = "fk_mmm"; // 기본 아이콘 경로
-                }
+                    String authorName = cursor.getString(cursor.getColumnIndexOrThrow("author_name"));
+                    String authorIcon = cursor.getString(cursor.getColumnIndexOrThrow("author_icon"));
 
-                CommunityPost post = new CommunityPost(
-                        id,
-                        title != null ? title : "제목 없음",
-                        content != null ? content : "내용 없음",
-                        imageUris,
-                        userId != null ? userId : "default_user_id",
-                        likeCount,
-                        commentCount,
-                        false,  // 기본값: 좋아요 안 됨
-                        authorName,
-                        authorIcon
-                );
+                    // 기본값 설정
+                    authorName = (authorName != null && !authorName.isEmpty()) ? authorName : "익명 사용자";
+                    authorIcon = (authorIcon != null && !authorIcon.isEmpty()) ? authorIcon : "fk_mmm";
 
-                postList.add(post);
-            } while (cursor.moveToNext());
-            cursor.close();
-        } else {
-            Log.e("DatabaseHelper", "게시글 데이터가 없습니다.");
+                    CommunityPost post = new CommunityPost(
+                            id,
+                            title != null ? title : "제목 없음",
+                            content != null ? content : "내용 없음",
+                            imageUris,
+                            userId != null ? userId : "default_user_id",
+                            likeCount,
+                            commentCount,
+                            false,  // 기본값: 좋아요 상태 false
+                            authorName,
+                            authorIcon
+                    );
+
+                    postList.add(post);
+                } while (cursor.moveToNext());
+            } else {
+                Log.d("DatabaseHelper", "게시글 데이터가 없습니다.");
+            }
+        } catch (Exception e) {
+            Log.e("DatabaseHelper", "게시글 데이터 로드 중 오류 발생: " + e.getMessage(), e);
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
         }
 
         return postList;

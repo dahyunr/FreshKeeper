@@ -117,34 +117,30 @@ public class CommunityAdapter extends RecyclerView.Adapter<CommunityAdapter.View
         }
 
         public void bind(CommunityPost post) {
-            titleTextView.setText(post.getTitle());
-            contentTextView.setText(post.getContent());
+            titleTextView.setText(post.getTitle() != null ? post.getTitle() : "제목 없음");
+            contentTextView.setText(post.getContent() != null ? post.getContent() : "내용 없음");
             likeCountTextView.setText(String.valueOf(post.getLikeCount()));
             commentCountTextView.setText(String.valueOf(post.getCommentCount()));
 
-            if (post.getAuthorIcon() != null && !post.getAuthorIcon().isEmpty()) {
-                Glide.with(context)
-                        .load(post.getAuthorIcon())
-                        .error(R.drawable.fk_mmm)
-                        .into(authorIcon);
-            } else {
-                authorIcon.setImageResource(R.drawable.fk_mmm);
-            }
-
-            Glide.with(context).clear(imageView);
+            // Post Image 처리
+            Glide.with(context).clear(imageView); // 이전 이미지 정리
             String firstImageUri = post.getFirstImageUri();
             if (firstImageUri != null && !firstImageUri.isEmpty()) {
                 imageView.setVisibility(View.VISIBLE);
                 Glide.with(context)
                         .load(firstImageUri)
-                        .error(R.drawable.fk_mmm)
+                        .error(R.drawable.fk_mmm) // 에러 시 기본 이미지
                         .into(imageView);
             } else {
-                imageView.setVisibility(View.GONE);
+                imageView.setVisibility(View.GONE); // 이미지가 없으면 숨김
             }
 
+            // 좋아요 상태에 따라 아이콘 설정
             heartIcon.setImageResource(post.isLiked() ? R.drawable.fk_heartfff : R.drawable.fk_heart);
         }
+
+
+
 
         public void onHeartClick(View view) {
             int position = getAdapterPosition();
@@ -157,5 +153,6 @@ public class CommunityAdapter extends RecyclerView.Adapter<CommunityAdapter.View
             likeCountTextView.setText(String.valueOf(post.getLikeCount()));
             heartIcon.setImageResource(post.isLiked() ? R.drawable.fk_heartfff : R.drawable.fk_heart);
         }
+
     }
 }

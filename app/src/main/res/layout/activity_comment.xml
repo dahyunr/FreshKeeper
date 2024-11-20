@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -21,16 +20,6 @@
             android:contentDescription="@string/back_button_desc"
             android:layout_alignParentStart="true" />
 
-        <!-- 앱 제목 -->
-        <TextView
-            android:id="@+id/appLogo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/app_logo"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:layout_centerHorizontal="true" />
-
         <!-- 알림 아이콘 -->
         <ImageView
             android:id="@+id/notification_icon"
@@ -38,8 +27,21 @@
             android:layout_height="32dp"
             android:src="@drawable/fk_notification"
             android:contentDescription="@string/notification_icon_desc"
-            android:layout_alignParentEnd="true" />
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="50dp" /> <!-- 오른쪽 여백 조정 -->
+
+        <!-- fk_vert 아이콘 -->
+        <ImageView
+            android:id="@+id/fk_vert_icon"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/fk_vert"
+            android:contentDescription="@string/fk_vert_icon_desc"
+            android:layout_toEndOf="@id/notification_icon"
+            android:layout_marginStart="-40dp" />
     </RelativeLayout>
+
+
 
     <!-- 게시글 제목 -->
     <TextView

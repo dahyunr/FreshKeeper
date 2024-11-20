@@ -80,13 +80,16 @@ public class CommunityPost {
     // Get the first image URI
     public String getFirstImageUri() {
         if (imageUris != null && !imageUris.isEmpty()) {
-            Log.d("CommunityPost", "First image URI: " + imageUris.get(0));
-            return imageUris.get(0);
+            for (String uri : imageUris) {
+                if (uri != null && !uri.isEmpty()) {
+                    Log.d("CommunityPost", "First image URI: " + uri);
+                    return uri;
+                }
+            }
         }
-        Log.d("CommunityPost", "No images found.");
-        return null; // 명확하게 null 처리
+        Log.d("CommunityPost", "No valid image URIs found. Returning empty string.");
+        return ""; // 안전한 기본값
     }
-
 
     public String getUserId() {
         return userId;
@@ -134,7 +137,7 @@ public class CommunityPost {
     }
 
     public String getAuthorIcon() {
-        return authorIcon;
+        return authorIcon != null && !authorIcon.isEmpty() ? authorIcon : "fk_mmm";
     }
 
     public void setAuthorIcon(String authorIcon) {

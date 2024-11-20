@@ -63,6 +63,6 @@
     <string name="default_content">내용 없음</string>
     <string name="like_icon_description">좋아요 아이콘</string>
     <string name="comment_icon_description">댓글 아이콘</string>
-
+    <string name="fk_vert_icon_desc">Vertical Icon</string>
 
 </resources>

@@ -47,12 +47,14 @@ public class CommunityActivity extends BaseActivity {
                     // Handle null or empty image URIs
                     List<String> imageUris = (imageUri != null && !imageUri.isEmpty())
                             ? Collections.singletonList(imageUri)
-                            : new ArrayList<>();
+                            : new ArrayList<>(); // 기본값으로 빈 리스트 처리
 
-                    // Default user details
-                    String defaultUserName = "익명 사용자";
-                    String defaultUserIcon = "fk_mmm";
+                    // Fetch logged-in user's name and icon from SharedPreferences
+                    SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+                    String loggedInUserName = sharedPreferences.getString("username", "고릴라"); // 기본값: "고릴라"
+                    String loggedInUserIcon = sharedPreferences.getString("userIcon", "fk_mmm");
 
+                    // Create a new post with the data
                     CommunityPost newPost = new CommunityPost(
                             title != null && !title.isEmpty() ? title : "제목 없음",
                             content != null && !content.isEmpty() ? content : "내용 없음",
@@ -60,8 +62,8 @@ public class CommunityActivity extends BaseActivity {
                             userId != null && !userId.isEmpty() ? userId : "default_user_id",
                             0, // likeCount
                             0, // commentCount
-                            defaultUserName,
-                            defaultUserIcon
+                            loggedInUserName, // 사용자 이름
+                            loggedInUserIcon // 사용자 아이콘
                     );
 
                     addPostToDatabase(newPost);
@@ -213,6 +215,9 @@ public class CommunityActivity extends BaseActivity {
     }
 
     private void addPostToDatabase(CommunityPost newPost) {
+        if (newPost.getImageUris() == null) {
+            newPost.setImageUris(new ArrayList<>());
+        }
         if (!dbHelper.isPostExists(newPost.getTitle())) {
             dbHelper.addCommunityPost(newPost);
             postList.add(0, newPost);
