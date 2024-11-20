@@ -1,10 +1,13 @@
 package com.example.freshkeeper;
 
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowInsets;
 import android.view.WindowInsetsController;
+import android.widget.ImageView;
+import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class BaseActivity extends AppCompatActivity {
@@ -13,7 +16,12 @@ public class BaseActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // API 30 이상일 때 상태바와 네비게이션 바 숨기기
+        // 상태바와 네비게이션 바 숨기기 설정
+        hideSystemBars();
+    }
+
+    // 상태바와 네비게이션 바 숨기기 메소드
+    private void hideSystemBars() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             getWindow().setDecorFitsSystemWindows(false);
             getWindow().getDecorView().setOnApplyWindowInsetsListener((v, insets) -> {
@@ -25,11 +33,62 @@ public class BaseActivity extends AppCompatActivity {
                 return insets;
             });
         } else {
-            // API 30 미만일 때 상태바와 네비게이션 바 숨기기
             getWindow().getDecorView().setSystemUiVisibility(
                     View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                             | View.SYSTEM_UI_FLAG_FULLSCREEN
                             | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
         }
+    }
+
+    // 하단 네비게이션 바 클릭 리스너 설정
+    protected void setupFooterNavigation() {
+        // 하단바 아이콘들을 findViewById를 통해 연결합니다.
+        ImageView iconRef = findViewById(R.id.icon_ref);
+        ImageView iconCalendar = findViewById(R.id.icon_calendar);
+        ImageView iconBarcode = findViewById(R.id.icon_barcode);
+        ImageView iconCommunity = findViewById(R.id.icon_community);
+        ImageView iconMypage = findViewById(R.id.icon_mypage);
+
+        if (iconRef != null) {
+            iconRef.setOnClickListener(view -> navigateToActivity(FkmainActivity.class));
+        }
+
+        if (iconCalendar != null) {
+            iconCalendar.setOnClickListener(view -> navigateToActivity(CalendarActivity.class));
+        }
+
+        if (iconBarcode != null) {
+            iconBarcode.setOnClickListener(view -> navigateToActivity(BarcodeScanActivity.class));
+        }
+
+        if (iconCommunity != null) {
+            iconCommunity.setOnClickListener(view -> {
+                if (!(this instanceof CommunityActivity)) {
+                    navigateToActivity(CommunityActivity.class);
+                } else {
+                    Toast.makeText(this, "이미 커뮤니티에 있습니다", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+
+        if (iconMypage != null) {
+            iconMypage.setOnClickListener(view -> {
+                if (!(this instanceof MypageActivity)) {
+                    navigateToActivity(MypageActivity.class);
+                } else {
+                    Toast.makeText(this, "이미 마이페이지에 있습니다", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+    }
+
+    // 액티비티 전환 메소드
+    protected void navigateToActivity(Class<?> targetActivity) {
+        Intent intent = new Intent(this, targetActivity);
+        // 중복 인스턴스를 방지하기 위해 플래그 설정
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        startActivity(intent);
+        // 애니메이션 없이 화면 전환
+        overridePendingTransition(0, 0);
     }
 }

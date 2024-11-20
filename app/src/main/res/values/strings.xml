@@ -58,4 +58,11 @@
     <string name="commenter_icon_desc">댓글 작성자의 아이콘</string>
     <string name="nickname_placeholder">닉네임</string>
     <string name="comment_placeholder">댓글 내용</string>
+    <string name="post_image_description">게시글 이미지</string>
+    <string name="default_title">제목 없음</string>
+    <string name="default_content">내용 없음</string>
+    <string name="like_icon_description">좋아요 아이콘</string>
+    <string name="comment_icon_description">댓글 아이콘</string>
+
+
 </resources>

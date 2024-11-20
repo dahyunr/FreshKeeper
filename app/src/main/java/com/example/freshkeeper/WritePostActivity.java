@@ -33,6 +33,7 @@ public class WritePostActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_write_post);
 
+        // UI 초기화
         titleEditText = findViewById(R.id.title_input);
         contentEditText = findViewById(R.id.content_input);
         saveButton = findViewById(R.id.submit_button);
@@ -40,30 +41,17 @@ public class WritePostActivity extends BaseActivity {
         photoIcon = findViewById(R.id.photo_icon);
         imageRecyclerView = findViewById(R.id.image_recycler_view);
 
+        // 이미지 리스트 및 어댑터 설정
         imageUris = new ArrayList<>();
         imageAdapter = new ImageAdapter(imageUris, this::removeImage);
 
         imageRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         imageRecyclerView.setAdapter(imageAdapter);
 
+        // 버튼 클릭 리스너 설정
         backButton.setOnClickListener(v -> finish());
         photoIcon.setOnClickListener(v -> openGallery());
-        saveButton.setOnClickListener(v -> {
-            String title = titleEditText.getText().toString().trim();
-            String content = contentEditText.getText().toString().trim();
-
-            if (title.isEmpty()) {
-                titleEditText.setError("제목을 입력하세요.");
-                return;
-            }
-
-            if (content.isEmpty()) {
-                contentEditText.setError("내용을 입력하세요.");
-                return;
-            }
-
-            savePost(title, content);
-        });
+        saveButton.setOnClickListener(v -> onSaveButtonClick());
     }
 
     private void openGallery() {
@@ -86,12 +74,16 @@ public class WritePostActivity extends BaseActivity {
                 int count = data.getClipData().getItemCount();
                 for (int i = 0; i < count && imageUris.size() < MAX_IMAGE_COUNT; i++) {
                     Uri imageUri = data.getClipData().getItemAt(i).getUri();
-                    imageUris.add(imageUri);
+                    if (!imageUris.contains(imageUri)) { // 중복 방지
+                        imageUris.add(imageUri);
+                    }
                 }
             } else if (data.getData() != null) { // 단일 선택인 경우
                 if (imageUris.size() < MAX_IMAGE_COUNT) {
                     Uri imageUri = data.getData();
-                    imageUris.add(imageUri);
+                    if (!imageUris.contains(imageUri)) { // 중복 방지
+                        imageUris.add(imageUri);
+                    }
                 }
             }
             imageAdapter.notifyDataSetChanged();
@@ -103,21 +95,44 @@ public class WritePostActivity extends BaseActivity {
         imageAdapter.notifyDataSetChanged();
     }
 
-    private void savePost(String title, String content) {
-        Toast.makeText(this, "게시글이 작성되었습니다.", Toast.LENGTH_SHORT).show();
+    private void onSaveButtonClick() {
+        String title = titleEditText.getText().toString().trim();
+        String content = contentEditText.getText().toString().trim();
 
+        // 제목 유효성 검사
+        if (title.isEmpty()) {
+            titleEditText.setError("제목을 입력하세요.");
+            titleEditText.requestFocus();
+            return;
+        }
+
+        // 내용 유효성 검사
+        if (content.isEmpty()) {
+            contentEditText.setError("내용을 입력하세요.");
+            contentEditText.requestFocus();
+            return;
+        }
+
+        // 게시글 저장
+        savePost(title, content);
+    }
+
+    private void savePost(String title, String content) {
+        // 결과 전달을 위한 Intent 생성
         Intent intent = new Intent();
         intent.putExtra("title", title);
         intent.putExtra("content", content);
 
-        // 이미지가 있을 경우에만 전달
+        // 이미지가 있을 경우 URI 전달
         if (!imageUris.isEmpty()) {
             Uri firstImageUri = imageUris.get(0);
             intent.putExtra("firstImageUri", firstImageUri.toString());
             intent.putParcelableArrayListExtra("imageUris", imageUris);
         }
 
+        // 결과 설정 및 액티비티 종료
         setResult(RESULT_OK, intent);
+        Toast.makeText(this, "게시글이 작성되었습니다.", Toast.LENGTH_SHORT).show();
         finish();
     }
 }

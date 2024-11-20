@@ -5,16 +5,12 @@ import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import com.example.freshkeeper.FoodItemAdapter;
-import com.example.freshkeeper.FoodItem;
 import com.github.sundeepk.compactcalendarview.CompactCalendarView;
 import com.github.sundeepk.compactcalendarview.domain.Event;
 import com.example.freshkeeper.database.DatabaseHelper;
@@ -126,7 +122,7 @@ public class CalendarActivity extends BaseActivity {
         updateYearMonthText(todayDate);
         Log.d(TAG, "onCreate: Year and month text updated");
 
-        // Setup the footer navigation
+        // 공통 하단 네비게이션 설정
         setupFooterNavigation();
 
         // Setup RecyclerView
@@ -170,27 +166,6 @@ public class CalendarActivity extends BaseActivity {
         }
         cursor.close();
         adapter.notifyDataSetChanged();
-    }
-
-    // Setup footer navigation buttons
-    private void setupFooterNavigation() {
-        ImageView iconFridge = findViewById(R.id.icon_ref);
-        iconFridge.setOnClickListener(v -> {
-            Intent intent = new Intent(CalendarActivity.this, FkmainActivity.class);
-            startActivity(intent);
-        });
-
-        ImageView iconBarcode = findViewById(R.id.icon_barcode);
-        iconBarcode.setOnClickListener(v -> {
-            Intent intent = new Intent(CalendarActivity.this, BarcodeScanActivity.class);
-            startActivity(intent);
-        });
-
-        ImageView iconMypage = findViewById(R.id.icon_mypage);
-        iconMypage.setOnClickListener(v -> {
-            Intent intent = new Intent(CalendarActivity.this, MypageActivity.class);
-            startActivity(intent);
-        });
     }
 
     // Setup RecyclerView

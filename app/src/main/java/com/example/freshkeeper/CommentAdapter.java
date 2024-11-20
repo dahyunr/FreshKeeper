@@ -32,6 +32,13 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
         holder.bind(comment);
     }
 
+    public void updateCommentList(List<Comment> newCommentList) {
+        this.commentList.clear(); // 기존 리스트를 비웁니다.
+        this.commentList.addAll(newCommentList); // 새로운 데이터를 추가합니다.
+        notifyDataSetChanged(); // RecyclerView를 갱신합니다.
+    }
+
+
     @Override
     public int getItemCount() {
         return commentList.size();
@@ -79,5 +86,6 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
             likeButton.setImageResource(R.drawable.fk_heartfff); // 좋아요가 눌렸을 때 이미지 변경
             notifyItemChanged(getAdapterPosition()); // 좋아요 버튼 클릭 후 갱신된 데이터 반영
         }
+
     }
 }

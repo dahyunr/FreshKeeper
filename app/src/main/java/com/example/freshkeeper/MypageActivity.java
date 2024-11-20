@@ -12,7 +12,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.content.DialogInterface;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -26,7 +25,6 @@ public class MypageActivity extends BaseActivity {
     private static final int PICK_IMAGE = 1;
     private ImageView profileImage;
     private TextView nicknameTextView;
-    private ImageView iconRef, iconCalendar, iconBarcode, iconMypage;
     private TextView notificationSettingsTextView;
     private TextView contactUsButton;  // 문의하기 버튼 변수 추가
     private TextView faqTextView;  // 자주 묻는 질문 버튼
@@ -48,10 +46,6 @@ public class MypageActivity extends BaseActivity {
         // UI 요소 초기화
         profileImage = findViewById(R.id.profile_image);
         nicknameTextView = findViewById(R.id.profile_nickname);
-        iconRef = findViewById(R.id.icon_ref);
-        iconCalendar = findViewById(R.id.icon_calendar);
-        iconBarcode = findViewById(R.id.icon_barcode);
-        iconMypage = findViewById(R.id.icon_mypage);
         notificationSettingsTextView = findViewById(R.id.notification_settings);
         contactUsButton = findViewById(R.id.button_contact_us);
         faqTextView = findViewById(R.id.button_faq);
@@ -108,29 +102,8 @@ public class MypageActivity extends BaseActivity {
         // 닉네임 클릭 리스너 - 다이얼로그로 변경
         nicknameTextView.setOnClickListener(v -> showEditDialog("닉네임 변경", nicknameTextView));
 
-        // 하단바 아이콘 클릭 리스너
-        final Intent intent = new Intent();  // Intent 변수 재사용
-        iconRef.setOnClickListener(v -> {
-            intent.setClass(MypageActivity.this, FkmainActivity.class);
-            startActivity(intent);
-        });
-
-        iconCalendar.setOnClickListener(v -> {
-            intent.setClass(MypageActivity.this, CalendarActivity.class);
-            startActivity(intent);
-        });
-
-        iconBarcode.setOnClickListener(v -> {
-            intent.setClass(MypageActivity.this, BarcodeScanActivity.class);
-            startActivity(intent);
-        });
-
-        iconMypage.setOnClickListener(v -> Toast.makeText(this, "이미 마이페이지에 있습니다", Toast.LENGTH_SHORT).show());
-
-        notificationSettingsTextView.setOnClickListener(v -> {
-            Intent notificationIntent = new Intent(MypageActivity.this, NotificationSettingsActivity.class);
-            startActivity(notificationIntent);
-        });
+        // 공통 하단 네비게이션 설정
+        setupFooterNavigation();
 
         // SharedPreferences에서 사용자 정보 로드
         loadUserInfo();
