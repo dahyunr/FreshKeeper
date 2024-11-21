@@ -100,9 +100,6 @@
 
         <!-- 문의하기 히스토리 관련 액티비티 -->
         <activity android:name=".InquiryHistoryActivity" android:exported="false"/>
-
-        <activity android:name=".UserPostsActivity" />
-
         <!-- 댓글 액티비티 -->
         <activity
             android:name=".CommentActivity"

@@ -235,13 +235,22 @@ public class CommunityActivity extends BaseActivity {
     private void loadCommunityPosts() {
         List<CommunityPost> loadedPosts = dbHelper.getAllCommunityPosts();
         if (loadedPosts != null && !loadedPosts.isEmpty()) {
-            postList.clear(); // 기존 데이터 초기화
-            postList.addAll(loadedPosts); // 새 데이터 추가
+            postList.clear();
+            postList.addAll(loadedPosts);
             communityAdapter.notifyDataSetChanged();
-            Log.d("CommunityActivity", "게시글 로드 성공: " + postList.size());
+
+            // Adapter에 클릭 리스너 추가
+            communityAdapter.setOnItemClickListener(post -> {
+                Intent intent = new Intent(CommunityActivity.this, CommentActivity.class);
+                intent.putExtra("postId", post.getId());
+                intent.putExtra("postTitle", post.getTitle());
+                intent.putExtra("postContent", post.getContent());
+                intent.putExtra("postAuthor", post.getAuthorName());
+                intent.putExtra("postImage", post.getFirstImageUri()); // 이미지 전달
+                startActivity(intent);
+            });
         } else {
             Log.d("CommunityActivity", "게시글이 없습니다.");
         }
     }
-
 }

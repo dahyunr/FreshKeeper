@@ -65,5 +65,5 @@
     <string name="like_icon_description">좋아요 아이콘</string>
     <string name="comment_icon_description">댓글 아이콘</string>
     <string name="fk_vert_icon_desc">Vertical Icon</string>
-
+    <string name="default_author">익명 사용자</string>
 </resources>

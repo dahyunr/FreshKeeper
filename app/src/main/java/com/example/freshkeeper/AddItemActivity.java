@@ -11,6 +11,7 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -29,7 +30,9 @@ import com.example.freshkeeper.utils.FileUtils;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 public class AddItemActivity extends BaseActivity {
 
@@ -37,7 +40,8 @@ public class AddItemActivity extends BaseActivity {
     private static final int REQUEST_CODE_STORAGE_PERMISSION = 100;
     private static final String TAG = "AddItemActivity";
 
-    private EditText itemName, itemRegDate, itemExpDate, itemMemo, itemQuantity;
+    private AutoCompleteTextView itemNameEditText;
+    private EditText itemRegDate, itemExpDate, itemMemo, itemQuantity;
     private Spinner storageMethodSpinner;
     private Button saveButton, cancelButton;
     private ImageView itemImage, itemQuantityMinus, itemQuantityPlus, itemRegDateIcon, itemExpDateIcon;
@@ -48,13 +52,15 @@ public class AddItemActivity extends BaseActivity {
     private String imagePath = null;
     private int itemId = -1;  // 아이템 ID를 저장하기 위한 변수
     private String barcode = ""; // 바코드 값을 저장하기 위한 변수
+    private final Map<String, Integer> recommendedExpiryDays = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_item);
 
-        itemName = findViewById(R.id.item_name);
+        // 초기화
+        itemNameEditText = findViewById(R.id.itemNameEditText);
         itemRegDate = findViewById(R.id.item_reg_date);
         itemExpDate = findViewById(R.id.item_exp_date);
         itemMemo = findViewById(R.id.item_memo);
@@ -70,15 +76,68 @@ public class AddItemActivity extends BaseActivity {
         calendar = Calendar.getInstance();
         dbHelper = new DatabaseHelper(this);
 
+        // 추천 유통기한 데이터 설정
+        recommendedExpiryDays.put("상추", 3);
+        recommendedExpiryDays.put("양파", 14);
+        recommendedExpiryDays.put("배추", 5);
+        recommendedExpiryDays.put("깻잎", 14);
+
+        // 자동완성 어댑터 설정
+        String[] items = {"상추", "양파", "배추", "깻잎"};
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, items);
+        itemNameEditText.setThreshold(1);
+        itemNameEditText.setAdapter(adapter);
+
+        // 자동완성 항목 선택 시 이벤트 처리
+        itemNameEditText.setOnItemClickListener((parent, view, position, id) -> {
+            String selectedItem = (String) parent.getItemAtPosition(position);
+            if (recommendedExpiryDays.containsKey(selectedItem)) {
+                int expiryDays = recommendedExpiryDays.get(selectedItem);
+                // 등록일로부터 추천 유통기한 설정
+                String recommendedExpiryDate;
+                if (isValidDate(itemRegDate.getText().toString().trim())) {
+                    recommendedExpiryDate = getRecommendedExpiryDateFromRegDate(expiryDays);
+                } else {
+                    recommendedExpiryDate = getRecommendedExpiryDateFromToday(expiryDays);
+                }
+                itemExpDate.setText(recommendedExpiryDate);
+                // 토스트 메시지 출력
+                Toast.makeText(AddItemActivity.this, "추천 유통기한이 입력되었습니다", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // 등록일 입력 시 추천 유통기한 자동 계산
+        itemRegDate.setOnFocusChangeListener((v, hasFocus) -> {
+            if (!hasFocus) { // 포커스를 잃을 때
+                String selectedItem = itemNameEditText.getText().toString().trim();
+                if (recommendedExpiryDays.containsKey(selectedItem)) {
+                    int expiryDays = recommendedExpiryDays.get(selectedItem);
+                    String recommendedExpiryDate = getRecommendedExpiryDateFromRegDate(expiryDays);
+                    itemExpDate.setText(recommendedExpiryDate);
+                }
+            }
+        });
+
+        // 등록일 아이콘 클릭 시 추천 유통기한 자동 계산
+        itemRegDateIcon.setOnClickListener(v -> {
+            showCustomDatePickerDialog(itemRegDate);
+            String selectedItem = itemNameEditText.getText().toString().trim();
+            if (recommendedExpiryDays.containsKey(selectedItem)) {
+                int expiryDays = recommendedExpiryDays.get(selectedItem);
+                String recommendedExpiryDate = getRecommendedExpiryDateFromRegDate(expiryDays);
+                itemExpDate.setText(recommendedExpiryDate);
+            }
+        });
+
         // 기본 이미지 로드
         Glide.with(this).load(R.drawable.fk_ppp).into(itemImage);
         itemQuantity.setText(String.valueOf(quantity));
 
         // Spinner 설정에서 "전체" 옵션을 제거하고 "냉장", "냉동", "상온"만 남김
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+        ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(this,
                 R.array.storage_methods, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        storageMethodSpinner.setAdapter(adapter);
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        storageMethodSpinner.setAdapter(spinnerAdapter);
 
         // 전달된 Intent 데이터로부터 상품명과 기타 정보 설정
         Intent intent = getIntent();
@@ -96,9 +155,9 @@ public class AddItemActivity extends BaseActivity {
 
             // 전달된 정보를 뷰에 설정
             if (productName != null && !productName.isEmpty()) {
-                itemName.setText(productName);
+                itemNameEditText.setText(productName);
             } else {
-                itemName.setHint("상품명을 입력하세요");
+                itemNameEditText.setHint("상품명을 입력하세요");
             }
             if (regDate != null && !regDate.isEmpty()) {
                 itemRegDate.setText(regDate);
@@ -131,9 +190,9 @@ public class AddItemActivity extends BaseActivity {
         }
 
         // 상품명 입력 필드 클릭 시 기본 안내 문구 제거
-        itemName.setOnFocusChangeListener((v, hasFocus) -> {
-            if (hasFocus && itemName.getText().toString().equals("상품명을 입력하세요")) {
-                itemName.setText("");
+        itemNameEditText.setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus && itemNameEditText.getText().toString().equals("상품명을 입력하세요")) {
+                itemNameEditText.setText("");
             }
         });
 
@@ -156,10 +215,6 @@ public class AddItemActivity extends BaseActivity {
             showCustomDatePickerDialog(itemExpDate);
         });
 
-        itemRegDateIcon.setOnClickListener(v -> {
-            showCustomDatePickerDialog(itemRegDate);
-        });
-
         itemExpDateIcon.setOnClickListener(v -> {
             showCustomDatePickerDialog(itemExpDate);
         });
@@ -174,7 +229,7 @@ public class AddItemActivity extends BaseActivity {
         });
 
         saveButton.setOnClickListener(v -> {
-            String name = itemName.getText().toString().trim();
+            String name = itemNameEditText.getText().toString().trim();
             String regDate = itemRegDate.getText().toString().trim();
             String expDate = itemExpDate.getText().toString().trim();
             String memo = itemMemo.getText().toString().trim();
@@ -272,8 +327,14 @@ public class AddItemActivity extends BaseActivity {
             selectedDate.set(year, month, day);
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.getDefault());
             dateField.setText(dateFormat.format(selectedDate.getTime()));
-
             Log.d(TAG, "Date selected: " + dateField.getText().toString());
+            String selectedItem = itemNameEditText.getText().toString().trim();
+            if (recommendedExpiryDays.containsKey(selectedItem)) {
+                int expiryDays = recommendedExpiryDays.get(selectedItem);
+                String recommendedExpiryDate = getRecommendedExpiryDateFromRegDate(expiryDays);
+                itemExpDate.setText(recommendedExpiryDate);
+                Toast.makeText(AddItemActivity.this, "추천 유통기한이 등록일 기준으로 업데이트되었습니다", Toast.LENGTH_SHORT).show();
+            }
             alertDialog.dismiss();
         });
         dialogView.findViewById(R.id.btn_cancel).setOnClickListener(view -> {
@@ -296,8 +357,31 @@ public class AddItemActivity extends BaseActivity {
                 e.printStackTrace();
             }
         } else {
-            Toast.makeText(this, "날짜를 8자리로 입력하세요 (yyyymmdd 형식).", Toast.LENGTH_SHORT).show();
+            Log.d(TAG, "날짜를 8자리로 입력해야 합니다 (yyyymmdd 형식).");
         }
         return false;
+    }
+
+    private String getRecommendedExpiryDateFromRegDate(int daysToAdd) {
+        String regDateText = itemRegDate.getText().toString().trim();
+        if (isValidDate(regDateText)) {
+            try {
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.getDefault());
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(dateFormat.parse(regDateText));
+                calendar.add(Calendar.DAY_OF_YEAR, daysToAdd);
+                return dateFormat.format(calendar.getTime());
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+        return "";
+    }
+
+    private String getRecommendedExpiryDateFromToday(int daysToAdd) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DAY_OF_YEAR, daysToAdd);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.getDefault());
+        return dateFormat.format(calendar.getTime());
     }
 }
