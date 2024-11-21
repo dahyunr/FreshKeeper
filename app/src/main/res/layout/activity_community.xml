@@ -11,6 +11,7 @@
         android:layout_height="match_parent"
         android:paddingTop="16dp">
 
+        <!-- Header with Title and Notification Icon -->
         <LinearLayout
             android:id="@+id/header"
             android:layout_width="match_parent"
@@ -38,6 +39,7 @@
                 android:contentDescription="알림 아이콘" />
         </LinearLayout>
 
+        <!-- Search Container -->
         <LinearLayout
             android:id="@+id/search_container"
             android:layout_width="match_parent"
@@ -71,6 +73,7 @@
                 android:layout_marginEnd="4dp" />
         </LinearLayout>
 
+        <!-- RecyclerView for Posts -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
@@ -79,6 +82,7 @@
             android:layout_above="@id/footer"
             android:padding="8dp" />
 
+        <!-- Footer with Navigation Icons -->
         <LinearLayout
             android:id="@+id/footer"
             android:layout_width="match_parent"
@@ -87,13 +91,15 @@
             android:background="#8BC34A"
             android:orientation="horizontal">
 
+            <!-- Refrigerator Icon -->
             <LinearLayout
+                android:id="@+id/icon_ref_container"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:orientation="vertical"
-                android:gravity="center">
-
+                android:gravity="center"
+                android:onClick="onClickFooterIcon">
                 <ImageView
                     android:id="@+id/icon_ref"
                     android:layout_width="30dp"
@@ -110,36 +116,40 @@
                     android:textSize="12sp" />
             </LinearLayout>
 
+            <!-- Calendar Icon -->
             <LinearLayout
+                android:id="@+id/icon_calendar_container"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:orientation="vertical"
-                android:gravity="center">
-
+                android:gravity="center"
+                android:onClick="onClickFooterIcon">
                 <ImageView
                     android:id="@+id/icon_calendar"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
                     android:src="@drawable/fk_calendar"
-                    app:tint="#FFFFFF"
+                    app:tint="#000000"
                     android:contentDescription="캘린더 아이콘" />
                 <TextView
                     android:id="@+id/text_calendar"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="캘린더"
-                    android:textColor="#ffffff"
+                    android:textColor="#000000"
                     android:textSize="12sp" />
             </LinearLayout>
 
+            <!-- Barcode Icon -->
             <LinearLayout
+                android:id="@+id/icon_barcode_container"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:orientation="vertical"
-                android:gravity="center">
-
+                android:gravity="center"
+                android:onClick="onClickFooterIcon">
                 <ImageView
                     android:id="@+id/icon_barcode"
                     android:layout_width="30dp"
@@ -156,19 +166,21 @@
                     android:textSize="12sp" />
             </LinearLayout>
 
+            <!-- Community Icon -->
             <LinearLayout
+                android:id="@+id/icon_community_container"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:orientation="vertical"
-                android:gravity="center">
-
+                android:gravity="center"
+                android:onClick="onClickFooterIcon">
                 <ImageView
                     android:id="@+id/icon_community"
                     android:layout_width="40dp"
                     android:layout_height="30dp"
                     android:src="@drawable/fk_community_icon"
-                    app:tint="#000000"
+                    app:tint="#FFFFFF"
                     android:scaleType="fitCenter"
                     android:contentDescription="커뮤니티 아이콘" />
                 <TextView
@@ -176,17 +188,19 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="커뮤니티"
-                    android:textColor="#233746"
+                    android:textColor="#ffffff"
                     android:textSize="12sp" />
             </LinearLayout>
 
+            <!-- My Page Icon -->
             <LinearLayout
+                android:id="@+id/icon_mypage_container"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:orientation="vertical"
-                android:gravity="center">
-
+                android:gravity="center"
+                android:onClick="onClickFooterIcon">
                 <ImageView
                     android:id="@+id/icon_mypage"
                     android:layout_width="30dp"
@@ -204,16 +218,18 @@
             </LinearLayout>
         </LinearLayout>
 
+        <!-- Plus Button for Adding Posts -->
         <ImageView
             android:id="@+id/plus_button"
             android:layout_width="56dp"
             android:layout_height="56dp"
-            android:layout_gravity="bottom|end"
             android:layout_marginBottom="100dp"
             android:layout_marginEnd="20dp"
             android:src="@drawable/fk_pen"
-            android:contentDescription="추가 버튼"
+            android:contentDescription="글쓰기 버튼"
             android:layout_alignParentBottom="true"
-            android:layout_alignParentEnd="true" />
+            android:layout_alignParentEnd="true"
+            android:onClick="onClickPlusButton" />
+
     </RelativeLayout>
 </FrameLayout>

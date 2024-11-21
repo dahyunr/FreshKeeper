@@ -1,0 +1,49 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="8dp">
+
+    <!-- 알림 아이콘 -->
+    <ImageView
+        android:id="@+id/ivNotificationIcon"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_gravity="center_vertical"
+        android:contentDescription="@string/notification_icon" />
+
+    <!-- 알림 제목 -->
+    <TextView
+        android:id="@+id/tvNotificationTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="알림 제목"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        android:layout_marginTop="4dp" />
+
+    <!-- 알림 내용 -->
+    <TextView
+        android:id="@+id/tvNotificationContent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="알림 내용"
+        android:textSize="14sp"
+        android:maxLines="2"
+        android:ellipsize="end"
+        android:layout_marginTop="4dp"
+        android:textColor="@color/gray" />
+
+    <!-- 알림 시간 -->
+    <TextView
+        android:id="@+id/tvNotificationTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="방금 전"
+        android:textSize="12sp"
+        android:textColor="@color/gray"
+        android:layout_marginTop="4dp" />
+
+</LinearLayout>

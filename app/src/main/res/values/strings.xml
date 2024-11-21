@@ -44,7 +44,8 @@
     <string name="previous_month">이전 달</string>
     <string name="next_month">다음 달</string>
     <string name="back_button_desc">뒤로 가기 버튼</string>
-    <string name="notification_icon_desc">알림 아이콘</string>
+    <string name="notification_icon_desc">알림 아이콘 설명</string>
+    <string name="notification_icon">알림 아이콘</string>
     <string name="post_title_placeholder">게시글 제목</string>
     <string name="post_user_placeholder">작성자</string>
     <string name="post_content_placeholder">게시글 내용</string>
@@ -64,7 +65,5 @@
     <string name="like_icon_description">좋아요 아이콘</string>
     <string name="comment_icon_description">댓글 아이콘</string>
     <string name="fk_vert_icon_desc">Vertical Icon</string>
-    <string name="more_options_description">추가 옵션</string>
-    <string name="option_edit">수정</string>
-    <string name="option_delete">삭제</string>
+
 </resources>
