@@ -41,20 +41,24 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="제목을 입력하세요"
+            android:textColorHint="#BBBBBB"
             android:textSize="16sp"
             android:textStyle="bold"
-            android:padding="8dp"/>
+            android:padding="12dp"/>
 
         <!-- 내용 입력 EditText -->
         <EditText
             android:id="@+id/content_input"
             android:layout_width="match_parent"
             android:layout_height="250dp"
-            android:background="#EBEAEA"
+            android:background="#F5F5F5"
             android:hint="내용을 입력하세요"
+            android:textColorHint="#BBBBBB"
             android:textSize="14sp"
             android:gravity="top|start"
-            android:padding="8dp"/>
+            android:minHeight="150dp"
+            android:padding="12dp"/>
+
 
         <!-- 사진 추가를 위한 photo_icon ImageView와 텍스트 -->
         <LinearLayout
@@ -87,9 +91,8 @@
             android:id="@+id/image_recycler_view"
             android:layout_width="match_parent"
             android:layout_height="100dp"
-            android:padding="8dp"
             android:clipToPadding="false"
-            android:scrollbars="horizontal"/>
+            android:scrollbars="horizontal" />
 
         <!-- 작성하기 버튼 위에 공백 추가 -->
         <View

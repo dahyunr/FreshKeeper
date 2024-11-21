@@ -74,13 +74,16 @@
         </LinearLayout>
 
         <!-- RecyclerView for Posts -->
+        <!-- RecyclerView 설정 -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:padding="8dp"
+            android:clipToPadding="false"
+            android:scrollbars="vertical"
             android:layout_below="@id/search_container"
-            android:layout_above="@id/footer"
-            android:padding="8dp" />
+            android:layout_above="@id/footer" />
 
         <!-- Footer with Navigation Icons -->
         <LinearLayout
@@ -130,14 +133,14 @@
                     android:layout_width="30dp"
                     android:layout_height="30dp"
                     android:src="@drawable/fk_calendar"
-                    app:tint="#000000"
+                    app:tint="#ffffff"
                     android:contentDescription="캘린더 아이콘" />
                 <TextView
                     android:id="@+id/text_calendar"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="캘린더"
-                    android:textColor="#000000"
+                    android:textColor="#ffffff"
                     android:textSize="12sp" />
             </LinearLayout>
 
@@ -180,7 +183,7 @@
                     android:layout_width="40dp"
                     android:layout_height="30dp"
                     android:src="@drawable/fk_community_icon"
-                    app:tint="#FFFFFF"
+                    app:tint="#000000"
                     android:scaleType="fitCenter"
                     android:contentDescription="커뮤니티 아이콘" />
                 <TextView
@@ -188,7 +191,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="커뮤니티"
-                    android:textColor="#ffffff"
+                    android:textColor="#000000"
                     android:textSize="12sp" />
             </LinearLayout>
 

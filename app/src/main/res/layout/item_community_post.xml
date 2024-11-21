@@ -65,14 +65,14 @@
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:src="@drawable/fk_heart"
-            android:layout_marginEnd="4dp"
+            android:layout_marginEnd="8dp"
             android:contentDescription="@string/like_icon_description" />
 
         <TextView
             android:id="@+id/likeCountTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="0"
+            android:text=""
             android:textSize="14sp"
             android:textColor="@color/black"
             android:layout_marginEnd="16dp" />
