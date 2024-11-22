@@ -1,6 +1,7 @@
 package com.example.freshkeeper;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -10,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -57,8 +59,6 @@ public class CommunityAdapter extends RecyclerView.Adapter<CommunityAdapter.View
         holder.bind(post);
     }
 
-
-
     @Override
     public int getItemCount() {
         return postList != null ? postList.size() : 0;
@@ -67,14 +67,34 @@ public class CommunityAdapter extends RecyclerView.Adapter<CommunityAdapter.View
     public void updateData(List<CommunityPost> updatedList) {
         if (postList == null) {
             postList = new ArrayList<>(updatedList);
+            notifyDataSetChanged();
         } else {
+            DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffUtil.Callback() {
+                @Override
+                public int getOldListSize() {
+                    return postList.size();
+                }
+
+                @Override
+                public int getNewListSize() {
+                    return updatedList.size();
+                }
+
+                @Override
+                public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+                    return postList.get(oldItemPosition).getId() == updatedList.get(newItemPosition).getId();
+                }
+
+                @Override
+                public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+                    return postList.get(oldItemPosition).equals(updatedList.get(newItemPosition));
+                }
+            });
             postList.clear();
             postList.addAll(updatedList);
+            diffResult.dispatchUpdatesTo(this);
         }
-        notifyDataSetChanged(); // RecyclerView 전체 갱신
     }
-
-
 
     class ViewHolder extends RecyclerView.ViewHolder {
         TextView titleTextView, contentTextView, likeCountTextView, commentCountTextView;
@@ -91,6 +111,7 @@ public class CommunityAdapter extends RecyclerView.Adapter<CommunityAdapter.View
 
             // 아이템 전체 클릭 리스너
             itemView.setOnClickListener(v -> onItemClick());
+
             // 좋아요 버튼 클릭 리스너
             heartIcon.setOnClickListener(this::onHeartClick);
         }
@@ -123,12 +144,22 @@ public class CommunityAdapter extends RecyclerView.Adapter<CommunityAdapter.View
             heartIcon.setImageResource(post.isLiked() ? R.drawable.fk_heartfff : R.drawable.fk_heart);
         }
 
-
         private void onItemClick() {
             int position = getAdapterPosition();
             if (position != RecyclerView.NO_POSITION && onItemClickListener != null && position < postList.size()) {
-                Log.d("CommunityAdapter", "Item clicked. Position: " + position + ", Title: " + postList.get(position).getTitle());
-                onItemClickListener.onItemClick(postList.get(position));
+                CommunityPost clickedPost = postList.get(position);
+                Log.d("CommunityAdapter", "Item clicked. Position: " + position + ", Title: " + clickedPost.getTitle());
+                onItemClickListener.onItemClick(clickedPost);
+
+                // 상세 보기 Intent 처리
+                Intent intent = new Intent(itemView.getContext(), CommentActivity.class);
+                intent.putExtra("postId", clickedPost.getId());
+                intent.putExtra("postTitle", clickedPost.getTitle());
+                intent.putExtra("postContent", clickedPost.getContent());
+                intent.putExtra("postAuthor", clickedPost.getAuthorName());
+                intent.putExtra("postAuthorIcon", clickedPost.getAuthorIcon());
+                intent.putExtra("postImageUri", clickedPost.getFirstImageUri());
+                itemView.getContext().startActivity(intent);
             } else {
                 Log.e("CommunityAdapter", "Invalid item click. Position: " + position);
             }

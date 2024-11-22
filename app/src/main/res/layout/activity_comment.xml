@@ -30,30 +30,31 @@
             android:layout_alignParentEnd="true"
             android:layout_marginEnd="50dp" />
 
-        <!-- fk_vert 아이콘 -->
+        <!-- 메뉴 아이콘 -->
+        <!-- fk_vert 클릭 시 팝업 메뉴가 나타나는 아이콘 -->
         <ImageView
             android:id="@+id/fk_vert_icon"
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:src="@drawable/fk_vert"
-            android:contentDescription="@string/fk_vert_icon_desc"
-            android:layout_toEndOf="@id/notification_icon"
-            android:layout_marginStart="-40dp" />
+            android:contentDescription="글 옵션"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="8dp" />
     </RelativeLayout>
 
     <!-- 게시글 제목 -->
     <TextView
         android:id="@+id/postTitle"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/post_title_placeholder"
+        android:text="제목 없음"
         android:textSize="22sp"
         android:textStyle="bold"
         android:textColor="#000000"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="4dp" />
 
-    <!-- 작성자 아이콘과 닉네임 -->
+    <!-- 작성자 정보 -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -64,19 +65,22 @@
         <!-- 작성자 아이콘 -->
         <ImageView
             android:id="@+id/postAuthorIcon"
-            android:layout_width="34dp"
+            android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_marginEnd="8dp"
             android:contentDescription="@string/author_icon_desc"
-            android:src="@drawable/fk_mmm" />
+            android:src="@drawable/fk_mmm"
+            android:scaleType="centerCrop"
+            android:background="#ffffff" />
 
         <!-- 작성자 닉네임 -->
         <TextView
             android:id="@+id/postAuthor"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="작성자 이름"
-            android:textSize="16sp"/>
+            android:text="익명 사용자"
+            android:textSize="16sp"
+            android:textColor="#757575" />
     </LinearLayout>
 
     <!-- 게시글 이미지 -->
@@ -94,7 +98,7 @@
         android:id="@+id/postContent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/post_content_placeholder"
+        android:text="내용 없음"
         android:textSize="16sp"
         android:textColor="#000000"
         android:layout_marginBottom="16dp" />
@@ -105,55 +109,49 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:layout_marginBottom="16dp" />
+        android:layout_marginBottom="16dp"
+        android:overScrollMode="always" />
 
-    <!-- 댓글이 없을 경우 표시할 텍스트 -->
-    <TextView
-        android:id="@+id/noCommentsTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="댓글이 없습니다."
-        android:textSize="16sp"
-        android:textColor="#757575"
-        android:visibility="gone"
-        android:layout_gravity="center"
-        android:layout_marginBottom="16dp" />
-
-    <!-- 댓글 입력 및 전송을 ScrollView로 감싸기 -->
-    <ScrollView
-        android:id="@+id/scrollView"
+    <!-- 댓글 입력 -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fillViewport="true">
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="8dp"
+        android:background="@color/light_gray">
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <!-- 댓글 입력창 -->
+        <EditText
+            android:id="@+id/comment_input"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:padding="8dp"
-            android:background="@color/light_gray">
+            android:layout_weight="1"
+            android:hint="댓글을 입력하세요"
+            android:padding="12dp"
+            android:background="@drawable/edittext_background"
+            android:layout_marginEnd="8dp"
+            android:inputType="text"
+            android:imeOptions="actionSend" />
 
-            <EditText
-                android:id="@+id/comment_input"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:hint="@string/comment_input_hint"
-                android:padding="12dp"
-                android:background="@drawable/edittext_background"
-                android:layout_marginEnd="8dp"
-                android:inputType="text"
-                android:imeOptions="actionSend" />
+        <!-- 전송 버튼 -->
+        <ImageView
+            android:id="@+id/send_button"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/fk_send"
+            android:contentDescription="@string/send_button_desc"
+            android:padding="8dp" />
 
-            <ImageView
-                android:id="@+id/send_button"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:src="@drawable/fk_send"
-                android:contentDescription="@string/send_button_desc"
-                android:padding="8dp" />
-        </LinearLayout>
-    </ScrollView>
-
+        <TextView
+            android:id="@+id/noCommentsTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="댓글이 없습니다."
+            android:textSize="16sp"
+            android:textColor="#757575"
+            android:visibility="gone"
+            android:layout_gravity="center"
+            android:layout_marginBottom="16dp" />
+    </LinearLayout>
 </LinearLayout>

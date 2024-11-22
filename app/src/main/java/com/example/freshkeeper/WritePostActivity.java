@@ -1,6 +1,7 @@
 package com.example.freshkeeper;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -65,34 +66,40 @@ public class WritePostActivity extends BaseActivity {
         });
 
         // 저장 버튼 클릭 리스너 설정
-        saveButton.setOnClickListener(v -> {
-            String title = titleEditText.getText().toString().trim(); // 제목 가져오기
-            String content = contentEditText.getText().toString().trim(); // 내용 가져오기
+        saveButton.setOnClickListener(v -> onSaveButtonClick());
+    }
 
-            // 제목 및 내용 유효성 검사
-            if (title.isEmpty()) {
-                titleEditText.setError("제목을 입력하세요.");
-                titleEditText.requestFocus();
-                return;
-            }
+    private void onSaveButtonClick() {
+        String title = titleEditText.getText().toString().trim();
+        String content = contentEditText.getText().toString().trim();
 
-            if (content.isEmpty()) {
-                contentEditText.setError("내용을 입력하세요.");
-                contentEditText.requestFocus();
-                return;
-            }
+        // 제목과 내용 유효성 검사
+        if (title.isEmpty()) {
+            titleEditText.setError("제목을 입력하세요.");
+            titleEditText.requestFocus();
+            return;
+        }
 
-            // 이미지 URI 리스트 변환 (ArrayList<Uri> -> List<String>)
-            List<String> imageUrisAsString = new ArrayList<>();
-            if (imageUris != null) {
-                for (Uri uri : imageUris) {
+        if (content.isEmpty()) {
+            contentEditText.setError("내용을 입력하세요.");
+            contentEditText.requestFocus();
+            return;
+        }
+
+        // 이미지 URI 리스트 변환
+        List<String> imageUrisAsString = new ArrayList<>();
+        if (imageUris != null) {
+            for (Uri uri : imageUris) {
+                if (!imageUrisAsString.contains(uri.toString())) {
                     imageUrisAsString.add(uri.toString());
                 }
             }
+        }
 
-            // 게시글 저장 호출
-            savePost(title, content, imageUrisAsString);
-        });
+        Log.d("WritePostActivity", "저장 중: 제목=" + title + ", 내용=" + content + ", 이미지 수=" + imageUrisAsString.size());
+
+        // 게시글 저장 호출
+        savePost(title, content, imageUrisAsString);
     }
 
     private void openGallery() {
@@ -142,52 +149,30 @@ public class WritePostActivity extends BaseActivity {
         imageAdapter.notifyDataSetChanged();
     }
 
-    private void onSaveButtonClick() {
-        String title = titleEditText.getText().toString().trim();
-        String content = contentEditText.getText().toString().trim();
-
-        if (title.isEmpty()) {
-            titleEditText.setError("제목을 입력하세요.");
-            titleEditText.requestFocus();
-            return;
-        }
-
-        if (content.isEmpty()) {
-            contentEditText.setError("내용을 입력하세요.");
-            contentEditText.requestFocus();
-            return;
-        }
-
-        // 이미지 URI 리스트를 String으로 변환
-        List<String> imageUrisAsString = new ArrayList<>();
-        if (imageUris != null) {
-            for (Uri uri : imageUris) {
-                imageUrisAsString.add(uri.toString());
-            }
-        }
-
-        // 게시글 저장
-        savePost(title, content, imageUrisAsString);
-    }
-
     private void savePost(String title, String content, List<String> imageUris) {
         DatabaseHelper dbHelper = DatabaseHelper.getInstance(this);
 
-        String imageUrisString = imageUris != null && !imageUris.isEmpty()
-                ? String.join(",", imageUris)
-                : null;
+        // SharedPreferences에서 사용자 정보 가져오기
+        SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+        String userId = sharedPreferences.getString("userId", "default_user_id"); // 사용자 ID
+        String userName = sharedPreferences.getString("userName", "익명 사용자"); // 사용자 닉네임
+        String userIcon = sharedPreferences.getString("userIcon", "fk_mmm"); // 사용자 아이콘
 
+        // CommunityPost 객체 생성
         CommunityPost post = new CommunityPost(
-                title != null ? title : "제목 없음",
-                content != null ? content : "내용 없음",
-                imageUris != null ? imageUris : new ArrayList<>(),
-                "default_user_id",
-                0,
-                0,
-                "익명 사용자",
-                "fk_mmm"
+                0, // postId (DB에서 자동 생성)
+                title != null ? title : "제목 없음", // 제목
+                content != null ? content : "내용 없음", // 내용
+                imageUris != null ? imageUris : new ArrayList<>(), // 이미지 URI 리스트
+                userId, // 작성자 ID
+                0, // 좋아요 수 초기값
+                0, // 댓글 수 초기값
+                false, // 좋아요 상태
+                userName != null && !userName.isEmpty() ? userName : "익명 사용자", // 닉네임
+                userIcon != null && !userIcon.isEmpty() ? userIcon : "fk_mmm" // 아이콘
         );
 
+        // 데이터베이스에 저장
         long postId = dbHelper.addCommunityPost(post);
         if (postId != -1) {
             Log.d("WritePostActivity", "게시글 저장 성공. ID: " + postId);
@@ -201,12 +186,5 @@ public class WritePostActivity extends BaseActivity {
             Log.e("WritePostActivity", "게시글 저장 실패.");
             Toast.makeText(this, "게시글 저장에 실패했습니다.", Toast.LENGTH_SHORT).show();
         }
-    }
-
-
-    public void onClickPlusButton(View view) {
-        Log.d("WritePostActivity", "글쓰기 버튼 클릭됨");
-        Intent intent = new Intent(this, WritePostActivity.class);
-        startActivity(intent);
     }
 }

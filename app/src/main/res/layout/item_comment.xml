@@ -7,14 +7,15 @@
 
     <!-- 사용자 아바타 -->
     <ImageView
-        android:id="@+id/commenterIcon"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:id="@+id/commenterIconImageView"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
         android:src="@drawable/fk_mmm"
+        android:scaleType="centerCrop"
         android:layout_marginEnd="8dp"
         android:contentDescription="@string/commenter_icon_desc" />
 
-    <!-- 댓글 내용 및 닉네임, 좋아요 버튼 -->
+    <!-- 닉네임 및 댓글 -->
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -23,7 +24,7 @@
 
         <!-- 닉네임 -->
         <TextView
-            android:id="@+id/commenterName"
+            android:id="@+id/commenterNameTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/nickname_placeholder"
@@ -33,22 +34,30 @@
 
         <!-- 댓글 내용 -->
         <TextView
-            android:id="@+id/commentContent"
+            android:id="@+id/commentTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:maxLines="4"
+            android:ellipsize="end"
             android:text="@string/comment_placeholder"
             android:textSize="16sp"
-            android:textColor="@android:color/black"
-            android:paddingEnd="8dp"
-            android:paddingStart="8dp" />
-
-        <!-- 좋아요 버튼 -->
-        <ImageView
-            android:id="@+id/likeButton"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/fk_heart"
-            android:contentDescription="@string/like_button_desc"
-            android:layout_marginTop="8dp" />
+            android:textColor="@android:color/black" />
     </LinearLayout>
+
+    <!-- 좋아요 버튼 -->
+    <ImageView
+        android:id="@+id/likeButton"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@drawable/fk_heart"
+        android:layout_gravity="end"
+        android:contentDescription="@string/like_button_desc" />
+
+    <TextView
+        android:id="@+id/commentLikeCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="0"
+        android:textSize="14sp"
+        android:textColor="@android:color/black" />
 </LinearLayout>

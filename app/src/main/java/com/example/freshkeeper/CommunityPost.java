@@ -125,11 +125,11 @@ public class CommunityPost {
     }
 
     public String getAuthorName() {
-        return authorName;
+        return authorName != null && !authorName.isEmpty() ? authorName : "익명 사용자";
     }
 
     public void setAuthorName(String authorName) {
-        this.authorName = authorName != null ? authorName : "익명 사용자"; // 기본값 처리
+        this.authorName = authorName != null ? authorName : "익명 사용자";
     }
 
     public String getAuthorIcon() {
@@ -137,7 +137,7 @@ public class CommunityPost {
     }
 
     public void setAuthorIcon(String authorIcon) {
-        this.authorIcon = authorIcon != null ? authorIcon : "fk_mmm"; // 기본값 처리
+        this.authorIcon = authorIcon != null ? authorIcon : "fk_mmm";
     }
 
     @Override

@@ -92,7 +92,6 @@
 
         <!-- 커뮤니티 기능 관련 액티비티 -->
         <activity android:name=".WritePostActivity" android:exported="false"/>
-        <activity android:name=".MyPostsActivity" android:exported="false"/>
         <activity android:name=".CommunityActivity" android:exported="true"/>
 
         <!-- 알람 수신기 -->
@@ -100,6 +99,7 @@
 
         <!-- 문의하기 히스토리 관련 액티비티 -->
         <activity android:name=".InquiryHistoryActivity" android:exported="false"/>
+
         <!-- 댓글 액티비티 -->
         <activity
             android:name=".CommentActivity"

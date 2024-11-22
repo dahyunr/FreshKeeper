@@ -1,16 +1,20 @@
 package com.example.freshkeeper;
 
-public class Comment {
-    private int id;
-    private String content;
-    private int userId;
-    private int postId;
-    private int likeCount;
-    private String commenterName; // 댓글 작성자 이름
-    private String commenterIcon; // 댓글 작성자 아이콘 URI
+import java.io.Serializable;
+
+public class Comment implements Serializable {
+    private int id;                 // 댓글 ID
+    private String content;         // 댓글 내용
+    private int userId;             // 작성자 사용자 ID
+    private int postId;             // 게시글 ID
+    private int likeCount;          // 좋아요 수
+    private String commenterName;   // 댓글 작성자 이름
+    private String commenterIcon;   // 댓글 작성자 아이콘 URI
+    private String createdAt;       // 작성 시간
+    private String updatedAt;       // 수정 시간
 
     // 모든 필드를 포함한 생성자
-    public Comment(int id, String content, int userId, int postId, int likeCount, String commenterName, String commenterIcon) {
+    public Comment(int id, String content, int userId, int postId, int likeCount, String commenterName, String commenterIcon, String createdAt, String updatedAt) {
         this.id = id;
         this.content = content;
         this.userId = userId;
@@ -18,16 +22,24 @@ public class Comment {
         this.likeCount = likeCount;
         this.commenterName = commenterName;
         this.commenterIcon = commenterIcon;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
 
-    // commenterName과 commenterIcon 없이 사용하는 생성자
-    public Comment(int id, String content, int userId, int postId, int likeCount) {
-        this(id, content, userId, postId, likeCount, null, null);
+    // createdAt, updatedAt 없이 생성하는 생성자
+    public Comment(int id, String content, int userId, int postId, int likeCount, String commenterName, String commenterIcon) {
+        this(id, content, userId, postId, likeCount, commenterName, commenterIcon, null, null);
     }
 
     // 댓글 ID 없이 생성하는 생성자 (새로운 댓글 추가 시 사용)
     public Comment(String content, int userId, int postId, int likeCount, String commenterName, String commenterIcon) {
-        this(0, content, userId, postId, likeCount, commenterName, commenterIcon);
+        this(0, content, userId, postId, likeCount, commenterName, commenterIcon, null, null);
+    }
+
+    // content와 postId만 사용하는 간단한 생성자
+    public Comment(String content, int postId) {
+        this.content = content;
+        this.postId = postId;
     }
 
     // Getter와 Setter
@@ -72,7 +84,7 @@ public class Comment {
     }
 
     public String getCommenterName() {
-        return commenterName;
+        return commenterName != null ? commenterName : "익명 사용자";
     }
 
     public void setCommenterName(String commenterName) {
@@ -80,11 +92,27 @@ public class Comment {
     }
 
     public String getCommenterIcon() {
-        return commenterIcon;
+        return commenterIcon != null ? commenterIcon : "https://example.com/default-icon.png";
     }
 
     public void setCommenterIcon(String commenterIcon) {
         this.commenterIcon = commenterIcon;
+    }
+
+    public String getCreatedAt() {
+        return createdAt != null ? createdAt : "Unknown"; // 기본값 반환
+    }
+
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public String getUpdatedAt() {
+        return updatedAt != null ? updatedAt : "Unknown"; // 기본값 반환
+    }
+
+    public void setUpdatedAt(String updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     @Override
@@ -97,6 +125,8 @@ public class Comment {
                 ", likeCount=" + likeCount +
                 ", commenterName='" + commenterName + '\'' +
                 ", commenterIcon='" + commenterIcon + '\'' +
+                ", createdAt='" + createdAt + '\'' +
+                ", updatedAt='" + updatedAt + '\'' +
                 '}';
     }
 }

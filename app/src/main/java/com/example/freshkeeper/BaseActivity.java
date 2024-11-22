@@ -1,6 +1,7 @@
 package com.example.freshkeeper;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
@@ -8,13 +9,20 @@ import android.view.WindowInsets;
 import android.view.WindowInsetsController;
 import android.widget.ImageView;
 import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 public class BaseActivity extends AppCompatActivity {
 
+    // SharedPreferences 선언
+    private SharedPreferences sharedPreferences;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // SharedPreferences 초기화
+        sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
 
         // 상태바와 네비게이션 바 숨기기 설정
         hideSystemBars();
@@ -90,5 +98,23 @@ public class BaseActivity extends AppCompatActivity {
         startActivity(intent);
         // 애니메이션 없이 화면 전환
         overridePendingTransition(0, 0);
+    }
+
+    // 사용자 닉네임 가져오기 메소드
+    protected String getUserNickname() {
+        if (sharedPreferences == null) {
+            // SharedPreferences가 초기화되지 않았을 경우 기본값 반환
+            return "익명 사용자";
+        }
+        return sharedPreferences.getString("userName", "익명 사용자");
+    }
+
+    // 사용자 아이콘 가져오기 메소드
+    protected String getUserIcon() {
+        if (sharedPreferences == null) {
+            // SharedPreferences가 초기화되지 않았을 경우 기본값 반환
+            return "fk_mmm";
+        }
+        return sharedPreferences.getString("userIcon", "fk_mmm");
     }
 }

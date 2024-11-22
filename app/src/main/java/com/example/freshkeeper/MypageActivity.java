@@ -26,14 +26,14 @@ public class MypageActivity extends BaseActivity {
     private ImageView profileImage;
     private TextView nicknameTextView;
     private TextView notificationSettingsTextView;
-    private TextView contactUsButton;  // 문의하기 버튼 변수 추가
-    private TextView faqTextView;  // 자주 묻는 질문 버튼
-    private TextView noticeButton;  // 공지사항 버튼 추가
-    private TextView logoutTextView;  // 로그아웃 버튼 변수 추가
+    private TextView contactUsButton;  // 문의하기 버튼
+    private TextView faqTextView;      // 자주 묻는 질문 버튼
+    private TextView noticeButton;    // 공지사항 버튼
+    private TextView logoutTextView;  // 로그아웃 버튼
     private TextView privacyPolicyButton;  // 개인정보 처리방침 버튼
-    private TextView termsOfServiceButton;  // 이용약관 버튼
+    private TextView termsOfServiceButton; // 이용약관 버튼
     private DatabaseHelper dbHelper;
-    private boolean isGuestUser;  // 비회원 여부 체크 변수 추가
+    private boolean isGuestUser;  // 비회원 여부 체크 변수
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,43 +54,42 @@ public class MypageActivity extends BaseActivity {
         privacyPolicyButton = findViewById(R.id.button_privacy_policy);
         termsOfServiceButton = findViewById(R.id.button_terms_of_service);
 
-        // 로그아웃 텍스트뷰 초기화 및 클릭 리스너 추가
+        // 로그아웃 클릭 리스너
         logoutTextView.setOnClickListener(v -> logout());
 
-        // "자주 묻는 질문" 텍스트뷰 초기화 및 클릭 리스너 추가
+        // "자주 묻는 질문" 클릭 리스너
         faqTextView.setOnClickListener(v -> {
             Intent faqIntent = new Intent(MypageActivity.this, FAQActivity.class);
             startActivity(faqIntent);
         });
 
-        // 공지사항 버튼 초기화 및 클릭 리스너 추가
+        // 공지사항 클릭 리스너
         noticeButton.setOnClickListener(v -> {
             Intent noticeIntent = new Intent(MypageActivity.this, NoticeActivity.class);
             startActivity(noticeIntent);
         });
 
-        // 개인정보 처리방침 버튼 초기화 및 클릭 리스너 추가
+        // 개인정보 처리방침 클릭 리스너
         privacyPolicyButton.setOnClickListener(v -> {
             Intent privacyPolicyIntent = new Intent(MypageActivity.this, PrivacyPolicyActivity.class);
             startActivity(privacyPolicyIntent);
         });
 
-        // 이용약관 버튼 초기화 및 클릭 리스너 추가
+        // 이용약관 클릭 리스너
         termsOfServiceButton.setOnClickListener(v -> {
             Intent termsIntent = new Intent(MypageActivity.this, TermsOfServiceActivity.class);
             startActivity(termsIntent);
         });
 
-        // 비회원 로그인 여부 확인
+        // 비회원 로그인 여부 확인 및 설정
         SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
         String guestId = sharedPreferences.getString("guestId", null);
 
         if (guestId != null) {
-            isGuestUser = true;  // 비회원 로그인 상태
-            disableContactUsButton();  // 비회원일 때 문의하기 버튼 비활성화
+            isGuestUser = true;
+            disableContactUsButton();
         } else {
-            isGuestUser = false;  // 회원 로그인 상태
-            // 문의하기 버튼 클릭 리스너 추가 (비회원이 아닐 경우에만 활성화)
+            isGuestUser = false;
             contactUsButton.setOnClickListener(v -> {
                 Intent contactIntent = new Intent(MypageActivity.this, QnaActivity.class);
                 startActivity(contactIntent);
@@ -99,20 +98,19 @@ public class MypageActivity extends BaseActivity {
 
         profileImage.setOnClickListener(v -> openGallery());
 
-        // 닉네임 클릭 리스너 - 다이얼로그로 변경
+        // 닉네임 클릭 리스너
         nicknameTextView.setOnClickListener(v -> showEditDialog("닉네임 변경", nicknameTextView));
 
         // 공통 하단 네비게이션 설정
         setupFooterNavigation();
 
-        // SharedPreferences에서 사용자 정보 로드
+        // 사용자 정보 로드
         loadUserInfo();
     }
 
-    // 비회원일 때 문의하기 버튼 비활성화
     private void disableContactUsButton() {
-        contactUsButton.setEnabled(false);  // 버튼 비활성화
-        contactUsButton.setAlpha(0.5f);  // 버튼을 회색으로 표시 (비활성화된 느낌)
+        contactUsButton.setEnabled(false);
+        contactUsButton.setAlpha(0.5f);
         contactUsButton.setOnClickListener(v -> {
             Toast.makeText(MypageActivity.this, "비회원은 문의하기 기능을 사용할 수 없습니다.", Toast.LENGTH_SHORT).show();
         });
@@ -123,13 +121,16 @@ public class MypageActivity extends BaseActivity {
         String userName = sharedPreferences.getString("userName", null);
         String guestId = sharedPreferences.getString("guestId", null);
 
-        // 사용자 이름이나 guestId가 있는 경우 닉네임으로 설정
+        // 디버그 로그
+        Log.d("SharedPreferences", "userName: " + userName);
+        Log.d("SharedPreferences", "guestId: " + guestId);
+
         if (guestId != null) {
-            nicknameTextView.setText(guestId);  // guestId 표시
+            nicknameTextView.setText(guestId);
         } else if (userName != null) {
-            nicknameTextView.setText(userName);  // 로그인된 사용자 이름 표시
+            nicknameTextView.setText(userName);
         } else {
-            nicknameTextView.setText("Unknown User");  // 기본값
+            nicknameTextView.setText("Unknown User");
         }
     }
 
@@ -165,17 +166,23 @@ public class MypageActivity extends BaseActivity {
                         String newText = input.getText().toString();
                         if (!newText.isEmpty()) {
                             textViewToEdit.setText(newText);
+
+                            // 닉네임 변경 시 SharedPreferences와 DB 업데이트
                             saveNickname(newText);
-                            Toast.makeText(MypageActivity.this, title + "이(가) 변경되었습니다.", Toast.LENGTH_SHORT).show();
+                            dbHelper.updateUserName(getCurrentUserEmail(), newText);
+                            Toast.makeText(MypageActivity.this, "닉네임이 변경되었습니다.", Toast.LENGTH_SHORT).show();
                         } else {
                             Toast.makeText(MypageActivity.this, "입력 값이 비어 있습니다.", Toast.LENGTH_SHORT).show();
                         }
                     })
                     .setNegativeButton("취소", null)
                     .show();
-        } else {
-            Toast.makeText(MypageActivity.this, "잘못된 항목입니다.", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private String getCurrentUserEmail() {
+        SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+        return sharedPreferences.getString("userEmail", null);
     }
 
     private void saveNickname(String nickname) {
@@ -183,6 +190,11 @@ public class MypageActivity extends BaseActivity {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString("userName", nickname);
         editor.apply();
+
+        String userEmail = sharedPreferences.getString("userEmail", null);
+        if (userEmail != null) {
+            dbHelper.updateUserNameByEmail(userEmail, nickname);
+        }
     }
 
     private void logout() {
