@@ -17,6 +17,8 @@
     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
         android:maxSdkVersion="30"/>
 
+
+
     <!-- 미디어 파일 위치 접근 (API 29 이상) -->
     <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION"/>
 

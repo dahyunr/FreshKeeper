@@ -1,9 +1,8 @@
+<!-- menu/menu_comment_options.xml -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-
     <item
-        android:id="@+id/action_delete"
-        android:icon="@drawable/fk_vert"
-        android:title="삭제"
-        app:showAsAction="ifRoom" />
+        android:id="@+id/action_delete_post"
+        android:title="글 삭제하기"
+        app:showAsAction="never" />
 </menu>

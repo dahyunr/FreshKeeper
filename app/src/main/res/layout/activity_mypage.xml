@@ -49,8 +49,10 @@
                         android:id="@+id/profile_image"
                         android:layout_width="65dp"
                         android:layout_height="65dp"
-                        android:alpha="0.4"
-                        android:src="@drawable/fk_mmm"/>
+                        android:src="@drawable/fk_mmm"
+                        android:alpha="0.5"
+                        android:contentDescription="프로필 이미지" />
+
 
                     <LinearLayout
                         android:layout_width="0dp"

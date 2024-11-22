@@ -42,6 +42,25 @@ public class CommentActivity extends BaseActivity {
         // 데이터베이스 초기화
         dbHelper = DatabaseHelper.getInstance(this);
 
+        // 데이터 변경 리스너 설정
+        // 데이터 변경 리스너 설정 부분
+        dbHelper.setOnDatabaseChangeListener(new DatabaseHelper.OnDatabaseChangeListener() {
+            @Override
+            public void onPostAdded() {
+                // 필요하다면 게시글 추가 시 처리할 코드 작성
+            }
+
+            @Override
+            public void onCommentAdded() {
+                runOnUiThread(() -> {
+                    if (postId != -1) {
+                        loadComments(postId); // 댓글이 추가되었을 때 댓글을 다시 불러옵니다.
+                    }
+                });
+            }
+        });
+
+
         // UI 초기화
         initializeUI();
 

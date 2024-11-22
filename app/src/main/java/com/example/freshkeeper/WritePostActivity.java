@@ -86,6 +86,9 @@ public class WritePostActivity extends BaseActivity {
             return;
         }
 
+        // 버튼 중복 클릭 방지
+        saveButton.setEnabled(false);
+
         // 이미지 URI 리스트 변환
         List<String> imageUrisAsString = new ArrayList<>();
         if (imageUris != null) {
@@ -173,6 +176,12 @@ public class WritePostActivity extends BaseActivity {
         );
 
         // 데이터베이스에 저장
+        if (dbHelper.isPostExists(title)) { // 중복 체크
+            Toast.makeText(this, "이미 동일한 제목의 게시물이 존재합니다.", Toast.LENGTH_SHORT).show();
+            saveButton.setEnabled(true); // 버튼 다시 활성화
+            return;
+        }
+
         long postId = dbHelper.addCommunityPost(post);
         if (postId != -1) {
             Log.d("WritePostActivity", "게시글 저장 성공. ID: " + postId);
@@ -185,6 +194,7 @@ public class WritePostActivity extends BaseActivity {
         } else {
             Log.e("WritePostActivity", "게시글 저장 실패.");
             Toast.makeText(this, "게시글 저장에 실패했습니다.", Toast.LENGTH_SHORT).show();
+            saveButton.setEnabled(true); // 버튼 다시 활성화
         }
     }
 }

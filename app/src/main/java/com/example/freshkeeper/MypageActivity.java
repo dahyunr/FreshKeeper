@@ -3,11 +3,10 @@ package com.example.freshkeeper;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.util.Log;
-import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -23,17 +22,19 @@ import java.io.IOException;
 public class MypageActivity extends BaseActivity {
 
     private static final int PICK_IMAGE = 1;
+    private static final String PROFILE_IMAGE_KEY = "profileImagePath";
+
     private ImageView profileImage;
     private TextView nicknameTextView;
     private TextView notificationSettingsTextView;
-    private TextView contactUsButton;  // 문의하기 버튼
-    private TextView faqTextView;      // 자주 묻는 질문 버튼
-    private TextView noticeButton;    // 공지사항 버튼
-    private TextView logoutTextView;  // 로그아웃 버튼
-    private TextView privacyPolicyButton;  // 개인정보 처리방침 버튼
-    private TextView termsOfServiceButton; // 이용약관 버튼
+    private TextView contactUsButton;
+    private TextView faqTextView;
+    private TextView noticeButton;
+    private TextView logoutTextView;
+    private TextView privacyPolicyButton;
+    private TextView termsOfServiceButton;
     private DatabaseHelper dbHelper;
-    private boolean isGuestUser;  // 비회원 여부 체크 변수
+    private boolean isGuestUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,47 +55,44 @@ public class MypageActivity extends BaseActivity {
         privacyPolicyButton = findViewById(R.id.button_privacy_policy);
         termsOfServiceButton = findViewById(R.id.button_terms_of_service);
 
-        // 로그아웃 클릭 리스너
+        // 기본 프로필 아이콘에 alpha 적용
+        profileImage.setAlpha(0.5f);
+
+        // 저장된 프로필 이미지 로드
+        loadProfileImage();
+
+        // 로그아웃 버튼 클릭 리스너
         logoutTextView.setOnClickListener(v -> logout());
 
-        // "자주 묻는 질문" 클릭 리스너
+        // "자주 묻는 질문" 버튼 클릭 리스너
         faqTextView.setOnClickListener(v -> {
             Intent faqIntent = new Intent(MypageActivity.this, FAQActivity.class);
             startActivity(faqIntent);
         });
 
-        // 공지사항 클릭 리스너
+        // 공지사항 버튼 클릭 리스너
         noticeButton.setOnClickListener(v -> {
             Intent noticeIntent = new Intent(MypageActivity.this, NoticeActivity.class);
             startActivity(noticeIntent);
         });
 
-        // 개인정보 처리방침 클릭 리스너
+        // 개인정보 처리방침 버튼 클릭 리스너
         privacyPolicyButton.setOnClickListener(v -> {
             Intent privacyPolicyIntent = new Intent(MypageActivity.this, PrivacyPolicyActivity.class);
             startActivity(privacyPolicyIntent);
         });
 
-        // 이용약관 클릭 리스너
+        // 이용약관 버튼 클릭 리스너
         termsOfServiceButton.setOnClickListener(v -> {
             Intent termsIntent = new Intent(MypageActivity.this, TermsOfServiceActivity.class);
             startActivity(termsIntent);
         });
 
-        // 비회원 로그인 여부 확인 및 설정
-        SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
-        String guestId = sharedPreferences.getString("guestId", null);
-
-        if (guestId != null) {
-            isGuestUser = true;
-            disableContactUsButton();
-        } else {
-            isGuestUser = false;
-            contactUsButton.setOnClickListener(v -> {
-                Intent contactIntent = new Intent(MypageActivity.this, QnaActivity.class);
-                startActivity(contactIntent);
-            });
-        }
+        // 알림 설정 버튼 클릭 리스너
+        notificationSettingsTextView.setOnClickListener(v -> {
+            Intent notificationIntent = new Intent(MypageActivity.this, NotificationSettingsActivity.class);
+            startActivity(notificationIntent);
+        });
 
         profileImage.setOnClickListener(v -> openGallery());
 
@@ -106,32 +104,6 @@ public class MypageActivity extends BaseActivity {
 
         // 사용자 정보 로드
         loadUserInfo();
-    }
-
-    private void disableContactUsButton() {
-        contactUsButton.setEnabled(false);
-        contactUsButton.setAlpha(0.5f);
-        contactUsButton.setOnClickListener(v -> {
-            Toast.makeText(MypageActivity.this, "비회원은 문의하기 기능을 사용할 수 없습니다.", Toast.LENGTH_SHORT).show();
-        });
-    }
-
-    private void loadUserInfo() {
-        SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
-        String userName = sharedPreferences.getString("userName", null);
-        String guestId = sharedPreferences.getString("guestId", null);
-
-        // 디버그 로그
-        Log.d("SharedPreferences", "userName: " + userName);
-        Log.d("SharedPreferences", "guestId: " + guestId);
-
-        if (guestId != null) {
-            nicknameTextView.setText(guestId);
-        } else if (userName != null) {
-            nicknameTextView.setText(userName);
-        } else {
-            nicknameTextView.setText("Unknown User");
-        }
     }
 
     private void openGallery() {
@@ -147,10 +119,55 @@ public class MypageActivity extends BaseActivity {
             try {
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
                 profileImage.setImageBitmap(bitmap);
+
+                // 갤러리에서 이미지를 불러온 후 alpha를 완전히 불투명하게 설정
+                profileImage.setAlpha(1.0f);
+
+                // 이미지 경로를 SharedPreferences에 저장
+                saveProfileImage(imageUri.toString());
             } catch (IOException e) {
                 e.printStackTrace();
                 Toast.makeText(this, "이미지를 불러오는데 실패했습니다.", Toast.LENGTH_SHORT).show();
             }
+        }
+    }
+
+    private void saveProfileImage(String imagePath) {
+        SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(PROFILE_IMAGE_KEY, imagePath);
+        editor.apply();
+    }
+
+    private void loadProfileImage() {
+        SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+        String imagePath = sharedPreferences.getString(PROFILE_IMAGE_KEY, null);
+
+        if (imagePath != null) {
+            Uri imageUri = Uri.parse(imagePath);
+            try {
+                Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
+                profileImage.setImageBitmap(bitmap);
+                profileImage.setAlpha(1.0f); // 불투명 설정
+            } catch (IOException e) {
+                e.printStackTrace();
+                Toast.makeText(this, "프로필 이미지를 불러오는데 실패했습니다.", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private void loadUserInfo() {
+        SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+        String userName = sharedPreferences.getString("userName", null);
+        String guestId = sharedPreferences.getString("guestId", null);
+
+        // 사용자 이름이나 guestId가 있는 경우 닉네임으로 설정
+        if (guestId != null) {
+            nicknameTextView.setText(guestId); // guestId 표시
+        } else if (userName != null) {
+            nicknameTextView.setText(userName); // 로그인된 사용자 이름 표시
+        } else {
+            nicknameTextView.setText("Unknown User"); // 기본값
         }
     }
 
@@ -166,23 +183,17 @@ public class MypageActivity extends BaseActivity {
                         String newText = input.getText().toString();
                         if (!newText.isEmpty()) {
                             textViewToEdit.setText(newText);
-
-                            // 닉네임 변경 시 SharedPreferences와 DB 업데이트
                             saveNickname(newText);
-                            dbHelper.updateUserName(getCurrentUserEmail(), newText);
-                            Toast.makeText(MypageActivity.this, "닉네임이 변경되었습니다.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(MypageActivity.this, title + "이(가) 변경되었습니다.", Toast.LENGTH_SHORT).show();
                         } else {
                             Toast.makeText(MypageActivity.this, "입력 값이 비어 있습니다.", Toast.LENGTH_SHORT).show();
                         }
                     })
                     .setNegativeButton("취소", null)
                     .show();
+        } else {
+            Toast.makeText(MypageActivity.this, "잘못된 항목입니다.", Toast.LENGTH_SHORT).show();
         }
-    }
-
-    private String getCurrentUserEmail() {
-        SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
-        return sharedPreferences.getString("userEmail", null);
     }
 
     private void saveNickname(String nickname) {
@@ -190,11 +201,6 @@ public class MypageActivity extends BaseActivity {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString("userName", nickname);
         editor.apply();
-
-        String userEmail = sharedPreferences.getString("userEmail", null);
-        if (userEmail != null) {
-            dbHelper.updateUserNameByEmail(userEmail, nickname);
-        }
     }
 
     private void logout() {
@@ -202,10 +208,10 @@ public class MypageActivity extends BaseActivity {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putBoolean("isLoggedIn", false);
         editor.remove("userName");
-        editor.remove("guestId");
+        editor.remove(PROFILE_IMAGE_KEY); // 로그아웃 시 프로필 이미지도 삭제
         editor.apply();
 
-        Toast.makeText(MypageActivity.this, "로그아웃 되었습니다.", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "로그아웃 되었습니다.", Toast.LENGTH_SHORT).show();
 
         Intent intent = new Intent(MypageActivity.this, LoginActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

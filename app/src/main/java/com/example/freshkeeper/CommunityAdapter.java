@@ -117,30 +117,26 @@ public class CommunityAdapter extends RecyclerView.Adapter<CommunityAdapter.View
         }
 
         public void bind(CommunityPost post) {
-            // 제목 및 내용 기본값 처리
-            titleTextView.setText(post.getTitle() != null && !post.getTitle().trim().isEmpty() ? post.getTitle() : "제목 없음");
-            contentTextView.setText(post.getContent() != null && !post.getContent().trim().isEmpty() ? post.getContent() : "내용 없음");
+            titleTextView.setText(post.getTitle() != null ? post.getTitle() : "제목 없음");
+            contentTextView.setText(post.getContent() != null ? post.getContent() : "내용 없음");
 
-            // 좋아요 및 댓글 수 기본값 처리
             likeCountTextView.setText(String.valueOf(Math.max(post.getLikeCount(), 0)));
             commentCountTextView.setText(String.valueOf(Math.max(post.getCommentCount(), 0)));
 
-            // 이미지 로드 처리
             Glide.with(context).clear(imageView);
             String firstImageUri = post.getFirstImageUri();
             if (firstImageUri != null && !firstImageUri.trim().isEmpty()) {
-                imageView.setVisibility(View.VISIBLE); // 이미지가 있으면 보이게 처리
+                imageView.setVisibility(View.VISIBLE);
                 Glide.with(context)
                         .load(Uri.parse(firstImageUri))
                         .placeholder(R.drawable.fk_mmm)
                         .error(R.drawable.fk_mmm)
-                        .fitCenter() // 이미지 크기 조정
+                        .fitCenter()
                         .into(imageView);
             } else {
-                imageView.setVisibility(View.GONE); // 이미지가 없으면 숨김 처리
+                imageView.setVisibility(View.GONE);
             }
 
-            // 좋아요 상태에 따른 아이콘 설정
             heartIcon.setImageResource(post.isLiked() ? R.drawable.fk_heartfff : R.drawable.fk_heart);
         }
 
@@ -148,10 +144,8 @@ public class CommunityAdapter extends RecyclerView.Adapter<CommunityAdapter.View
             int position = getAdapterPosition();
             if (position != RecyclerView.NO_POSITION && onItemClickListener != null && position < postList.size()) {
                 CommunityPost clickedPost = postList.get(position);
-                Log.d("CommunityAdapter", "Item clicked. Position: " + position + ", Title: " + clickedPost.getTitle());
                 onItemClickListener.onItemClick(clickedPost);
 
-                // 상세 보기 Intent 처리
                 Intent intent = new Intent(itemView.getContext(), CommentActivity.class);
                 intent.putExtra("postId", clickedPost.getId());
                 intent.putExtra("postTitle", clickedPost.getTitle());
@@ -160,15 +154,12 @@ public class CommunityAdapter extends RecyclerView.Adapter<CommunityAdapter.View
                 intent.putExtra("postAuthorIcon", clickedPost.getAuthorIcon());
                 intent.putExtra("postImageUri", clickedPost.getFirstImageUri());
                 itemView.getContext().startActivity(intent);
-            } else {
-                Log.e("CommunityAdapter", "Invalid item click. Position: " + position);
             }
         }
 
         private void onHeartClick(View view) {
             int position = getAdapterPosition();
             if (position == RecyclerView.NO_POSITION || position >= postList.size()) {
-                Log.e("CommunityAdapter", "Invalid heart click. Position: " + position);
                 return;
             }
             CommunityPost post = postList.get(position);
@@ -176,8 +167,6 @@ public class CommunityAdapter extends RecyclerView.Adapter<CommunityAdapter.View
             post.setLiked(isLiked);
             post.setLikeCount(isLiked ? post.getLikeCount() + 1 : Math.max(post.getLikeCount() - 1, 0));
             notifyItemChanged(position);
-
-            Log.d("CommunityAdapter", "Heart icon clicked. Post ID: " + post.getId() + ", Liked: " + isLiked);
         }
     }
 }
