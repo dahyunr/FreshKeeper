@@ -31,88 +31,87 @@
             android:layout_marginEnd="8dp" />
     </RelativeLayout>
 
-    <!-- 게시글 제목 -->
-    <TextView
-        android:id="@+id/postTitle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="제목 없음"
-        android:textSize="22sp"
-        android:textStyle="bold"
-        android:textColor="#000000"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="4dp" />
-
-    <!-- 작성자 정보 -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:layout_marginBottom="8dp">
-
-        <!-- 작성자 아이콘 -->
-        <ImageView
-            android:id="@+id/postAuthorIcon"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginEnd="8dp"
-            android:contentDescription="@string/author_icon_desc"
-            android:src="@drawable/fk_mmm"
-            android:scaleType="centerCrop"
-            android:background="#ffffff" />
-
-        <!-- 작성자 닉네임 -->
-        <TextView
-            android:id="@+id/postAuthor"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="익명 사용자"
-            android:textSize="16sp"
-            android:textColor="#757575" />
-    </LinearLayout>
-
-    <!-- 게시글 이미지 -->
-    <ImageView
-        android:id="@+id/postImage"
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:scaleType="centerCrop"
-        android:visibility="gone"
-        android:layout_marginBottom="8dp"
-        android:contentDescription="@string/post_image_desc" />
-
-    <!-- 게시글 내용 -->
-    <TextView
-        android:id="@+id/postContent"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="내용 없음"
-        android:textSize="16sp"
-        android:textColor="#000000"
-        android:layout_marginBottom="16dp" />
-
-    <!-- 댓글 목록 -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/commentRecyclerView"
+    <!-- 콘텐츠와 댓글을 감싸는 NestedScrollView -->
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:layout_marginBottom="8dp"
-        android:overScrollMode="always" />
+        android:fillViewport="true">
 
-    <!-- 댓글이 없습니다 텍스트 -->
-    <TextView
-        android:id="@+id/noCommentsTextView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="댓글이 없습니다."
-        android:textSize="16sp"
-        android:textColor="#757575"
-        android:visibility="gone"
-        android:gravity="center"
-        android:padding="8dp"
-        android:layout_marginBottom="8dp" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- 게시글 제목 -->
+            <TextView
+                android:id="@+id/postTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="제목 없음"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:textColor="#000000"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="4dp" />
+
+            <!-- 작성자 정보 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="8dp">
+
+                <!-- 작성자 아이콘 -->
+                <ImageView
+                    android:id="@+id/postAuthorIcon"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginEnd="8dp"
+                    android:contentDescription="@string/author_icon_desc"
+                    android:src="@drawable/fk_mmm"
+                    android:scaleType="centerCrop"
+                    android:background="#ffffff" />
+
+                <!-- 작성자 닉네임 -->
+                <TextView
+                    android:id="@+id/postAuthor"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="익명 사용자"
+                    android:textSize="16sp"
+                    android:textColor="#757575" />
+            </LinearLayout>
+
+            <!-- 게시글 이미지 -->
+            <ImageView
+                android:id="@+id/postImage"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:scaleType="centerCrop"
+                android:visibility="gone"
+                android:layout_marginBottom="8dp"
+                android:contentDescription="@string/post_image_desc" />
+
+            <!-- 게시글 내용 -->
+            <TextView
+                android:id="@+id/postContent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="내용 없음"
+                android:textSize="16sp"
+                android:textColor="#000000"
+                android:layout_marginBottom="16dp" />
+
+            <!-- 댓글 목록 -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/commentRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:overScrollMode="always" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 
     <!-- 댓글 입력 -->
     <LinearLayout

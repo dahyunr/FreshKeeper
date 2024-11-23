@@ -31,7 +31,7 @@ public class CommentActivity extends BaseActivity {
     private DatabaseHelper dbHelper;
     private EditText commentInput;
     private ImageView sendButton, backButton, postImage, postAuthorIcon, fkVertIcon;
-    private TextView postTitle, postAuthor, postContent, noCommentsTextView;
+    private TextView postTitle, postAuthor, postContent;
     private SharedPreferences sharedPreferences;
     private int postId;
     private Set<Integer> likedComments = new HashSet<>(); // 초기화 추가
@@ -70,8 +70,6 @@ public class CommentActivity extends BaseActivity {
                         Log.e("CommentActivity", "commentAdapter가 초기화되지 않음");
                     }
 
-                    // 댓글 없음 텍스트 처리
-                    noCommentsTextView.setVisibility(commentList.isEmpty() ? View.VISIBLE : View.GONE);
                 });
             }
         });
@@ -107,7 +105,6 @@ public class CommentActivity extends BaseActivity {
         postAuthorIcon = findViewById(R.id.postAuthorIcon);
         postImage = findViewById(R.id.postImage);
         commentRecyclerView = findViewById(R.id.commentRecyclerView);
-        noCommentsTextView = findViewById(R.id.noCommentsTextView);
         commentInput = findViewById(R.id.comment_input);
         sendButton = findViewById(R.id.send_button);
         backButton = findViewById(R.id.back_button);
@@ -194,8 +191,6 @@ public class CommentActivity extends BaseActivity {
         } else {
             commentAdapter.updateCommentList(commentList);
         }
-
-        noCommentsTextView.setVisibility(commentList.isEmpty() ? View.VISIBLE : View.GONE);
     }
 
     /**
