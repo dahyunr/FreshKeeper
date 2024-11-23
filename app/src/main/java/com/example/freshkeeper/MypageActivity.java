@@ -27,7 +27,7 @@ public class MypageActivity extends BaseActivity {
     private ImageView profileImage;
     private TextView nicknameTextView;
     private TextView notificationSettingsTextView;
-    private TextView contactUsButton;
+    private TextView contactUsButton;  // 문의하기 버튼
     private TextView faqTextView;
     private TextView noticeButton;
     private TextView logoutTextView;
@@ -48,7 +48,7 @@ public class MypageActivity extends BaseActivity {
         profileImage = findViewById(R.id.profile_image);
         nicknameTextView = findViewById(R.id.profile_nickname);
         notificationSettingsTextView = findViewById(R.id.notification_settings);
-        contactUsButton = findViewById(R.id.button_contact_us);
+        contactUsButton = findViewById(R.id.button_contact_us);  // 문의하기 버튼 초기화
         faqTextView = findViewById(R.id.button_faq);
         noticeButton = findViewById(R.id.button_notice);
         logoutTextView = findViewById(R.id.logout);
@@ -63,6 +63,12 @@ public class MypageActivity extends BaseActivity {
 
         // 로그아웃 버튼 클릭 리스너
         logoutTextView.setOnClickListener(v -> logout());
+
+        // 문의하기 버튼 클릭 리스너 추가
+        contactUsButton.setOnClickListener(v -> {
+            Intent intent = new Intent(MypageActivity.this, QnaActivity.class);
+            startActivity(intent);
+        });
 
         // "자주 묻는 질문" 버튼 클릭 리스너
         faqTextView.setOnClickListener(v -> {
