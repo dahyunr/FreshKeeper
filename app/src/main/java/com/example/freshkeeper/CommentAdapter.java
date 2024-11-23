@@ -55,16 +55,15 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
 
             @Override
             public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
-                Comment oldComment = commentList.get(oldItemPosition);
-                Comment newComment = newCommentList.get(newItemPosition);
-                return oldComment.equals(newComment); // equals()를 사용하여 내용 비교
+                return commentList.get(oldItemPosition).equals(newCommentList.get(newItemPosition));
             }
         });
 
-        this.commentList.clear();
-        this.commentList.addAll(newCommentList);
+        commentList.clear();
+        commentList.addAll(newCommentList);
         diffResult.dispatchUpdatesTo(this); // RecyclerView 업데이트
     }
+
 
     // ViewHolder 생성
     @NonNull
@@ -113,6 +112,16 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
 
         // 댓글 데이터 바인딩
         void bind(Comment comment, String currentUserId) {
+
+            commentTextView.setText(comment.getContent()); // 댓글 내용을 설정
+            commenterNameTextView.setText(comment.getCommenterName()); // 작성자 이름 설정
+
+            // 아이콘 설정 (기본값 처리 포함)
+            Glide.with(itemView.getContext())
+                    .load(comment.getCommenterIcon())
+                    .placeholder(R.drawable.fk_mmm)
+                    .into(commenterIconImageView);
+
             // AtomicBoolean으로 좋아요 상태 관리
             AtomicBoolean isLiked = new AtomicBoolean(
                     DatabaseHelper.getInstance(itemView.getContext()).isCommentLikedByUser(comment.getId(), currentUserId)

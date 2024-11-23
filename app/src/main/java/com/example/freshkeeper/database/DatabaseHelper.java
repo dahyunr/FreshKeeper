@@ -21,7 +21,7 @@ import java.util.List;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "FreshKeeper.db";
-    private static final int DATABASE_VERSION = 24; // 기존 22에서 23으로 업데이트
+    private static final int DATABASE_VERSION = 25; // 기존 22에서 23으로 업데이트
     private static final String USERS_TABLE_NAME = "users";
     private static final String USER_COLUMN_ID = "user_id";
     private static final String USER_COLUMN_NAME = "user_name";
@@ -167,7 +167,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        if (oldVersion < 23) { // 버전 23 이하에서만 실행
+        if (oldVersion < 24) { // 버전 23 이하에서만 실행
             try {
                 // comments 테이블 수정
                 db.execSQL("ALTER TABLE comments ADD COLUMN commenter_name TEXT;");
@@ -647,7 +647,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void addComment(Comment comment) {
         SQLiteDatabase db = getDatabase();
         db.beginTransaction();
-        Log.d("DatabaseHelper", "notifyCommentAdded 호출됨");
 
         try {
             ContentValues values = new ContentValues();
@@ -665,8 +664,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 // 댓글 수 업데이트
                 updateCommentCount(comment.getPostId());
 
-                // **리스너 호출로 실시간 반영**
-                notifyCommentAdded();  // 이 코드가 실행되는지 확인
+                // 실시간 반영
+                notifyCommentAdded();  // **이 코드가 반드시 호출되어야 함!**
             } else {
                 Log.e("DatabaseHelper", "댓글 삽입 실패");
             }
@@ -677,6 +676,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.endTransaction();
         }
     }
+
 
 
     // 댓글 추가 이벤트 트리거 메서드
@@ -1063,4 +1063,5 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
         return isLiked;
     }
+
 }

@@ -52,7 +52,7 @@ public class CommentActivity extends BaseActivity {
         dbHelper.setOnDatabaseChangeListener(new DatabaseHelper.OnDatabaseChangeListener() {
             @Override
             public void onPostAdded() {
-                // 게시글 관련 이벤트 처리
+                // 게시글 추가 시 동작
             }
 
             @Override
@@ -65,12 +65,12 @@ public class CommentActivity extends BaseActivity {
                     commentList.addAll(dbHelper.getCommentsByPostId(postId));
 
                     if (commentAdapter != null) {
-                        commentAdapter.updateCommentList(commentList); // DiffUtil 사용
+                        commentAdapter.updateCommentList(commentList);
                     } else {
                         Log.e("CommentActivity", "commentAdapter가 초기화되지 않음");
                     }
 
-                    // '댓글 없음' 텍스트 처리
+                    // 댓글 없음 텍스트 처리
                     noCommentsTextView.setVisibility(commentList.isEmpty() ? View.VISIBLE : View.GONE);
                 });
             }
@@ -140,18 +140,19 @@ public class CommentActivity extends BaseActivity {
         sendButton.setOnClickListener(view -> {
             String commentText = commentInput.getText().toString().trim();
             if (!TextUtils.isEmpty(commentText)) {
+                // 새로운 댓글 생성
                 Comment newComment = new Comment(commentText, -1, postId, 0, "익명 사용자", "icon_uri");
+
+                // 댓글 삽입 (실시간 반영은 DatabaseHelper에서 처리됨)
                 dbHelper.addComment(newComment);
 
                 // 입력창 초기화
                 commentInput.setText("");
-
-                // 댓글 강제 로드
-                loadComments(postId);
             } else {
                 Toast.makeText(this, "댓글 내용을 입력하세요.", Toast.LENGTH_SHORT).show();
             }
         });
+
     }
 
     /**
