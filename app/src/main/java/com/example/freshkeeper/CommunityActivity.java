@@ -165,13 +165,14 @@ public class CommunityActivity extends BaseActivity {
             communityAdapter.notifyDataSetChanged();
 
             // 게시글 클릭 시 댓글 페이지로 이동하는 리스너 설정
+            // CommunityActivity.java
             communityAdapter.setOnItemClickListener(post -> {
                 Intent intent = new Intent(CommunityActivity.this, CommentActivity.class);
                 intent.putExtra("postId", post.getId());
                 intent.putExtra("postTitle", post.getTitle());
                 intent.putExtra("postContent", post.getContent());
                 intent.putExtra("postAuthor", post.getAuthorName());
-                intent.putExtra("postImage", post.getFirstImageUri());
+                intent.putExtra("postImageUri", post.getFirstImageUri());
                 startActivity(intent);
             });
         } else {

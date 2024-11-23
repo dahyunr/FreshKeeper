@@ -144,16 +144,11 @@ public class CommunityAdapter extends RecyclerView.Adapter<CommunityAdapter.View
             int position = getAdapterPosition();
             if (position != RecyclerView.NO_POSITION && onItemClickListener != null && position < postList.size()) {
                 CommunityPost clickedPost = postList.get(position);
-                onItemClickListener.onItemClick(clickedPost);
 
-                Intent intent = new Intent(itemView.getContext(), CommentActivity.class);
-                intent.putExtra("postId", clickedPost.getId());
-                intent.putExtra("postTitle", clickedPost.getTitle());
-                intent.putExtra("postContent", clickedPost.getContent());
-                intent.putExtra("postAuthor", clickedPost.getAuthorName());
-                intent.putExtra("postAuthorIcon", clickedPost.getAuthorIcon());
-                intent.putExtra("postImageUri", clickedPost.getFirstImageUri());
-                itemView.getContext().startActivity(intent);
+                // 중복 호출 방지
+                if (onItemClickListener != null) {
+                    onItemClickListener.onItemClick(clickedPost);
+                }
             }
         }
 
