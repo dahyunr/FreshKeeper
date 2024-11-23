@@ -141,7 +141,7 @@ public class CommentActivity extends BaseActivity {
             String commentText = commentInput.getText().toString().trim();
             if (!TextUtils.isEmpty(commentText)) {
                 // 새로운 댓글 생성
-                Comment newComment = new Comment(commentText, -1, postId, 0, "익명 사용자", "icon_uri");
+                Comment newComment = new Comment(commentText, -1, postId, 0, "익명", "icon_uri");
 
                 // 댓글 삽입 (실시간 반영은 DatabaseHelper에서 처리됨)
                 dbHelper.addComment(newComment);
@@ -161,7 +161,7 @@ public class CommentActivity extends BaseActivity {
     private void updatePostUI(String title, String content, String authorName, String authorIcon, String imageUri) {
         postTitle.setText(!TextUtils.isEmpty(title) ? title : "제목 없음");
         postContent.setText(!TextUtils.isEmpty(content) ? content : "내용 없음");
-        postAuthor.setText(!TextUtils.isEmpty(authorName) ? authorName : "익명 사용자");
+        postAuthor.setText(!TextUtils.isEmpty(authorName) ? authorName : "익명");
 
         if (!TextUtils.isEmpty(authorIcon)) {
             Glide.with(this).load(authorIcon).placeholder(R.drawable.fk_mmm).into(postAuthorIcon);

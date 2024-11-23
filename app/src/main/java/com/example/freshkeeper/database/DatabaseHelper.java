@@ -461,7 +461,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         likeCount,
                         commentCount,
                         false,
-                        authorName != null && !authorName.isEmpty() ? authorName : "익명 사용자",
+                        authorName != null && !authorName.isEmpty() ? authorName : "익명",
                         authorIcon != null && !authorIcon.isEmpty() ? authorIcon : "fk_mmm"
                 );
                 postList.add(post);
@@ -497,7 +497,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     // 댓글 작성자 이름 가져오기 (익명 처리 포함)
                     String commenterName = cursor.getString(cursor.getColumnIndexOrThrow("commenter_name"));
                     if (commenterName == null || commenterName.isEmpty()) {
-                        commenterName = "익명 사용자";
+                        commenterName = "익명";
                     }
 
                     // 댓글 작성자 아이콘 가져오기 (기본 아이콘 처리 포함)
@@ -566,7 +566,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
             String authorName = cursor.getString(cursor.getColumnIndexOrThrow("author_name"));
             if (authorName == null || authorName.isEmpty()) {
-                authorName = "익명 사용자";
+                authorName = "익명";
             }
 
             String authorIcon = cursor.getString(cursor.getColumnIndexOrThrow("author_icon"));
@@ -583,7 +583,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public String getNicknameByUserId(String userId) {
         SQLiteDatabase db = getReadableDatabase();
-        String nickname = "익명 사용자"; // 기본 닉네임
+        String nickname = "익명"; // 기본 닉네임
         Cursor cursor = db.rawQuery("SELECT user_name FROM users WHERE user_id = ?", new String[]{userId});
         if (cursor.moveToFirst()) {
             nickname = cursor.getString(cursor.getColumnIndexOrThrow("user_name"));
@@ -721,7 +721,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                             cursor.getInt(cursor.getColumnIndexOrThrow(POST_COLUMN_LIKE_COUNT)),
                             cursor.getInt(cursor.getColumnIndexOrThrow(POST_COLUMN_COMMENT_COUNT)),
                             false, // 기본 좋아요 상태
-                            "익명 사용자", // 필요시 수정
+                            "익명", // 필요시 수정
                             "fk_mmm" // 필요시 수정
                     );
 
@@ -961,7 +961,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 likeCount,
                 commentCount,
                 false,
-                authorName != null ? authorName : "익명 사용자",
+                authorName != null ? authorName : "익명",
                 authorIcon != null ? authorIcon : "fk_mmm"
         );
     }

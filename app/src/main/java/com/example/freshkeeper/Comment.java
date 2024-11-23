@@ -84,7 +84,7 @@ public class Comment implements Serializable {
     }
 
     public String getCommenterName() {
-        return commenterName != null ? commenterName : "익명 사용자";
+        return commenterName != null ? commenterName : "익명";
     }
 
     public void setCommenterName(String commenterName) {
