@@ -16,6 +16,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.content.SharedPreferences;
+
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -137,10 +139,19 @@ public class FkmainActivity extends BaseActivity {
             startActivity(intent);
         });
 
-        communityButton.setOnClickListener(v -> { // 커뮤니티 페이지로 이동하는 클릭 리스너 추가
-            Intent intent = new Intent(FkmainActivity.this, CommunityActivity.class);
-            startActivity(intent);
+        communityButton.setOnClickListener(v -> {
+            SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+            boolean isLoggedIn = sharedPreferences.getBoolean("isLoggedIn", false);
+            boolean isGuest = sharedPreferences.getBoolean("isGuest", false);
+
+            if (isLoggedIn && !isGuest) {
+                Intent intent = new Intent(FkmainActivity.this, CommunityActivity.class);
+                startActivity(intent);
+            } else {
+                Toast.makeText(this, "회원만 이용 가능한 서비스입니다. 로그인 후 이용해주세요.", Toast.LENGTH_LONG).show();
+            }
         });
+
 
         adapter.setOnItemClickListener(position -> {
             Intent intent = new Intent(FkmainActivity.this, AddItemActivity.class);
