@@ -20,18 +20,7 @@
             android:contentDescription="@string/back_button_desc"
             android:layout_alignParentStart="true" />
 
-        <!-- 알림 아이콘 -->
-        <ImageView
-            android:id="@+id/notification_icon"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:src="@drawable/fk_notification"
-            android:contentDescription="@string/notification_icon_desc"
-            android:layout_alignParentEnd="true"
-            android:layout_marginEnd="50dp" />
-
         <!-- 메뉴 아이콘 -->
-        <!-- fk_vert 클릭 시 팝업 메뉴가 나타나는 아이콘 -->
         <ImageView
             android:id="@+id/fk_vert_icon"
             android:layout_width="32dp"
@@ -109,8 +98,21 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="8dp"
         android:overScrollMode="always" />
+
+    <!-- 댓글이 없습니다 텍스트 -->
+    <TextView
+        android:id="@+id/noCommentsTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="댓글이 없습니다."
+        android:textSize="16sp"
+        android:textColor="#757575"
+        android:visibility="gone"
+        android:gravity="center"
+        android:padding="8dp"
+        android:layout_marginBottom="8dp" />
 
     <!-- 댓글 입력 -->
     <LinearLayout
@@ -142,16 +144,5 @@
             android:src="@drawable/fk_send"
             android:contentDescription="@string/send_button_desc"
             android:padding="8dp" />
-
-        <TextView
-            android:id="@+id/noCommentsTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="댓글이 없습니다."
-            android:textSize="16sp"
-            android:textColor="#757575"
-            android:visibility="gone"
-            android:layout_gravity="center"
-            android:layout_marginBottom="16dp" />
     </LinearLayout>
 </LinearLayout>

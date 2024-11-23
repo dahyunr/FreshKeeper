@@ -464,62 +464,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return postList;
     }
 
-
-
-    // DatabaseHelper.java
-    public void addComment(Comment comment) {
-        SQLiteDatabase db = getDatabase();
-        db.beginTransaction(); // 트랜잭션 시작
-
-        try {
-            ContentValues values = new ContentValues();
-            values.put(COMMENT_COLUMN_CONTENT, comment.getContent());
-            values.put(COMMENT_COLUMN_USER_ID, comment.getUserId());
-            values.put(COMMENT_COLUMN_POST_ID, comment.getPostId());
-            values.put(COMMENT_COLUMN_LIKE_COUNT, comment.getLikeCount());
-
-            // 기본값 처리
-            String defaultName = comment.getCommenterName() != null && !comment.getCommenterName().isEmpty()
-                    ? comment.getCommenterName()
-                    : "익명 사용자";
-            String defaultIcon = comment.getCommenterIcon() != null && !comment.getCommenterIcon().isEmpty()
-                    ? comment.getCommenterIcon()
-                    : "fk_mmm";
-            values.put("commenter_name", defaultName);
-            values.put("commenter_icon", defaultIcon);
-
-            // 댓글 삽입
-            long rowId = db.insert(COMMENTS_TABLE_NAME, null, values);
-            if (rowId != -1) {
-                Log.d("DatabaseHelper", "댓글 삽입 성공: " + comment.getContent());
-                updateCommentCount(comment.getPostId()); // 댓글 수 업데이트
-                db.setTransactionSuccessful(); // 트랜잭션 성공으로 설정
-
-                // 실시간 변경 알림 호출 (댓글이 추가된 후에 실행)
-                if (onDatabaseChangeListener != null) {
-                    onDatabaseChangeListener.onCommentAdded(); // 댓글이 추가되었을 때 호출
-                }
-            } else {
-                Log.e("DatabaseHelper", "댓글 삽입 실패");
-            }
-        } catch (SQLException e) {
-            Log.e("DatabaseHelper", "댓글 삽입 오류: " + e.getMessage());
-        } finally {
-            db.endTransaction(); // 트랜잭션 종료
-        }
-    }
-
     public void setOnDatabaseChangeListener(OnDatabaseChangeListener listener) {
         this.onDatabaseChangeListener = listener;
     }
 
-
     private OnDatabaseChangeListener onDatabaseChangeListener;
-
-
-
-
-
     public List<Comment> getCommentsByPostId(int postId) {
         List<Comment> commentList = new ArrayList<>();
         SQLiteDatabase db = getReadableDatabase();
@@ -566,9 +515,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             }
         }
 
+        // **로깅 추가**
+        Log.d("DatabaseHelper", "댓글 목록 로드: " + commentList.size() + "개");
+
         return commentList;
     }
-
 
     // DatabaseHelper.java
     public CommunityPost getPostById(int postId) {
@@ -677,50 +628,48 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
         return exists;
     }
-
-    public void addComment(int postId, String commentContent, String authorName) {
+    // 댓글 삽입 메서드
+    public void addComment(Comment comment) {
         SQLiteDatabase db = getDatabase();
-        db.beginTransaction(); // 트랜잭션 시작
+        db.beginTransaction();
+        Log.d("DatabaseHelper", "notifyCommentAdded 호출됨");
 
         try {
             ContentValues values = new ContentValues();
-            values.put(COMMENT_COLUMN_CONTENT, commentContent);
-            values.put(COMMENT_COLUMN_USER_ID, authorName); // 사용자 ID를 넣으세요 (필요한 수정)
-            values.put(COMMENT_COLUMN_POST_ID, postId);
-            values.put(COMMENT_COLUMN_LIKE_COUNT, 0); // 초기 좋아요 수는 0으로 설정
+            values.put(COMMENT_COLUMN_CONTENT, comment.getContent());
+            values.put(COMMENT_COLUMN_USER_ID, comment.getUserId());
+            values.put(COMMENT_COLUMN_POST_ID, comment.getPostId());
+            values.put(COMMENT_COLUMN_LIKE_COUNT, comment.getLikeCount());
+            values.put("commenter_name", comment.getCommenterName());
+            values.put("commenter_icon", comment.getCommenterIcon());
 
-            // 기본값 처리
-            String defaultName = (authorName != null && !authorName.isEmpty()) ? authorName : "익명 사용자";
-            String defaultIcon = "fk_mmm"; // 기본 아이콘 경로를 설정하세요
-            values.put("commenter_name", defaultName);
-            values.put("commenter_icon", defaultIcon);
-
-            // 댓글 삽입
             long rowId = db.insert(COMMENTS_TABLE_NAME, null, values);
             if (rowId != -1) {
-                Log.d("DatabaseHelper", "댓글 삽입 성공: " + commentContent);
-                updateCommentCount(postId); // 댓글 수 업데이트
-                db.setTransactionSuccessful(); // 트랜잭션 성공으로 설정
+                Log.d("DatabaseHelper", "댓글 삽입 성공: " + comment.getContent());
 
-                // 실시간 변경 알림 호출 (댓글이 추가된 후에 실행)
-                notifyCommentAdded(); // 댓글 추가 알림 호출
+                // 댓글 수 업데이트
+                updateCommentCount(comment.getPostId());
+
+                // **리스너 호출로 실시간 반영**
+                notifyCommentAdded();  // 이 코드가 실행되는지 확인
             } else {
                 Log.e("DatabaseHelper", "댓글 삽입 실패");
             }
+            db.setTransactionSuccessful();
         } catch (SQLException e) {
             Log.e("DatabaseHelper", "댓글 삽입 오류: " + e.getMessage());
         } finally {
-            db.endTransaction(); // 트랜잭션 종료
+            db.endTransaction();
         }
     }
 
 
+    // 댓글 추가 이벤트 트리거 메서드
     private void notifyCommentAdded() {
         if (onDatabaseChangeListener != null) {
             onDatabaseChangeListener.onCommentAdded();
         }
     }
-
 
     public void updateCommentCount(int postId, int newCommentCount) {
         // 게시글의 댓글 수를 데이터베이스에 업데이트하는 로직 구현
@@ -1017,17 +966,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     // DatabaseHelper.java
 
-    // 특정 게시글 삭제 메서드
-    // 게시글 삭제 메서드
     public boolean deletePostById(int postId) {
         SQLiteDatabase db = getDatabase();
         boolean isDeleted = false;
 
         try {
             db.beginTransaction();
-            db.delete(COMMENTS_TABLE_NAME, "postId = ?", new String[]{String.valueOf(postId)});
-            int rowsAffected = db.delete(COMMUNITY_POSTS_TABLE_NAME, "post_id = ?", new String[]{String.valueOf(postId)});
+
+            // 해당 게시글의 댓글 먼저 삭제
+            db.delete(COMMENTS_TABLE_NAME, COMMENT_COLUMN_POST_ID + " = ?", new String[]{String.valueOf(postId)});
+
+            // 게시글 삭제
+            int rowsAffected = db.delete(COMMUNITY_POSTS_TABLE_NAME, POST_COLUMN_ID + " = ?", new String[]{String.valueOf(postId)});
             isDeleted = rowsAffected > 0;
+
             db.setTransactionSuccessful();
         } catch (Exception e) {
             Log.e("DatabaseHelper", "게시글 삭제 실패: " + e.getMessage());
