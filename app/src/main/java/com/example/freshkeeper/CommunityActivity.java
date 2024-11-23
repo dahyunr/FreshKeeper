@@ -79,8 +79,15 @@ public class CommunityActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        loadCommunityPosts(); // 삭제된 게시글 반영을 위해 리스트 새로 로드
+        String currentQuery = searchEditText.getText().toString().trim();
+        if (currentQuery.isEmpty()) {
+            loadCommunityPosts(); // 전체 게시글 로드
+        } else {
+            List<CommunityPost> filteredPosts = dbHelper.searchPosts(currentQuery);
+            communityAdapter.updateData(filteredPosts);
+        }
     }
+
 
     @Override
     protected void setupFooterNavigation() {
@@ -143,7 +150,17 @@ public class CommunityActivity extends BaseActivity {
         ImageView plusButton = findViewById(R.id.plus_button);
         SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
         boolean isLoggedIn = sharedPreferences.getBoolean("isLoggedIn", false);
-        boolean isGuest = sharedPreferences.getBoolean("isGuest", false); // 게스트 여부 확인
+        boolean isGuest = sharedPreferences.getBoolean("isGuest", false);
+
+        // 사용자 이름 가져오기 (게스트 여부에 따라)
+        String userEmail = sharedPreferences.getString("userEmail", null);
+        String userName = "게스트";
+
+        if (isLoggedIn && userEmail != null) {
+            userName = dbHelper.getUserNameByEmail(userEmail);
+        }
+
+        Log.d("CommunityActivity", "사용자 이름: " + userName);
 
         if (!isLoggedIn || isGuest) {
             plusButton.setEnabled(false);
@@ -156,6 +173,7 @@ public class CommunityActivity extends BaseActivity {
         }
     }
 
+
     private void setupSearchFunctionality() {
         searchEditText = findViewById(R.id.search_edit_text);
         searchEditText.addTextChangedListener(new TextWatcher() {
@@ -165,9 +183,10 @@ public class CommunityActivity extends BaseActivity {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (s.toString().trim().isEmpty()) {
-                    communityAdapter.updateData(postList);
+                    loadCommunityPosts(); // 검색어가 없으면 전체 게시글을 다시 로드
                 } else {
-                    filterPosts(s.toString());
+                    List<CommunityPost> filteredPosts = dbHelper.searchPosts(s.toString());
+                    communityAdapter.updateData(filteredPosts);
                 }
             }
 
@@ -175,6 +194,7 @@ public class CommunityActivity extends BaseActivity {
             public void afterTextChanged(Editable s) {}
         });
     }
+
 
     private void filterPosts(String query) {
         List<CommunityPost> filteredList = new ArrayList<>();
@@ -186,6 +206,7 @@ public class CommunityActivity extends BaseActivity {
         }
         communityAdapter.updateData(filteredList);
     }
+
 
     private void navigateTo(Class<?> activityClass) {
         Intent intent = new Intent(CommunityActivity.this, activityClass);

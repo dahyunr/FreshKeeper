@@ -235,7 +235,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String userName = null;
 
         Cursor cursor = db.query(USERS_TABLE_NAME,
-                new String[]{"user_name"}, // user_name 컬럼 포함
+                new String[]{USER_COLUMN_NAME}, // "user_name" 컬럼 포함
                 "email = ?",
                 new String[]{email},
                 null,
@@ -243,14 +243,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 null);
 
         if (cursor != null && cursor.moveToFirst()) {
-            int columnIndex = cursor.getColumnIndex("user_name");
-            if (columnIndex != -1) { // user_name 컬럼이 존재하는 경우
+            int columnIndex = cursor.getColumnIndex(USER_COLUMN_NAME);
+            if (columnIndex != -1) {
                 userName = cursor.getString(columnIndex);
             }
             cursor.close();
         }
         return userName;
     }
+
 
     // 사용자 비밀번호 업데이트 메서드
     public void updateUserPassword(String email, String newPassword) {
