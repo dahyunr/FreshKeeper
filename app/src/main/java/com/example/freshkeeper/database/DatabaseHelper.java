@@ -130,6 +130,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     "user_id TEXT NOT NULL, " +
                     "FOREIGN KEY(comment_id) REFERENCES comments(comment_id));";
 
+
+    private static final String POST_LIKES_TABLE_CREATE =
+            "CREATE TABLE IF NOT EXISTS post_likes (" +
+                    "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    "post_id INTEGER NOT NULL, " +
+                    "user_id TEXT NOT NULL, " +
+                    "UNIQUE(post_id, user_id), " + // 중복 좋아요 방지
+                    "FOREIGN KEY(post_id) REFERENCES community_posts(post_id));";
+
     private SQLiteDatabase database;
 
     public DatabaseHelper(Context context) {
@@ -155,7 +164,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return instance;
     }
 
-
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(USERS_TABLE_CREATE);
@@ -164,6 +172,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(COMMUNITY_POSTS_TABLE_CREATE);
         db.execSQL(COMMENTS_TABLE_CREATE);
         db.execSQL(COMMENT_LIKES_TABLE_CREATE);
+        db.execSQL(POST_LIKES_TABLE_CREATE);
     }
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -448,10 +457,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         ? Arrays.asList(imageUri.split(","))
                         : new ArrayList<>();
                 String userId = cursor.getString(cursor.getColumnIndexOrThrow("user_id"));
-                int likeCount = cursor.getInt(cursor.getColumnIndexOrThrow("like_count"));
-                int commentCount = cursor.getInt(cursor.getColumnIndexOrThrow("comment_count"));
                 String authorName = cursor.getString(cursor.getColumnIndexOrThrow("author_name"));
                 String authorIcon = cursor.getString(cursor.getColumnIndexOrThrow("author_icon"));
+
+                // 좋아요 수를 동적으로 계산
+                int likeCount = getLikeCount(id);
+
+                // 현재 사용자의 좋아요 상태 확인
+                boolean isLiked = isPostLikedByCurrentUser(id);
+
+                int commentCount = cursor.getInt(cursor.getColumnIndexOrThrow("comment_count"));
 
                 CommunityPost post = new CommunityPost(
                         id,
@@ -461,7 +476,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         userId,
                         likeCount,
                         commentCount,
-                        false,
+                        isLiked,
                         authorName != null && !authorName.isEmpty() ? authorName : "익명",
                         authorIcon != null && !authorIcon.isEmpty() ? authorIcon : "fk_mmm"
                 );
@@ -678,7 +693,49 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
+    public boolean isPostLikedByCurrentUser(int postId) {
+        SQLiteDatabase db = getReadableDatabase();
+        SharedPreferences prefs = context.getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
+        String currentUserId = prefs.getString("userId", "default_user_id");
 
+        String query = "SELECT COUNT(*) FROM post_likes WHERE post_id = ? AND user_id = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(postId), currentUserId});
+
+        boolean isLiked = false;
+        if (cursor.moveToFirst()) {
+            isLiked = cursor.getInt(0) > 0;
+        }
+        cursor.close();
+        return isLiked;
+    }
+
+    public void toggleLikeStatus(int postId, String userId) {
+        SQLiteDatabase db = getDatabase();
+        boolean isLiked = isPostLikedByUser(postId, userId);
+
+        try {
+            db.beginTransaction();
+
+            if (isLiked) {
+                // 좋아요 제거
+                db.delete("post_likes", "post_id = ? AND user_id = ?", new String[]{String.valueOf(postId), userId});
+                updateLikeCount(postId, false);
+            } else {
+                // 좋아요 추가
+                ContentValues values = new ContentValues();
+                values.put("post_id", postId);
+                values.put("user_id", userId);
+                db.insert("post_likes", null, values);
+                updateLikeCount(postId, true);
+            }
+
+            db.setTransactionSuccessful();
+        } catch (SQLException e) {
+            Log.e("DatabaseHelper", "좋아요 상태 토글 오류: " + e.getMessage());
+        } finally {
+            db.endTransaction();
+        }
+    }
 
     // 댓글 추가 이벤트 트리거 메서드
     private void notifyCommentAdded() {
@@ -1039,18 +1096,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public void updateLikeCount(int commentId, boolean isLiked) {
         SQLiteDatabase db = getDatabase();
-        ContentValues values = new ContentValues();
-        String columnName = isLiked ? "likeCount" : "likeCount";
 
-        // 좋아요 증가 또는 감소
-        if (isLiked) {
-            db.execSQL("UPDATE comments SET likeCount = likeCount + 1 WHERE comment_id = ?", new Object[]{commentId});
-        } else {
-            db.execSQL("UPDATE comments SET likeCount = likeCount - 1 WHERE comment_id = ?", new Object[]{commentId});
+        try {
+            if (isLiked) {
+                db.execSQL("UPDATE comments SET likeCount = likeCount + 1 WHERE comment_id = ?", new Object[]{commentId});
+            } else {
+                db.execSQL("UPDATE comments SET likeCount = CASE WHEN likeCount > 0 THEN likeCount - 1 ELSE 0 END WHERE comment_id = ?", new Object[]{commentId});
+            }
+
+            Log.d("DatabaseHelper", "댓글 ID: " + commentId + ", 좋아요 상태 업데이트: " + (isLiked ? "추가" : "취소"));
+        } catch (SQLException e) {
+            Log.e("DatabaseHelper", "좋아요 상태 업데이트 중 오류 발생: " + e.getMessage());
         }
-
-        Log.d("DatabaseHelper", "댓글 ID: " + commentId + ", 좋아요 상태 업데이트: " + (isLiked ? "추가" : "취소"));
     }
+
 
     public void updateCommentLike(int commentId, String userId, boolean isLiked) {
         SQLiteDatabase db = getDatabase();
@@ -1095,5 +1154,43 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
         return isLiked;
     }
+
+    public void updateLikeStatus(int postId, boolean isLiked, int likeCount) {
+        SQLiteDatabase db = getDatabase();
+        ContentValues values = new ContentValues();
+        values.put("like_count", likeCount);
+
+        // 좋아요 상태를 별도 테이블에 저장하거나 추가 컬럼 생성 가능
+        String query = "UPDATE community_posts SET like_count = ? WHERE post_id = ?";
+        db.execSQL(query, new Object[]{likeCount, postId});
+
+        Log.d("DatabaseHelper", "좋아요 상태 업데이트: postId=" + postId + ", likeCount=" + likeCount);
+    }
+
+    public boolean isPostLikedByUser(int postId, String userId) {
+        SQLiteDatabase db = getReadableDatabase();
+        String query = "SELECT COUNT(*) FROM post_likes WHERE post_id = ? AND user_id = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(postId), userId});
+
+        boolean isLiked = false;
+        if (cursor.moveToFirst()) {
+            isLiked = cursor.getInt(0) > 0;
+        }
+        cursor.close();
+        return isLiked;
+    }
+
+    public int getLikeCount(int postId) {
+        SQLiteDatabase db = getReadableDatabase();
+        String query = "SELECT COUNT(*) FROM post_likes WHERE post_id = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(postId)});
+        int likeCount = 0;
+        if (cursor.moveToFirst()) {
+            likeCount = cursor.getInt(0);
+        }
+        cursor.close();
+        return likeCount;
+    }
+
 
 }

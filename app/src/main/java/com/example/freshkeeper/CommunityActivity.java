@@ -79,15 +79,15 @@ public class CommunityActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        String currentQuery = searchEditText.getText().toString().trim();
-        if (currentQuery.isEmpty()) {
-            loadCommunityPosts(); // 전체 게시글 로드
-        } else {
-            List<CommunityPost> filteredPosts = dbHelper.searchPosts(currentQuery);
-            communityAdapter.updateData(filteredPosts);
-        }
+        loadPosts(); // 데이터 새로 불러오기
     }
 
+    // 게시물 불러오기 메서드
+    private void loadPosts() {
+        DatabaseHelper dbHelper = DatabaseHelper.getInstance(this);
+        postList = dbHelper.getAllCommunityPosts(); // 최신 데이터 가져오기
+        communityAdapter.updateData(postList); // RecyclerView에 갱신
+    }
 
     @Override
     protected void setupFooterNavigation() {

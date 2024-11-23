@@ -1,7 +1,7 @@
 package com.example.freshkeeper;
 
 import android.content.Context;
-import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.freshkeeper.database.DatabaseHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -137,7 +138,13 @@ public class CommunityAdapter extends RecyclerView.Adapter<CommunityAdapter.View
                 imageView.setVisibility(View.GONE);
             }
 
-            heartIcon.setImageResource(post.isLiked() ? R.drawable.fk_heartfff : R.drawable.fk_heart);
+            // 좋아요 상태 초기화
+            SharedPreferences prefs = context.getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
+            String currentUserId = prefs.getString("userId", "default_user_id");
+            DatabaseHelper dbHelper = DatabaseHelper.getInstance(context);
+            boolean isLiked = dbHelper.isPostLikedByUser(post.getId(), currentUserId);
+
+            heartIcon.setImageResource(isLiked ? R.drawable.fk_heartfff : R.drawable.fk_heart);
         }
 
         private void onItemClick() {
@@ -152,15 +159,23 @@ public class CommunityAdapter extends RecyclerView.Adapter<CommunityAdapter.View
             }
         }
 
-        private void onHeartClick(View view) {
+        private void onHeartClick(View v) {
             int position = getAdapterPosition();
-            if (position == RecyclerView.NO_POSITION || position >= postList.size()) {
-                return;
-            }
+            if (position == RecyclerView.NO_POSITION) return;
+
             CommunityPost post = postList.get(position);
-            boolean isLiked = !post.isLiked();
+
+            // 좋아요 상태 토글
+            SharedPreferences prefs = context.getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
+            String currentUserId = prefs.getString("userId", "default_user_id");
+
+            DatabaseHelper dbHelper = DatabaseHelper.getInstance(context);
+            boolean isLiked = !dbHelper.isPostLikedByUser(post.getId(), currentUserId);
+            dbHelper.toggleLikeStatus(post.getId(), currentUserId);
+
+            // UI 업데이트
             post.setLiked(isLiked);
-            post.setLikeCount(isLiked ? post.getLikeCount() + 1 : Math.max(post.getLikeCount() - 1, 0));
+            post.setLikeCount(isLiked ? post.getLikeCount() + 1 : post.getLikeCount() - 1);
             notifyItemChanged(position);
         }
     }
