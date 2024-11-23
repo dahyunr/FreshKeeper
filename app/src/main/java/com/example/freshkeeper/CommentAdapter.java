@@ -16,6 +16,7 @@ import com.example.freshkeeper.database.DatabaseHelper;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -112,18 +113,25 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
 
         // 댓글 데이터 바인딩
         void bind(Comment comment, String currentUserId) {
-            // 좋아요 상태 확인
-            boolean isLiked = DatabaseHelper.getInstance(itemView.getContext()).isCommentLikedByUser(comment.getId(), currentUserId);
+            // AtomicBoolean으로 좋아요 상태 관리
+            AtomicBoolean isLiked = new AtomicBoolean(
+                    DatabaseHelper.getInstance(itemView.getContext()).isCommentLikedByUser(comment.getId(), currentUserId)
+            );
 
-            // 좋아요 버튼 업데이트
-            likeButton.setImageResource(isLiked ? R.drawable.fk_heartfff : R.drawable.fk_heart);
+            // 좋아요 버튼 초기 상태 업데이트
+            likeButton.setImageResource(isLiked.get() ? R.drawable.fk_heartfff : R.drawable.fk_heart);
             commentLikeCount.setText(String.valueOf(comment.getLikeCount()));
 
+            // 좋아요 버튼 클릭 리스너
             likeButton.setOnClickListener(view -> {
-                boolean newIsLiked = !isLiked;
-                DatabaseHelper.getInstance(view.getContext()).updateCommentLike(comment.getId(), currentUserId, newIsLiked);
+                boolean newIsLiked = !isLiked.get(); // 현재 상태 반전
+                DatabaseHelper db = DatabaseHelper.getInstance(view.getContext());
 
-                // 좋아요 상태와 UI 업데이트
+                // 데이터베이스에서 좋아요 상태 업데이트
+                db.updateCommentLike(comment.getId(), currentUserId, newIsLiked);
+
+                // 좋아요 상태 및 UI 업데이트
+                isLiked.set(newIsLiked); // AtomicBoolean 값 변경
                 likeButton.setImageResource(newIsLiked ? R.drawable.fk_heartfff : R.drawable.fk_heart);
                 comment.setLikeCount(comment.getLikeCount() + (newIsLiked ? 1 : -1));
                 commentLikeCount.setText(String.valueOf(comment.getLikeCount()));

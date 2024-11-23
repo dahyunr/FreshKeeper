@@ -1039,13 +1039,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             Log.e("DatabaseHelper", "댓글 좋아요 업데이트 오류: " + e.getMessage());
         }
     }
-
     private void updateLikeCount(int commentId) {
         SQLiteDatabase db = getDatabase();
         String query = "SELECT COUNT(*) FROM comment_likes WHERE comment_id = ?";
         Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(commentId)});
         if (cursor.moveToFirst()) {
-            int likeCount = cursor.getInt(0);
+            int likeCount = cursor.getInt(0); // 현재 좋아요 개수
             ContentValues values = new ContentValues();
             values.put("likeCount", likeCount);
             db.update("comments", values, "comment_id = ?", new String[]{String.valueOf(commentId)});
