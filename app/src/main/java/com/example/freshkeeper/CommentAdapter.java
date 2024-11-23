@@ -11,14 +11,20 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.freshkeeper.database.DatabaseHelper;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+
+
 public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentViewHolder> {
-    private List<Comment> commentList;
-    private Set<Integer> likedComments; // 좋아요 상태를 저장하는 Set (댓글 ID 기준)
+    private final List<Comment> commentList;
+    private final Set<Integer> likedComments;
+
     private OnCommentInteractionListener interactionListener; // 좋아요 이벤트 리스너
 
     // 생성자
@@ -70,8 +76,11 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
     // ViewHolder 바인딩
     @Override
     public void onBindViewHolder(@NonNull CommentViewHolder holder, int position) {
+        SharedPreferences sharedPreferences = holder.itemView.getContext().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
+        String currentUserId = sharedPreferences.getString("userId", "default_user_id");
+
         Comment comment = commentList.get(position);
-        holder.bind(comment);
+        holder.bind(comment, currentUserId);
     }
 
     @Override
@@ -102,31 +111,28 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
         }
 
         // 댓글 데이터 바인딩
-        void bind(Comment comment) {
-            // 댓글 내용 설정
-            commentTextView.setText(comment.getContent());
+        void bind(Comment comment, String currentUserId) {
+            // 좋아요 상태 확인
+            boolean isLiked = DatabaseHelper.getInstance(itemView.getContext()).isCommentLikedByUser(comment.getId(), currentUserId);
 
-            // 댓글 작성자 이름 설정
-            commenterNameTextView.setText(comment.getCommenterName() != null ? comment.getCommenterName() : "익명 사용자");
-
-            // 댓글 작성자 아이콘 설정 (Glide 사용)
-            if (comment.getCommenterIcon() != null && !comment.getCommenterIcon().isEmpty()) {
-                Glide.with(itemView.getContext())
-                        .load(comment.getCommenterIcon())
-                        .placeholder(R.drawable.fk_mmm) // 기본 아이콘
-                        .error(R.drawable.fk_mmm)      // 에러 발생 시 기본 아이콘
-                        .into(commenterIconImageView);
-            } else {
-                commenterIconImageView.setImageResource(R.drawable.fk_mmm);
-            }
-
-            // 좋아요 버튼 이미지 및 좋아요 수 설정
-            if (likedComments.contains(comment.getId())) {
-                likeButton.setImageResource(R.drawable.fk_heartfff); // 채워진 하트
-            } else {
-                likeButton.setImageResource(R.drawable.fk_heart); // 빈 하트
-            }
+            // 좋아요 버튼 업데이트
+            likeButton.setImageResource(isLiked ? R.drawable.fk_heartfff : R.drawable.fk_heart);
             commentLikeCount.setText(String.valueOf(comment.getLikeCount()));
+
+            likeButton.setOnClickListener(view -> {
+                boolean newIsLiked = !isLiked;
+                DatabaseHelper.getInstance(view.getContext()).updateCommentLike(comment.getId(), currentUserId, newIsLiked);
+
+                // 좋아요 상태와 UI 업데이트
+                likeButton.setImageResource(newIsLiked ? R.drawable.fk_heartfff : R.drawable.fk_heart);
+                comment.setLikeCount(comment.getLikeCount() + (newIsLiked ? 1 : -1));
+                commentLikeCount.setText(String.valueOf(comment.getLikeCount()));
+
+                // 리스너 호출
+                if (interactionListener != null) {
+                    interactionListener.onLikeClicked(comment);
+                }
+            });
         }
 
         private void onLikeClick(View view) {
@@ -140,11 +146,17 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
                 likedComments.remove(comment.getId());
                 comment.setLikeCount(comment.getLikeCount() - 1); // 좋아요 수 감소
                 likeButton.setImageResource(R.drawable.fk_heart); // 빈 하트로 변경
+
+                // 데이터베이스에 반영
+                DatabaseHelper.getInstance(view.getContext()).updateLikeCount(comment.getId(), false);
             } else {
                 // 좋아요 추가
                 likedComments.add(comment.getId());
                 comment.setLikeCount(comment.getLikeCount() + 1); // 좋아요 수 증가
                 likeButton.setImageResource(R.drawable.fk_heartfff); // 채워진 하트로 변경
+
+                // 데이터베이스에 반영
+                DatabaseHelper.getInstance(view.getContext()).updateLikeCount(comment.getId(), true);
             }
 
             // 좋아요 수 갱신

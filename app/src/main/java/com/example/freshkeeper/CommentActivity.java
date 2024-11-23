@@ -20,7 +20,9 @@ import com.bumptech.glide.Glide;
 import com.example.freshkeeper.database.DatabaseHelper;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class CommentActivity extends BaseActivity {
     private RecyclerView commentRecyclerView;
@@ -32,6 +34,8 @@ public class CommentActivity extends BaseActivity {
     private TextView postTitle, postAuthor, postContent, noCommentsTextView;
     private SharedPreferences sharedPreferences;
     private int postId;
+    private Set<Integer> likedComments = new HashSet<>(); // 초기화 추가
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -176,27 +180,21 @@ public class CommentActivity extends BaseActivity {
      * 댓글 데이터 로드 메서드
      */
     private void loadComments(int postId) {
-        commentList = dbHelper.getCommentsByPostId(postId);
+        SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+        String currentUserId = sharedPreferences.getString("userId", "default_user_id");
 
-        if (commentList == null || commentList.isEmpty()) {
-            commentList = new ArrayList<>();
-            noCommentsTextView.setVisibility(View.VISIBLE);
-        } else {
-            noCommentsTextView.setVisibility(View.GONE);
-        }
+        commentList = dbHelper.getCommentsByPostId(postId);
 
         if (commentAdapter == null) {
             commentAdapter = new CommentAdapter(commentList, comment -> {
-                // 좋아요 클릭 이벤트 처리
-                Log.d("CommentActivity", "좋아요 클릭: " + comment.getId());
-                // 필요 시 서버로 좋아요 상태 전송 로직 추가
+                // 필요 시 좋아요 클릭 이벤트 추가
             });
             commentRecyclerView.setAdapter(commentAdapter);
         } else {
             commentAdapter.updateCommentList(commentList);
         }
 
-        Log.d("CommentActivity", "댓글 로드 완료: 총 " + commentList.size() + "개");
+        noCommentsTextView.setVisibility(commentList.isEmpty() ? View.VISIBLE : View.GONE);
     }
 
     /**
