@@ -14,7 +14,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class BaseActivity extends AppCompatActivity {
 
-    // SharedPreferences 선언
     private SharedPreferences sharedPreferences;
 
     @Override
@@ -24,11 +23,11 @@ public class BaseActivity extends AppCompatActivity {
         // SharedPreferences 초기화
         sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
 
-        // 상태바와 네비게이션 바 숨기기 설정
+        // 상태바와 네비게이션 바 숨기기
         hideSystemBars();
     }
 
-    // 상태바와 네비게이션 바 숨기기 메소드
+    // 상태바와 네비게이션 바 숨기기
     private void hideSystemBars() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             getWindow().setDecorFitsSystemWindows(false);
@@ -50,7 +49,7 @@ public class BaseActivity extends AppCompatActivity {
 
     // 하단 네비게이션 바 클릭 리스너 설정
     protected void setupFooterNavigation() {
-        // 하단바 아이콘들을 findViewById를 통해 연결합니다.
+        // 하단바 아이콘 초기화
         ImageView iconRef = findViewById(R.id.icon_ref);
         ImageView iconCalendar = findViewById(R.id.icon_calendar);
         ImageView iconBarcode = findViewById(R.id.icon_barcode);
@@ -71,10 +70,15 @@ public class BaseActivity extends AppCompatActivity {
 
         if (iconCommunity != null) {
             iconCommunity.setOnClickListener(view -> {
-                if (!(this instanceof CommunityActivity)) {
+                boolean isLoggedIn = sharedPreferences.getBoolean("isLoggedIn", false);
+                boolean isGuest = sharedPreferences.getBoolean("isGuest", false);
+
+                if (isLoggedIn && !isGuest) {
+                    // 회원만 접근 가능
                     navigateToActivity(CommunityActivity.class);
                 } else {
-                    Toast.makeText(this, "이미 커뮤니티에 있습니다", Toast.LENGTH_SHORT).show();
+                    // 비회원 및 게스트 로그인 차단
+                    showLoginRequiredMessage();
                 }
             });
         }
@@ -90,29 +94,30 @@ public class BaseActivity extends AppCompatActivity {
         }
     }
 
+    // 커뮤니티 접근 제한 시 메시지
+    private void showLoginRequiredMessage() {
+        Toast.makeText(this, "회원만 이용 가능한 서비스입니다. 로그인 후 이용해주세요.", Toast.LENGTH_LONG).show();
+    }
+
     // 액티비티 전환 메소드
     protected void navigateToActivity(Class<?> targetActivity) {
         Intent intent = new Intent(this, targetActivity);
-        // 중복 인스턴스를 방지하기 위해 플래그 설정
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         startActivity(intent);
-        // 애니메이션 없이 화면 전환
         overridePendingTransition(0, 0);
     }
 
-    // 사용자 닉네임 가져오기 메소드
+    // 사용자 닉네임 가져오기
     protected String getUserNickname() {
         if (sharedPreferences == null) {
-            // SharedPreferences가 초기화되지 않았을 경우 기본값 반환
             return "익명 사용자";
         }
         return sharedPreferences.getString("userName", "익명 사용자");
     }
 
-    // 사용자 아이콘 가져오기 메소드
+    // 사용자 아이콘 가져오기
     protected String getUserIcon() {
         if (sharedPreferences == null) {
-            // SharedPreferences가 초기화되지 않았을 경우 기본값 반환
             return "fk_mmm";
         }
         return sharedPreferences.getString("userIcon", "fk_mmm");

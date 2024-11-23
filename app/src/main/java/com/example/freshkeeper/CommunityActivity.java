@@ -9,9 +9,11 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -32,7 +34,6 @@ public class CommunityActivity extends BaseActivity {
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
                 if (result.getResultCode() == RESULT_OK && result.getData() != null) {
-                    // 새 게시글 작성 후 데이터 처리
                     Log.d("CommunityActivity", "게시글 작성 완료 후 결과 처리");
                     loadCommunityPosts(); // 게시글을 새로 로드하여 즉시 반영
                 }
@@ -48,7 +49,6 @@ public class CommunityActivity extends BaseActivity {
                     int deletedPostId = result.getData().getIntExtra("deletedPostId", -1);
 
                     if (postDeleted) {
-                        // 삭제된 게시글을 리스트에서 제거
                         for (int i = 0; i < postList.size(); i++) {
                             if (postList.get(i).getId() == deletedPostId) {
                                 postList.remove(i);
@@ -61,21 +61,6 @@ public class CommunityActivity extends BaseActivity {
                 }
             }
     );
-
-    @Override
-    protected void setupFooterNavigation() {
-        findViewById(R.id.icon_ref).setOnClickListener(view -> navigateTo(FkmainActivity.class));
-        findViewById(R.id.icon_calendar).setOnClickListener(view -> navigateTo(CalendarActivity.class));
-        findViewById(R.id.icon_barcode).setOnClickListener(view -> navigateTo(BarcodeScanActivity.class));
-        findViewById(R.id.icon_community).setOnClickListener(null); // 현재 페이지 유지
-        findViewById(R.id.icon_mypage).setOnClickListener(view -> navigateTo(MypageActivity.class));
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        loadCommunityPosts(); // 삭제된 게시글 반영을 위해 리스트 새로 로드
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,6 +76,51 @@ public class CommunityActivity extends BaseActivity {
         setupFooterNavigation();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadCommunityPosts(); // 삭제된 게시글 반영을 위해 리스트 새로 로드
+    }
+
+    @Override
+    protected void setupFooterNavigation() {
+        findViewById(R.id.icon_ref).setOnClickListener(view -> navigateTo(FkmainActivity.class));
+        findViewById(R.id.icon_calendar).setOnClickListener(view -> navigateTo(CalendarActivity.class));
+        findViewById(R.id.icon_barcode).setOnClickListener(view -> navigateTo(BarcodeScanActivity.class));
+
+        // 커뮤니티 버튼 클릭 이벤트
+        findViewById(R.id.icon_community).setOnClickListener(view -> {
+            SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+            boolean isLoggedIn = sharedPreferences.getBoolean("isLoggedIn", false);
+            boolean isGuest = sharedPreferences.getBoolean("isGuest", false);
+
+            if (isLoggedIn && !isGuest) {
+                // 회원만 접근 가능
+                navigateTo(CommunityActivity.class);
+            } else {
+                // 비회원 차단
+                showLoginRequiredMessage();
+            }
+        });
+
+        findViewById(R.id.icon_mypage).setOnClickListener(view -> navigateTo(MypageActivity.class));
+    }
+
+    private void showLoginRequiredMessage() {
+        Toast.makeText(this, "회원만 이용 가능한 서비스입니다. 로그인 후 이용해주세요.", Toast.LENGTH_LONG).show();
+
+        // 선택적으로 다이얼로그 추가
+        new AlertDialog.Builder(this)
+                .setTitle("로그인 필요")
+                .setMessage("커뮤니티 서비스를 이용하려면 로그인이 필요합니다. 로그인 하시겠습니까?")
+                .setPositiveButton("로그인", (dialog, which) -> {
+                    Intent intent = new Intent(this, LoginActivity.class);
+                    startActivity(intent);
+                })
+                .setNegativeButton("취소", null)
+                .show();
+    }
+
     private void setupRecyclerView() {
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -98,7 +128,6 @@ public class CommunityActivity extends BaseActivity {
         communityAdapter = new CommunityAdapter(this, postList);
         recyclerView.setAdapter(communityAdapter);
 
-        // 게시글 클릭 시 댓글 페이지로 이동하는 리스너 설정
         communityAdapter.setOnItemClickListener(post -> {
             Intent intent = new Intent(CommunityActivity.this, CommentActivity.class);
             intent.putExtra("postId", post.getId());
@@ -106,7 +135,7 @@ public class CommunityActivity extends BaseActivity {
             intent.putExtra("postContent", post.getContent());
             intent.putExtra("postAuthor", post.getAuthorName());
             intent.putExtra("postImageUri", post.getFirstImageUri());
-            commentActivityLauncher.launch(intent); // CommentActivity 실행
+            commentActivityLauncher.launch(intent);
         });
     }
 
@@ -114,14 +143,15 @@ public class CommunityActivity extends BaseActivity {
         ImageView plusButton = findViewById(R.id.plus_button);
         SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
         boolean isLoggedIn = sharedPreferences.getBoolean("isLoggedIn", false);
+        boolean isGuest = sharedPreferences.getBoolean("isGuest", false); // 게스트 여부 확인
 
-        if (!isLoggedIn) {
+        if (!isLoggedIn || isGuest) {
             plusButton.setEnabled(false);
             plusButton.setVisibility(View.GONE);
         } else {
             plusButton.setOnClickListener(view -> {
                 Intent intent = new Intent(CommunityActivity.this, WritePostActivity.class);
-                writePostLauncher.launch(intent); // 게시글 작성 페이지 실행
+                writePostLauncher.launch(intent);
             });
         }
     }
@@ -147,14 +177,14 @@ public class CommunityActivity extends BaseActivity {
     }
 
     private void filterPosts(String query) {
-        List<CommunityPost> filteredList = dbHelper.searchPosts(query); // 데이터베이스에서 검색
+        List<CommunityPost> filteredList = new ArrayList<>();
         for (CommunityPost post : postList) {
             if (post.getTitle().toLowerCase().contains(query.toLowerCase()) ||
                     post.getContent().toLowerCase().contains(query.toLowerCase())) {
                 filteredList.add(post);
             }
         }
-        communityAdapter.updateData(filteredList); // 검색 결과로 RecyclerView 업데이트
+        communityAdapter.updateData(filteredList);
     }
 
     private void navigateTo(Class<?> activityClass) {
