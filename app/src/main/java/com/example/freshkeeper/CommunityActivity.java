@@ -147,14 +147,14 @@ public class CommunityActivity extends BaseActivity {
     }
 
     private void filterPosts(String query) {
-        List<CommunityPost> filteredList = new ArrayList<>();
+        List<CommunityPost> filteredList = dbHelper.searchPosts(query); // 데이터베이스에서 검색
         for (CommunityPost post : postList) {
             if (post.getTitle().toLowerCase().contains(query.toLowerCase()) ||
                     post.getContent().toLowerCase().contains(query.toLowerCase())) {
                 filteredList.add(post);
             }
         }
-        communityAdapter.updateData(filteredList);
+        communityAdapter.updateData(filteredList); // 검색 결과로 RecyclerView 업데이트
     }
 
     private void navigateTo(Class<?> activityClass) {

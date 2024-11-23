@@ -969,15 +969,46 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public List<CommunityPost> searchPosts(String keyword) {
         List<CommunityPost> posts = new ArrayList<>();
         SQLiteDatabase db = getReadableDatabase();
-        String query = "SELECT * FROM community_posts WHERE title LIKE ? OR content LIKE ? ORDER BY post_id DESC";
-        Cursor cursor = db.rawQuery(query, new String[]{"%" + keyword + "%", "%" + keyword + "%"});
 
-        while (cursor.moveToNext()) {
-            posts.add(getCommunityPostFromCursor(cursor));
+        // SQL 쿼리: 제목 또는 내용에 키워드가 포함된 게시글 검색
+        String query = "SELECT * FROM " + COMMUNITY_POSTS_TABLE_NAME +
+                " WHERE " + POST_COLUMN_TITLE + " LIKE ? OR " + POST_COLUMN_CONTENT + " LIKE ?" +
+                " ORDER BY " + POST_COLUMN_ID + " DESC";
+        String[] args = {"%" + keyword + "%", "%" + keyword + "%"};
+
+        Cursor cursor = db.rawQuery(query, args);
+        try {
+            while (cursor.moveToNext()) {
+                // Cursor에서 데이터 읽기
+                int id = cursor.getInt(cursor.getColumnIndexOrThrow(POST_COLUMN_ID));
+                String title = cursor.getString(cursor.getColumnIndexOrThrow(POST_COLUMN_TITLE));
+                String content = cursor.getString(cursor.getColumnIndexOrThrow(POST_COLUMN_CONTENT));
+                String imageUri = cursor.getString(cursor.getColumnIndexOrThrow(POST_COLUMN_IMAGE_URI));
+                String userId = cursor.getString(cursor.getColumnIndexOrThrow(POST_COLUMN_USER_ID));
+                int likeCount = cursor.getInt(cursor.getColumnIndexOrThrow(POST_COLUMN_LIKE_COUNT));
+                int commentCount = cursor.getInt(cursor.getColumnIndexOrThrow(POST_COLUMN_COMMENT_COUNT));
+                String authorName = cursor.getString(cursor.getColumnIndexOrThrow("author_name"));
+                String authorIcon = cursor.getString(cursor.getColumnIndexOrThrow("author_icon"));
+
+                List<String> imageUris = (imageUri != null && !imageUri.isEmpty())
+                        ? Arrays.asList(imageUri.split(","))
+                        : new ArrayList<>();
+
+                // CommunityPost 객체 생성 및 리스트에 추가
+                CommunityPost post = new CommunityPost(id, title, content, imageUris, userId, likeCount, commentCount, false, authorName, authorIcon);
+                posts.add(post);
+            }
+        } catch (Exception e) {
+            Log.e("DatabaseHelper", "검색 중 오류 발생: " + e.getMessage());
+        } finally {
+            if (cursor != null && !cursor.isClosed()) {
+                cursor.close();
+            }
         }
-        cursor.close();
+
         return posts;
     }
+
 
     // DatabaseHelper.java
 
