@@ -27,7 +27,7 @@ public class CommunityPost {
         this.likeCount = likeCount;
         this.commentCount = commentCount;
         this.isLiked = isLiked;
-        this.authorName = authorName != null ? authorName : "익명 사용자"; // Default to anonymous if null
+        this.authorName = authorName != null ? authorName : "익명"; // Default to anonymous if null
         this.authorIcon = authorIcon != null ? authorIcon : "fk_mmm"; // Default to "fk_mmm" if null
     }
 
@@ -125,11 +125,11 @@ public class CommunityPost {
     }
 
     public String getAuthorName() {
-        return authorName != null && !authorName.isEmpty() ? authorName : "익명 사용자";
+        return authorName != null && !authorName.isEmpty() ? authorName : "익명";
     }
 
     public void setAuthorName(String authorName) {
-        this.authorName = authorName != null ? authorName : "익명 사용자";
+        this.authorName = authorName != null ? authorName : "익명";
     }
 
     public String getAuthorIcon() {
