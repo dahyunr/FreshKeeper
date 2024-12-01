@@ -22,5 +22,7 @@
     <color name="black">#000000</color>
     <color name="tab_active">#65B120</color>
     <color name="light_gray">#D3D3D3</color>
-    <color name="tab_default_color">#FF5733</color>
+    <color name="tab_default_color">#65B120</color>
+    <color name="selected_tab_border_color">#FF0000</color>
+    <color name="unselected_tab_border_color">#CCCCCC</color>
 </resources>

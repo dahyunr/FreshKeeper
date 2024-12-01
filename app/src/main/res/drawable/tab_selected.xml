@@ -1,0 +1,5 @@
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@color/tab_selected"/>
+    <stroke android:color="@color/tab_active" android:width="2dp"/>
+    <corners android:radius="10dp"/>
+</shape>

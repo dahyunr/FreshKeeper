@@ -270,12 +270,14 @@ public class FkmainActivity extends BaseActivity {
     }
 
     private void activateTab(Button activeTab) {
-        tabAll.setBackgroundColor(getResources().getColor(android.R.color.transparent));
-        tabFrozen.setBackgroundColor(getResources().getColor(android.R.color.transparent));
-        tabRefrigerated.setBackgroundColor(getResources().getColor(android.R.color.transparent));
-        tabRoomTemp.setBackgroundColor(getResources().getColor(android.R.color.transparent));
+        // 기본 상태로 모든 탭의 배경을 설정
+        tabAll.setSelected(false);
+        tabFrozen.setSelected(false);
+        tabRefrigerated.setSelected(false);
+        tabRoomTemp.setSelected(false);
 
-        activeTab.setBackgroundColor(getResources().getColor(R.color.tab_active));
+        // 선택된 탭은 배경을 채우고, 테두리는 그대로
+        activeTab.setSelected(true);
     }
 
     private void loadItemsFromDatabase() {
