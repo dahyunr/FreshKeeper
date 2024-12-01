@@ -1,16 +1,16 @@
 pluginManagement {
     repositories {
         gradlePluginPortal()
-        google()
-        mavenCentral()
+        google() // Google Maven Repository
+        mavenCentral() // Maven Central Repository
     }
 }
 
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
     repositories {
-        google()
-        mavenCentral()
+        google() // Google Maven Repository
+        mavenCentral() // Maven Central Repository
         maven { url = uri("https://jitpack.io") } // JitPack 추가
     }
 }

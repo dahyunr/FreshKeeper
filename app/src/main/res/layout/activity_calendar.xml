@@ -59,7 +59,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_below="@id/compactcalendar_view"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="0dp"
         android:layout_above="@id/footer"
         android:layout_weight="1"
         android:padding="8dp" />
